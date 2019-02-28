@@ -1,0 +1,20 @@
+# Install numpy
+numpy
+
+# Install pandas
+pandas
+
+# Install pytest
+pytest
+
+# Install numba
+numba
+
+# Install quantum-systems
+git+https://github.com/Schoyen/quantum-systems.git
+
+# Install matplotlib for plotting of scripts
+matplotlib
+
+# Install black
+black
