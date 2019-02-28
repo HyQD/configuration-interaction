@@ -1,6 +1,12 @@
 # Install numpy
 numpy
 
+# Install scipy
+scipy
+
+# Install sympy
+sympy
+
 # Install pandas
 pandas
 
