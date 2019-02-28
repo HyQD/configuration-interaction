@@ -8,7 +8,7 @@ h_01 = 0x0101_0101_0101_0101
 
 
 @numba.njit(cache=True)
-def popcount_32(num):
+def popcount_64(num):
     # Implementation of the Hamming weight algorithm shown here:
     # https://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
 
