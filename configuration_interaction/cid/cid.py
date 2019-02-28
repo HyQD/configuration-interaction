@@ -11,7 +11,9 @@ class CID(ConfigurationInteraction):
 
         np = self.np
 
-        self.num_states = self.m * (self.m - 1) // 2 + 1
+        self.num_states = (
+            self.n * (self.n - 1) // 2 * self.m * (self.m - 1) // 2 + 1
+        )
 
         if self.verbose:
             print("Number of states to create: {0}".format(self.num_states))
