@@ -2,6 +2,17 @@ import numba
 
 
 @numba.njit(cache=True)
+def popcount_32(num):
+    count = 0
+
+    while num > 0:
+        num &= num - 1
+        count += 1
+
+    return count
+
+
+@numba.njit(cache=True)
 def create_reference_state(n, l, states):
     ref_index = 0
 
