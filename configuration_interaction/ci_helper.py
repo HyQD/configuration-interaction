@@ -1,9 +1,22 @@
 import numba
 
+# Const used by the Hamming weight algorithm
+m_1 = 0x5555_5555_5555_5555
+m_2 = 0x3333_3333_3333_3333
+m_4 = 0x0F0F_0F0F_0F0F_0F0F
+h_01 = 0x0101_0101_0101_0101
+
 
 @numba.njit(cache=True)
 def popcount_32(num):
-    count = 0
+    # Implementation of the Hamming weight algorithm shown here:
+    # https://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
+
+    num -= (num >> 1) & m_1
+    num = (num & m_2) + ((num >> 2) & m_2)
+    num = (num + (num >> 4)) & m_4
+
+    return (num * h_01) >> 56
 
     while num > 0:
         num &= num - 1
