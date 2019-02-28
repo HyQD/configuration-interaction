@@ -1,4 +1,8 @@
 from configuration_interaction.ci import ConfigurationInteraction
+from configuration_interaction.ci_helper import (
+    create_reference_state,
+    create_doubles_states,
+)
 
 
 class CID(ConfigurationInteraction):
@@ -7,8 +11,7 @@ class CID(ConfigurationInteraction):
 
         np = self.np
 
-        self.num_states = self.n * (self.n - 1) // 2
-        self.num_states *= self.l * (self.l - 1) // 2
+        self.num_states = self.m * (self.m - 1) // 2 + 1
 
         if self.verbose:
             print("Number of states to create: {0}".format(self.num_states))
@@ -26,4 +29,5 @@ class CID(ConfigurationInteraction):
         self.states = np.zeros(shape, dtype=np.uint32)
 
     def setup_ci_space(self):
-        pass
+        create_reference_state(self.n, self.l, self.states)
+        create_doubles_states(self.n, self.l, self.states, 1)
