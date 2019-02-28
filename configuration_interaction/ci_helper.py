@@ -18,11 +18,27 @@ def popcount_64(num):
 
     return (num * h_01) >> 56
 
-    while num > 0:
-        num &= num - 1
-        count += 1
 
-    return count
+@numba.njit(cache=True)
+def get_diff_lists(states):
+    diff_by_one_list = []
+    diff_by_two_list = []
+
+    for i in range(len(states)):
+        for j in range(i + 1, len(states)):
+            diff = states[i] ^ states[j]
+
+            num_bits = 0
+
+            for elem in diff:
+                num_bits += popcount_64(elem)
+
+            if num_bits == 2:
+                diff_by_one_list.append((i, j))
+            elif num_bits == 4:
+                diff_by_two_list.append((i, j))
+
+    return diff_by_one_list, diff_by_two_list
 
 
 @numba.njit(cache=True)
