@@ -1,4 +1,4 @@
-from configuration_interaction.cid import CID
+from configuration_interaction import CID
 
 
 def test_setup(odho_ti_small):
