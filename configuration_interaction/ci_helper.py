@@ -106,3 +106,18 @@ def compute_sign(state, p):
         k += (state[elem_i] >> (i - elem_i * BITSTRING_SIZE)) & 1
 
     return (-1) ** k
+
+
+@numba.njit(cache=True)
+def create_particle(state, p):
+    elem_p = p // BITSTRING_SIZE
+
+    sign = compute_sign(state, p)
+    new_state = state.copy()
+
+    new_state[elem_p] ^= 1 << (p - elem_p * BITSTRING_SIZE)
+
+    if new_state[elem_p] & (1 << (p - elem_p * BITSTRING_SIZE)) == 0:
+        sign = 0
+
+    return new_state, sign

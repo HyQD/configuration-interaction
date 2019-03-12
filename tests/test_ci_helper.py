@@ -1,6 +1,10 @@
 import numpy as np
 
-from configuration_interaction.ci_helper import popcount_64, compute_sign
+from configuration_interaction.ci_helper import (
+    popcount_64,
+    compute_sign,
+    create_particle,
+)
 
 
 def test_popcount_64():
@@ -59,3 +63,25 @@ def test_sign():
     assert compute_sign(extended, 33) == -1
     assert compute_sign(extended, 34) == -1
     assert compute_sign(extended, 35) == 1
+
+
+def test_create_particle():
+    det = np.array([0, 0]).astype(np.uint32)
+
+    new_det, new_sign = create_particle(det, 0)
+    assert new_sign == 1
+    assert new_det[0] == 1
+
+    new_det, new_sign = create_particle(new_det, 1)
+    assert new_sign == -1
+    assert new_det[0] == 0b11
+
+    new_det, new_sign = create_particle(new_det, 32)
+    assert new_sign == 1
+    assert new_det[0] == 0b11
+    assert new_det[1] == 0b1
+
+    new_det, new_sign = create_particle(new_det, 32)
+    assert new_sign == 0
+    assert new_det[0] == 0b11
+    assert new_det[1] == 0
