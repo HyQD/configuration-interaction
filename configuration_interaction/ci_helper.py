@@ -94,7 +94,7 @@ def create_doubles_states(n, l, states):
 
 
 @numba.njit(cache=True)
-def sign(state, p):
+def compute_sign(state, p):
     elem_i = 0
     k = 0
 
