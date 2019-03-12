@@ -4,6 +4,7 @@ from configuration_interaction.ci_helper import (
     popcount_64,
     compute_sign,
     create_particle,
+    annihilate_particle,
 )
 
 
@@ -85,3 +86,29 @@ def test_create_particle():
     assert new_sign == 0
     assert new_det[0] == 0b11
     assert new_det[1] == 0
+
+
+def test_annihilate_particle():
+    det = np.array([0b11, 0b101]).astype(np.uint32)
+
+    new_det, new_sign = annihilate_particle(det, 0)
+    assert new_sign == 1
+    assert new_det[0] == 0b10
+
+    new_det, new_sign = annihilate_particle(new_det, 0)
+    assert new_sign == 0
+    assert new_det[0] == 0b11
+
+    new_det, new_sign = annihilate_particle(new_det, 1)
+    assert new_sign == -1
+    assert new_det[0] == 0b1
+
+    new_det, new_sign = annihilate_particle(new_det, 32)
+    assert new_sign == -1
+    assert new_det[0] == 0b1
+    assert new_det[1] == 0b100
+
+    new_det, new_sign = annihilate_particle(new_det, 34)
+    assert new_sign == -1
+    assert new_det[0] == 0b1
+    assert new_det[1] == 0b0

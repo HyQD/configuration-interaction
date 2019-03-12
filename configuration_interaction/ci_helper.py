@@ -121,3 +121,18 @@ def create_particle(state, p):
         sign = 0
 
     return new_state, sign
+
+
+@numba.njit(cache=True)
+def annihilate_particle(state, p):
+    elem_p = p // BITSTRING_SIZE
+
+    sign = compute_sign(state, p)
+    new_state = state.copy()
+
+    new_state[elem_p] ^= 1 << (p - elem_p * BITSTRING_SIZE)
+
+    if new_state[elem_p] & (1 << (p - elem_p * BITSTRING_SIZE)) != 0:
+        sign = 0
+
+    return new_state, sign
