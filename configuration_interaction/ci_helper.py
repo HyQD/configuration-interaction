@@ -91,3 +91,18 @@ def create_doubles_states(n, l, states):
                     states[index, elem_b] |= 1 << (b - elem_b * BITSTRING_SIZE)
 
                     index += 1
+
+
+@numba.njit(cache=True)
+def sign(state, p):
+    elem_i = 0
+    k = 0
+
+    for i in range(p):
+
+        if (i - elem_i * BITSTRING_SIZE) >= BITSTRING_SIZE:
+            elem_i += 1
+
+        k += (state[elem_i] >> (i - elem_i * BITSTRING_SIZE)) & 1
+
+    return (-1) ** k
