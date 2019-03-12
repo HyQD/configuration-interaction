@@ -37,5 +37,5 @@ class CID(ConfigurationInteraction):
 
     def setup_ci_space(self):
         create_reference_state(self.n, self.l, self.states)
-        create_doubles_states(self.n, self.l, self.states, 1)
+        create_doubles_states(self.n, self.l, self.states)
         diff_by_one, diff_by_two = get_diff_lists(self.states)

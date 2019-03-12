@@ -58,7 +58,9 @@ def create_reference_state(n, l, states):
 
 
 @numba.njit(cache=True)
-def create_singles_states(n, l, states, index):
+def create_singles_states(n, l, states):
+    index = 1
+
     for i in range(n):
         elem_i = i // BITSTRING_SIZE
         for a in range(n, l):
@@ -71,7 +73,9 @@ def create_singles_states(n, l, states, index):
 
 
 @numba.njit(cache=True)
-def create_doubles_states(n, l, states, index):
+def create_doubles_states(n, l, states):
+    index = 1
+
     for i in range(n):
         elem_i = i // BITSTRING_SIZE
         for j in range(i + 1, n):
