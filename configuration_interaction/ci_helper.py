@@ -1,4 +1,8 @@
 import numba
+import numpy as np
+
+BITTYPE = np.uint32
+BITSTRING_SIZE = np.dtype(BITTYPE).itemsize
 
 # Const used by the Hamming weight algorithm
 m_1 = 0x5555_5555_5555_5555
@@ -46,8 +50,8 @@ def create_reference_state(n, l, states):
     ref_index = 0
 
     for i in range(n):
-        elem = i // 32
-        states[ref_index, elem] |= 1 << (i - elem * 32)
+        elem = i // BITSTRING_SIZE
+        states[ref_index, elem] |= 1 << (i - elem * BITSTRING_SIZE)
 
     for i in range(ref_index + 1, len(states)):
         states[i] += states[ref_index]
@@ -56,17 +60,17 @@ def create_reference_state(n, l, states):
 @numba.njit(cache=True)
 def create_doubles_states(n, l, states, index):
     for i in range(n):
-        elem_i = i // 32
+        elem_i = i // BITSTRING_SIZE
         for j in range(i + 1, n):
-            elem_j = j // 32
+            elem_j = j // BITSTRING_SIZE
             for a in range(n, l):
-                elem_a = a // 32
+                elem_a = a // BITSTRING_SIZE
                 for b in range(a + 1, l):
-                    elem_b = b // 32
+                    elem_b = b // BITSTRING_SIZE
 
-                    states[index, elem_i] ^= 1 << (i - elem_i * 32)
-                    states[index, elem_j] ^= 1 << (j - elem_j * 32)
-                    states[index, elem_a] |= 1 << (a - elem_a * 32)
-                    states[index, elem_b] |= 1 << (b - elem_b * 32)
+                    states[index, elem_i] ^= 1 << (i - elem_i * BITSTRING_SIZE)
+                    states[index, elem_j] ^= 1 << (j - elem_j * BITSTRING_SIZE)
+                    states[index, elem_a] |= 1 << (a - elem_a * BITSTRING_SIZE)
+                    states[index, elem_b] |= 1 << (b - elem_b * BITSTRING_SIZE)
 
                     index += 1
