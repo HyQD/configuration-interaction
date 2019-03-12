@@ -136,3 +136,25 @@ def annihilate_particle(state, p):
         sign = 0
 
     return new_state, sign
+
+
+@numba.njit(cache=True)
+def evaluate_one_body_overlap(state_i, state_j, p, q):
+    """Function evaluating the overlap
+
+        O_{IJ} = <\Phi_I| c_{p}^{\dagger} c_{q} |\Phi_J>,
+
+    that is, the overlap between two Slater determinants acted upon by a
+    creation and an annihilation operator."""
+
+    q_state, sign_q = annihilate_particle(state_j, q)
+
+    if sign_q == 0:
+        return 0
+
+    p_state, sign_p = create_particle(q_state, p)
+
+    if sign_p == 0:
+        return 0
+
+    return sign_p * sign_q

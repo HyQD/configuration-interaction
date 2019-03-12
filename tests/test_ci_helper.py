@@ -5,6 +5,7 @@ from configuration_interaction.ci_helper import (
     compute_sign,
     create_particle,
     annihilate_particle,
+    evaluate_one_body_overlap,
 )
 
 
@@ -112,3 +113,8 @@ def test_annihilate_particle():
     assert new_sign == -1
     assert new_det[0] == 0b1
     assert new_det[1] == 0b0
+
+
+def test_one_body_overlap():
+    phi_i = np.array([0b11, 0b101]).astype(np.uint32)
+    phi_j = np.array([0b101, 0b1]).astype(np.uint32)
