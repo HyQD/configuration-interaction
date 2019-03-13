@@ -185,3 +185,40 @@ def evaluate_one_body_overlap(state_i, state_j, p, q):
         return 0
 
     return sign_p * sign_q
+
+
+@numba.njit(cache=True)
+def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
+    """Fnction evaluating the overlap
+
+        O_{IJ} = <\Phi_I| c_{p}^{\dagger} c_{q}^{\dagger} c_{s} c_{r} |\Phi_J>,
+
+    that is, the overlap between two Slater determinants acted upon by a pair of
+    creation and annihilation operators from the second quantized form of a two
+    body operator.
+
+    Note especially the ordering of the ordering of the annihilation operators.
+    """
+
+    state_r, sign_r = annihilate_particle(state_j, r)
+
+    if sign_r == 0:
+        return 0
+
+    state_s, sign_s = annihilate_particle(state_r, s)
+
+    if sign_s == 0:
+        return 0
+
+    state_q, sign_q = create_particle(state_s, q)
+
+    if sign_q == 0:
+        return 0
+
+    state_p, sign_p = create_particle(state_q, p)
+
+    # Check if state_i == state_p
+    if not state_equality(state_i, state_p):
+        return 0
+
+    return sign_p * sign_q * sign_s * sign_r
