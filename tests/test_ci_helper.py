@@ -2,6 +2,8 @@ import numpy as np
 
 from configuration_interaction.ci_helper import (
     popcount_64,
+    state_diff,
+    state_equality,
     compute_sign,
     create_particle,
     annihilate_particle,
@@ -29,6 +31,34 @@ def test_popcount_64():
         assert popcount_64(num) == set_bits
 
         prev_num = num
+
+
+def test_state_diff():
+    zero = np.array([0, 0]).astype(np.uint32)
+    assert state_diff(zero, zero) == 0
+
+    one = np.array([0b1, 0]).astype(np.uint32)
+    assert state_diff(zero, one) == 1
+
+    two = np.array([0b1, 0b1]).astype(np.uint32)
+    assert state_diff(one, two) == 1
+    assert state_diff(two, one) == 1
+    assert state_diff(zero, two) == 2
+
+
+def test_state_equality():
+    zero = np.array([0, 0]).astype(np.uint32)
+    assert state_equality(zero, zero)
+
+    one = np.array([0b1, 0]).astype(np.uint32)
+    assert state_equality(one, one)
+    assert not state_equality(zero, one)
+
+    two = np.array([0b1, 0b1]).astype(np.uint32)
+    assert state_equality(two, two)
+    assert not state_equality(one, two)
+    assert not state_equality(two, one)
+    assert not state_equality(zero, two)
 
 
 def test_sign():
