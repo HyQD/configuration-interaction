@@ -1,7 +1,7 @@
 import numba
 import numpy as np
 
-BITTYPE = np.uint32
+BITTYPE = np.uint64
 BITSTRING_SIZE = np.dtype(BITTYPE).itemsize * 8
 
 # Const used by the Hamming weight algorithm
