@@ -1,4 +1,5 @@
 from configuration_interaction import CIS
+from configuration_interaction.ci_helper import BITSTRING_SIZE
 
 
 def test_setup(odho_ti_small):
@@ -12,7 +13,7 @@ def test_setup(odho_ti_small):
             counter += 1
 
         for elem in reversed(range(len(cis.states[i]))):
-            print(bin(cis.states[i, elem])[2:].zfill(32), end=" ")
+            print(bin(cis.states[i, elem])[2:].zfill(BITSTRING_SIZE), end=" ")
         print()
 
     print(counter, len(cis.states))
