@@ -231,11 +231,9 @@ def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
 
 
 @numba.njit(parallel=True, nogil=True, fastmath=True)
-# @numba.njit(cache=True, fastmath=True)
 def setup_hamiltonian_brute_force(hamiltonian, states, h, u, n, l):
     num_states = len(states)
 
-    # for I in range(num_states):
     for I in numba.prange(num_states):
         state_I = states[I]
         for J in range(I, num_states):
