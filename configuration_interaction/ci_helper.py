@@ -11,7 +11,7 @@ m_4 = 0x0F0F_0F0F_0F0F_0F0F
 h_01 = 0x0101_0101_0101_0101
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def popcount_64(num):
     # Implementation of the Hamming weight algorithm shown here:
     # https://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
@@ -23,7 +23,7 @@ def popcount_64(num):
     return (num * h_01) >> 56
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def state_diff(state_i, state_j):
     """Function computing the difference between state_i and state_j. This is
     done by computing
@@ -43,13 +43,13 @@ def state_diff(state_i, state_j):
     return num_bits
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def state_equality(state_i, state_j):
     """Function checking if state_i == state_j."""
     return state_diff(state_i, state_j) == 0
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def get_diff_lists(states):
     diff_by_one_list = []
     diff_by_two_list = []
@@ -71,7 +71,7 @@ def get_diff_lists(states):
     return diff_by_one_list, diff_by_two_list
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def create_reference_state(n, l, states):
     ref_index = 0
 
@@ -83,7 +83,7 @@ def create_reference_state(n, l, states):
         states[i] += states[ref_index]
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def create_singles_states(n, l, states):
     index = 1
 
@@ -98,7 +98,7 @@ def create_singles_states(n, l, states):
             index += 1
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def create_doubles_states(n, l, states):
     index = 1
 
@@ -119,7 +119,7 @@ def create_doubles_states(n, l, states):
                     index += 1
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def compute_sign(state, p):
     elem_i = 0
     k = 0
@@ -134,7 +134,7 @@ def compute_sign(state, p):
     return (-1) ** k
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def create_particle(state, p):
     elem_p = p // BITSTRING_SIZE
 
@@ -149,7 +149,7 @@ def create_particle(state, p):
     return new_state, sign
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def annihilate_particle(state, p):
     elem_p = p // BITSTRING_SIZE
 
@@ -164,7 +164,7 @@ def annihilate_particle(state, p):
     return new_state, sign
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def evaluate_one_body_overlap(state_i, state_j, p, q):
     r"""Function evaluating the overlap
 
@@ -190,7 +190,7 @@ def evaluate_one_body_overlap(state_i, state_j, p, q):
     return sign_p * sign_q
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
     r"""Fnction evaluating the overlap
 
@@ -228,3 +228,38 @@ def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
         return 0
 
     return sign_p * sign_q * sign_s * sign_r
+
+
+@numba.njit(parallel=True, nogil=True, fastmath=True)
+# @numba.njit(cache=True, fastmath=True)
+def setup_hamiltonian_brute_force(hamiltonian, states, h, u, n, l):
+    num_states = len(states)
+
+    # for I in range(num_states):
+    for I in numba.prange(num_states):
+        state_I = states[I]
+        for J in range(I, num_states):
+            state_J = states[J]
+
+            val = complex(0)
+
+            for p in range(l):
+                for q in range(l):
+                    sign = evaluate_one_body_overlap(state_I, state_J, p, q)
+                    val += sign * h[p, q]
+
+                    for r in range(l):
+                        for s in range(l):
+                            sign = evaluate_two_body_overlap(
+                                state_I, state_J, p, q, r, s
+                            )
+
+                            if sign == 0:
+                                continue
+
+                            val += 0.25 * sign * u[p, q, r, s]
+
+            hamiltonian[I, J] = val
+
+            if I != J:
+                hamiltonian[J, I] = np.conj(val)
