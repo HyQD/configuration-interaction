@@ -1,3 +1,5 @@
+import time
+
 from configuration_interaction.ci import ConfigurationInteraction
 from configuration_interaction.ci_helper import (
     create_reference_state,
@@ -36,6 +38,12 @@ class CID(ConfigurationInteraction):
         self.states = np.zeros(shape, dtype=BITTYPE)
 
     def setup_ci_space(self):
+        t0 = time.time()
         create_reference_state(self.n, self.l, self.states)
         create_doubles_states(self.n, self.l, self.states)
+        t1 = time.time()
+
+        if self.verbose:
+            print("Time spent setting up CID space: {0} sec".format(t1 - t0))
+
         diff_by_one, diff_by_two = get_diff_lists(self.states)
