@@ -24,6 +24,32 @@ def popcount_64(num):
 
 
 @numba.njit(cache=True)
+def state_diff(state_i, state_j):
+    """Function computing the difference between state_i and state_j. This is
+    done by computing
+
+        diff := state_i XOR state_j,
+
+    and counting all non-zero bits. As the states are arrays with bits, we
+    iterate through each element in diff and perform popcount_64 to count the
+    bits, which we accumulate."""
+
+    diff = state_i ^ state_j
+
+    num_bits = 0
+    for elem in diff:
+        num_bits += popcount_64(elem)
+
+    return num_bits
+
+
+@numba.njit(cache=True)
+def state_equality(state_i, state_j):
+    """Function checking if state_i == state_j."""
+    return state_diff(state_i, state_j) == 0
+
+
+@numba.njit(cache=True)
 def get_diff_lists(states):
     diff_by_one_list = []
     diff_by_two_list = []
