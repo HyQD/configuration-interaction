@@ -147,4 +147,9 @@ def test_annihilate_particle():
 
 def test_one_body_overlap():
     phi_i = np.array([0b11, 0b101]).astype(np.uint32)
-    phi_j = np.array([0b101, 0b1]).astype(np.uint32)
+    phi_j = np.array([0b101, 0b101]).astype(np.uint32)
+    assert evaluate_one_body_overlap(phi_i, phi_j, p=1, q=2) == 1
+    assert evaluate_one_body_overlap(phi_i, phi_j, p=1, q=0) == 0
+
+    phi_j = np.array([0b11, 0b11]).astype(np.uint32)
+    assert evaluate_one_body_overlap(phi_i, phi_j, p=34, q=33) == 1
