@@ -147,14 +147,13 @@ def evaluate_one_body_overlap(state_i, state_j, p, q):
     that is, the overlap between two Slater determinants acted upon by a
     creation and an annihilation operator."""
 
-    q_state, sign_q = annihilate_particle(state_j, q)
+    state_q, sign_q = annihilate_particle(state_j, q)
 
     if sign_q == 0:
         return 0
 
-    p_state, sign_p = create_particle(q_state, p)
+    state_p, sign_p = create_particle(state_q, p)
 
-    if sign_p == 0:
-        return 0
+    # Check if state_i == p_state
 
     return sign_p * sign_q
