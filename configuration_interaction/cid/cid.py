@@ -40,7 +40,7 @@ class CID(ConfigurationInteraction):
     def setup_ci_space(self):
         t0 = time.time()
         create_reference_state(self.n, self.l, self.states)
-        create_doubles_states(self.n, self.l, self.states)
+        create_doubles_states(self.n, self.l, self.states, index=1)
         t1 = time.time()
 
         if self.verbose:
