@@ -8,6 +8,7 @@ from configuration_interaction.ci_helper import (
     create_particle,
     annihilate_particle,
     evaluate_one_body_overlap,
+    evaluate_two_body_overlap,
 )
 
 
@@ -158,3 +159,15 @@ def test_one_body_overlap():
     assert evaluate_one_body_overlap(phi_i, phi_j, p=0, q=0) == 1
     assert evaluate_one_body_overlap(phi_i, phi_j, p=1, q=1) == 1
     assert evaluate_one_body_overlap(phi_i, phi_j, p=2, q=2) == 0
+
+
+def test_two_body_overlap():
+    phi_i = np.array([0b11, 0b101]).astype(np.uint32)
+    phi_j = np.array([0b101, 0b101]).astype(np.uint32)
+
+    assert evaluate_two_body_overlap(phi_i, phi_j, p=1, q=2, r=2, s=2) == 0
+    assert evaluate_two_body_overlap(phi_i, phi_j, p=2, q=2, r=2, s=0) == 0
+    assert evaluate_two_body_overlap(phi_i, phi_j, p=1, q=0, r=2, s=0) == 1
+    assert evaluate_two_body_overlap(phi_i, phi_j, p=0, q=1, r=2, s=0) == -1
+    assert evaluate_two_body_overlap(phi_i, phi_j, p=0, q=1, r=0, s=2) == 1
+    assert evaluate_two_body_overlap(phi_i, phi_j, p=1, q=0, r=0, s=2) == -1
