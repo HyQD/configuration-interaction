@@ -3,6 +3,7 @@ import time
 from configuration_interaction.ci_helper import (
     setup_hamiltonian_brute_force,
     construct_one_body_density_matrix,
+    compute_particle_density,
 )
 
 
@@ -82,10 +83,17 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         assert 0 <= K < self.num_states
 
+        np = self.np
+
         rho_qp = np.zeros((self.l, self.l), dtype=np.complex128)
         construct_one_body_density_matrix(rho_qp, self.states, self._C[:, K])
 
         return rho_qp
+
+    def compute_particle_density(self, K=0):
+        rho_qp = self.compute_one_body_density_matrix(K=K)
+
+        return compute_particle_density(rho_qp, self.system.spf, self.np)
 
     @property
     def energies(self):

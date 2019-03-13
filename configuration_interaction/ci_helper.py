@@ -268,6 +268,7 @@ def setup_hamiltonian_brute_force(hamiltonian, states, h, u, n, l):
 @numba.njit(parallel=True, nogil=True, fastmath=True)
 def construct_one_body_density_matrix(rho_qp, states, c):
     num_states = len(states)
+    l = len(rho_qp)
 
     for I in numba.prange(num_states):
         state_I = states[I]
@@ -279,3 +280,14 @@ def construct_one_body_density_matrix(rho_qp, states, c):
                     rho_qp[q, p] = np.dot(
                         c, np.conj(c)
                     ) * evaluate_one_body_overlap(state_I, state_J, p=p, q=q)
+
+
+def compute_particle_density(rho_qp, spf, np):
+    rho = np.zeros(spf.shape[1:], dtype=spf.dtype)
+    spf_slice = slice(0, spf.shape[0])
+
+    for _i in np.ndindex(rho.shape):
+        i = (spf_slice, *_i)
+        rho[_i] += np.dot(spf[i].conj(), np.dot(rho_qp, spf[i]))
+
+    return rho
