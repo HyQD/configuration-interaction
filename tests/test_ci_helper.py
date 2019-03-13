@@ -153,3 +153,8 @@ def test_one_body_overlap():
 
     phi_j = np.array([0b11, 0b11]).astype(np.uint32)
     assert evaluate_one_body_overlap(phi_i, phi_j, p=34, q=33) == 1
+
+    phi_j = np.array([0b11, 0b101]).astype(np.uint32)
+    assert evaluate_one_body_overlap(phi_i, phi_j, p=0, q=0) == 1
+    assert evaluate_one_body_overlap(phi_i, phi_j, p=1, q=1) == 1
+    assert evaluate_one_body_overlap(phi_i, phi_j, p=2, q=2) == 0
