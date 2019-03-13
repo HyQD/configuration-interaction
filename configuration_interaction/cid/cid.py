@@ -31,7 +31,7 @@ class CID(ConfigurationInteraction):
         if self.verbose:
             print(
                 "Size of a state in bytes: {0}".format(
-                    (self.l // BITSTRING_SIZE + 1) * 4
+                    np.dtype(BITTYPE).itemsize * 1
                 )
             )
 
