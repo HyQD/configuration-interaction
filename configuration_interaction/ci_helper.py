@@ -180,6 +180,9 @@ def evaluate_one_body_overlap(state_i, state_j, p, q):
 
     state_p, sign_p = create_particle(state_q, p)
 
+    if sign_p == 0:
+        return 0
+
     # Check if state_i == state_p
     if not state_equality(state_i, state_p):
         return 0
@@ -216,6 +219,9 @@ def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
         return 0
 
     state_p, sign_p = create_particle(state_q, p)
+
+    if sign_p == 0:
+        return 0
 
     # Check if state_i == state_p
     if not state_equality(state_i, state_p):
