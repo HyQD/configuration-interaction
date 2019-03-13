@@ -1,6 +1,9 @@
 import abc
 import time
-from configuration_interaction.ci_helper import setup_hamiltonian_brute_force
+from configuration_interaction.ci_helper import (
+    setup_hamiltonian_brute_force,
+    construct_one_body_density_matrix,
+)
 
 
 class ConfigurationInteraction(metaclass=abc.ABCMeta):
@@ -62,6 +65,27 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             print(
                 "Time spent diagonalizing Hamiltonian: {0} sec".format(t1 - t0)
             )
+
+    def compute_one_body_density_matrix(self, K=0):
+        r"""Function computing the one-body density matrix \rho^{q}_{p} defined
+        by
+
+            \rho^{q}_{p} = <\Psi_K|c_{p}^{\dagger} c_{q} |\Psi_K>,
+
+        where |\Psi_K> is the K'th eigenstate of the Hamiltonian defined by
+
+            |\Psi_K> = C_{JK} |\Phi_J>,
+
+        where |\Phi_J> is the J'th Slater determinant and C_{JK} is the JK
+        element of the coefficient matrix found from diagonalizing the
+        Hamiltonian."""
+
+        assert 0 <= K < self.num_states
+
+        rho_qp = np.zeros((self.l, self.l), dtype=np.complex128)
+        construct_one_body_density_matrix(rho_qp, self.states, self._C[:, K])
+
+        return rho_qp
 
     @property
     def energies(self):
