@@ -166,7 +166,7 @@ def annihilate_particle(state, p):
 
 @numba.njit(cache=True)
 def evaluate_one_body_overlap(state_i, state_j, p, q):
-    """Function evaluating the overlap
+    r"""Function evaluating the overlap
 
         O_{IJ} = <\Phi_I| c_{p}^{\dagger} c_{q} |\Phi_J>,
 
@@ -192,7 +192,7 @@ def evaluate_one_body_overlap(state_i, state_j, p, q):
 
 @numba.njit(cache=True)
 def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
-    """Fnction evaluating the overlap
+    r"""Fnction evaluating the overlap
 
         O_{IJ} = <\Phi_I| c_{p}^{\dagger} c_{q}^{\dagger} c_{s} c_{r} |\Phi_J>,
 
