@@ -83,10 +83,23 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         assert 0 <= K < self.num_states
 
-        np = self.np
+        rho_qp = self.np.zeros((self.l, self.l), dtype=self._C.dtype)
 
-        rho_qp = np.zeros((self.l, self.l), dtype=np.complex128)
+        t0 = time.time()
         construct_one_body_density_matrix(rho_qp, self.states, self._C[:, K])
+        t1 = time.time()
+
+        if self.verbose:
+            print(
+                "Time spent computing one-body matrix: {0} sec".format(t1 - t0)
+            )
+
+        tr_rho = self.np.trace(rho_qp)
+        error_str = (
+            f"Trace of one-body density matrix (rho_qp = {tr_rho}) does "
+            + "not equal the number of particles (n = {0})".format(self.n)
+        )
+        assert abs(tr_rho - self.n) < 1e-8, error_str
 
         return rho_qp
 
