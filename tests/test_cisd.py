@@ -16,3 +16,17 @@ def test_setup(odho_ti_small):
 
     assert counter == cisd.num_states
 
+
+def test_slater_condon_hamiltonian(odho_ti_small):
+    cisd_b = CISD(odho_ti_small, brute_force=True, verbose=True)
+    cisd_b.setup_ci_space()
+
+    cisd = CISD(odho_ti_small, verbose=True)
+    cisd.setup_ci_space()
+
+    cisd_b.compute_ground_state()
+    cisd.compute_ground_state()
+
+    np.testing.assert_allclose(cisd_b.hamiltonian, cisd.hamiltonian)
+    np.testing.assert_allclose(cisd_b.energies, cisd.energies)
+    np.testing.assert_allclose(cisd_b.C, cisd.C)

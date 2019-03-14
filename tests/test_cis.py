@@ -16,8 +16,18 @@ def test_setup(odho_ti_small):
             counter += 1
 
     assert counter == cis.num_states
+
+
+def test_slater_condon_hamiltonian(odho_ti_small):
+    cis_b = CIS(odho_ti_small, brute_force=True, verbose=True)
+    cis_b.setup_ci_space()
+
+    cis = CIS(odho_ti_small, verbose=True)
     cis.setup_ci_space()
 
-    print(counter, len(cis.states))
+    cis_b.compute_ground_state()
+    cis.compute_ground_state()
 
-    assert False
+    np.testing.assert_allclose(cis_b.hamiltonian, cis.hamiltonian)
+    np.testing.assert_allclose(cis_b.energies, cis.energies)
+    np.testing.assert_allclose(cis_b.C, cis.C)
