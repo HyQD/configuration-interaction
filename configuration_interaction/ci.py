@@ -2,19 +2,21 @@ import abc
 import time
 from configuration_interaction.ci_helper import (
     setup_hamiltonian_brute_force,
+    setup_hamiltonian,
     construct_one_body_density_matrix,
     compute_particle_density,
 )
 
 
 class ConfigurationInteraction(metaclass=abc.ABCMeta):
-    def __init__(self, system, verbose=False, np=None):
+    def __init__(self, system, brute_force=False, verbose=False, np=None):
         self.verbose = verbose
 
         if np is None:
             import numpy as np
 
         self.np = np
+        self.brute_force = brute_force
 
         self.system = system
 
@@ -42,8 +44,13 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             (self.num_states, self.num_states), dtype=np.complex128
         )
 
+        hamiltonian_function = setup_hamiltonian
+
+        if self.brute_force:
+            hamiltonian_function = setup_hamiltonian_brute_force
+
         t0 = time.time()
-        setup_hamiltonian_brute_force(
+        hamiltonian_function(
             self.hamiltonian,
             self.states,
             self.system.h,
