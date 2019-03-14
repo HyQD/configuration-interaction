@@ -4,7 +4,6 @@ from configuration_interaction.ci import ConfigurationInteraction
 from configuration_interaction.ci_helper import (
     create_reference_state,
     create_doubles_states,
-    get_diff_lists,
     BITTYPE,
     BITSTRING_SIZE,
 )
