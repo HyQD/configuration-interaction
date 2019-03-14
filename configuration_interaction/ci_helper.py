@@ -67,6 +67,37 @@ def get_index(state):
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
+def get_double_index(state):
+    """Computes the indices of the two first set bits in state. That is, if
+    state is given by
+
+        state = 0b110 = 6,
+
+    then get_double_index(state) returns
+
+        get_double_index(state) = (1, 2)."""
+    first_index = 0
+    second_index = 0
+
+    first_add = 1
+    second_add = 1
+
+    for elem_p in range(len(state)):
+        for p in range(BITSTRING_SIZE):
+            check = (state[elem_p] >> p) & 0b1 != 0
+
+            if check and first_add == 1:
+                first_add = 0
+            elif check and second_add == 1:
+                return first_index, second_index
+
+            first_index += first_add
+            second_index += second_add
+
+    return -1, -1
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def state_diff(state_i, state_j):
     """Function computing the difference between state_i and state_j. This is
     done by computing

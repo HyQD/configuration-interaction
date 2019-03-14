@@ -7,6 +7,7 @@ from configuration_interaction.ci_helper import (
     count_state,
     occupied_index,
     get_index,
+    get_double_index,
     state_diff,
     state_equality,
     compute_sign,
@@ -102,6 +103,29 @@ def test_get_index():
 
     one[0] ^= np.uint32(0b1)
     assert get_index(one) == 1
+
+
+def test_get_double_index():
+    zero = np.array([0, 0, 0, 0]).astype(BITTYPE)
+    assert get_double_index(zero) == (-1, -1)
+
+    one = np.array([1, 0, 0]).astype(BITTYPE)
+    assert get_double_index(one) == (-1, -1)
+
+    one[0] |= np.uint32(0b10)
+    assert get_double_index(one) == (0, 1)
+
+    one[0] ^= np.uint32(0b1)
+    assert get_double_index(one) == (-1, -1)
+
+    one[0] |= np.uint32(0b10000)
+    assert get_double_index(one) == (1, 4)
+
+    one[0] |= np.uint32(0b1000000)
+    assert get_double_index(one) == (1, 4)
+
+    state = np.array([6]).astype(BITTYPE)
+    assert get_double_index(state) == (1, 2)
 
 
 def test_state_diff():
