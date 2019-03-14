@@ -124,28 +124,6 @@ def state_equality(state_i, state_j):
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
-def get_diff_lists(states):
-    diff_by_one_list = []
-    diff_by_two_list = []
-
-    for i in range(len(states)):
-        for j in range(i + 1, len(states)):
-            diff = states[i] ^ states[j]
-
-            num_bits = 0
-
-            for elem in diff:
-                num_bits += popcount_64(elem)
-
-            if num_bits == 2:
-                diff_by_one_list.append((i, j))
-            elif num_bits == 4:
-                diff_by_two_list.append((i, j))
-
-    return diff_by_one_list, diff_by_two_list
-
-
-@numba.njit(cache=True, nogil=True, fastmath=True)
 def create_reference_state(n, l, states):
     ref_index = 0
 

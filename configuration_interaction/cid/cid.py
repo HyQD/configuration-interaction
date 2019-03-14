@@ -45,5 +45,3 @@ class CID(ConfigurationInteraction):
 
         if self.verbose:
             print("Time spent setting up CID space: {0} sec".format(t1 - t0))
-
-        diff_by_one, diff_by_two = get_diff_lists(self.states)
