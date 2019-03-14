@@ -41,6 +41,32 @@ def occupied_index(state, p):
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
+def get_index(state):
+    """Computes the index of the first set bit in state. That is, if state is
+
+        state = 0b100 = 4,
+
+    then get_index(state) returns
+
+        get_index(state) = 2.
+
+    This is done by checking if the lowermost bit is set and then rolling the
+    bits one position to the right and counting places until a set bit is
+    encountered. Returns -1 if there are no set bits."""
+
+    index = 0
+
+    for elem_p in range(len(state)):
+        for p in range(BITSTRING_SIZE):
+            if (state[elem_p] >> p) & 0b1 != 0:
+                return index
+
+            index += 1
+
+    return -1
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def state_diff(state_i, state_j):
     """Function computing the difference between state_i and state_j. This is
     done by computing

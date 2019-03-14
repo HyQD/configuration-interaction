@@ -6,6 +6,7 @@ from configuration_interaction.ci_helper import (
     popcount_64,
     count_state,
     occupied_index,
+    get_index,
     state_diff,
     state_equality,
     compute_sign,
@@ -87,6 +88,20 @@ def test_occupied_index():
         occ = occupied_index(state, p)
 
         assert occ if p in indices else not occ
+
+
+def test_get_index():
+    zero = np.array([0, 0, 0, 0]).astype(BITTYPE)
+    assert get_index(zero) == -1
+
+    one = np.array([1, 0, 0]).astype(BITTYPE)
+    assert get_index(one) == 0
+
+    one[0] |= np.uint32(0b10)
+    assert get_index(one) == 0
+
+    one[0] ^= np.uint32(0b1)
+    assert get_index(one) == 1
 
 
 def test_state_diff():
