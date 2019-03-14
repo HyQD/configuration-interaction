@@ -24,6 +24,13 @@ def popcount_64(num):
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
+def occupied_index(state, p):
+    elem_p = p // BITSTRING_SIZE
+
+    return (state[elem_p] & (1 << (p - elem_p * BITSTRING_SIZE))) != 0
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def state_diff(state_i, state_j):
     """Function computing the difference between state_i and state_j. This is
     done by computing
