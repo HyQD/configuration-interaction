@@ -4,6 +4,7 @@ from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
     popcount_64,
+    count_state,
     occupied_index,
     state_diff,
     state_equality,
@@ -35,6 +36,30 @@ def test_popcount_64():
         assert popcount_64(num) == set_bits
 
         prev_num = num
+
+
+def test_count_state():
+    state = np.array([0, 0, 0]).astype(BITTYPE)
+
+    num_set_indices = np.random.randint(BITSTRING_SIZE * len(state))
+    indices = np.random.choice(
+        np.arange(BITSTRING_SIZE * len(state)),
+        size=num_set_indices,
+        replace=False,
+    )
+
+    for p in indices:
+        elem_p = p // BITSTRING_SIZE
+
+        state[elem_p] |= BITTYPE(1 << (p - elem_p * BITSTRING_SIZE))
+
+    counter = 0
+    for elem in state:
+        counter += popcount_64(elem)
+
+    assert counter == num_set_indices
+    assert counter == count_state(state)
+    assert count_state(state) == num_set_indices
 
 
 def test_occupied_index():

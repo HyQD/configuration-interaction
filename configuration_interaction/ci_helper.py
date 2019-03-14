@@ -24,6 +24,16 @@ def popcount_64(num):
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
+def count_state(state):
+    counter = 0
+
+    for elem in state:
+        counter += popcount_64(elem)
+
+    return counter
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
 def occupied_index(state, p):
     elem_p = p // BITSTRING_SIZE
 
