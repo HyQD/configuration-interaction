@@ -7,14 +7,15 @@ def test_setup(odho_ti_small):
 
     cid.setup_ci_space()
 
+    assert cid.num_states == 46
+    assert len(cid.states) == cid.num_states
+
     counter = 0
     for i in range(len(cid.states)):
         if cid.states[i, 0] > 0:
             counter += 1
 
-        for elem in reversed(range(len(cid.states[i]))):
-            print(bin(cid.states[i, elem])[2:].zfill(BITSTRING_SIZE), end=" ")
-        print()
+    assert counter == cid.num_states
 
     print(counter, len(cid.states))
     assert False
