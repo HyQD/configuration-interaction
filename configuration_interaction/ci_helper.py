@@ -317,6 +317,17 @@ def setup_hamiltonian_brute_force(hamiltonian, states, h, u, n, l):
 
 @numba.njit(parallel=True, nogil=True, fastmath=True)
 def setup_hamiltonian(hamiltonian, states, h, u, n, l):
+    
+    """
+    The Hamiltonian should be split in a one- and two-body component 
+
+        H = H1 + H2 
+        H1 = <psi|h_{pq} c_p^\dagger c_q|psi>
+        H2 = <psi|u_{pq,rs} c_p^\dagger c_q^\dagger c_s c_r|psi> 
+
+    This is advantageous when doing TD-CI since we do not have to re-compute H2 
+    (assuming static orbitals) if the two-body is time-independent (which it usually is). 
+    """
     num_states = len(states)
 
     for I in range(num_states):
