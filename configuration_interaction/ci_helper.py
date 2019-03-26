@@ -123,37 +123,6 @@ def state_equality(state_i, state_j):
     return state_diff(state_i, state_j) == 0
 
 
-########################################################################
-"""
-It is desirable to guarantee some (systematic) ordering of the Slater determinants. 
-For example if p_1, p_2, p_3,... are occpied indices we would like to have determinants that satisfies 
-p_1 < p_2 < p_3 and so on. 
-
-Specifically, for N=2, where L denotes the number of spin-orbitals.
-
-Reference: |01>
-
-Singles  : |02>, |03>, |04>, ..., |0L>
-           |12>, |13>, |14>, ..., |1L>
-
-Doubles  : |23>, |24>, |25>, ..., |2L>
-                 |34>, |35>, ..., |3L>
-                        ..., ..., |4L>
-                                   .
-                                   .
-                                   .
-
-In my (Håkon) old CI-code the ordering of the singles determinants  
-
-Singles  : |12>, |13>, |14>, ..., |1L>
-           |02>, |03>, |04>, ..., |0L>
-
-which caused errors when doing the Brueckner analysis. That being said, I think that particular 
-problem is related to how Simen formulated the Brueckner analysis, not that the ordering MUST be 
-that way. The (most) important thing is that we know the structure of the ordering.  
-"""
-
-
 @numba.njit(cache=True, nogil=True, fastmath=True)
 def create_reference_state(n, l, states):
     ref_index = 0
@@ -200,9 +169,6 @@ def create_doubles_states(n, l, states, index):
                     index += 1
 
     return index
-
-
-########################################################################
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
