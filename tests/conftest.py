@@ -10,4 +10,7 @@ def odho_ti_small():
     grid = 10
     num_grid_points = 400
 
-    return OneDimensionalHarmonicOscillator(n, l, grid, num_grid_points)
+    odho = OneDimensionalHarmonicOscillator(n, l, grid, num_grid_points)
+    odho.setup_system()
+
+    return odho
