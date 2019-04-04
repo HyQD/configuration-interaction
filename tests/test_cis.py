@@ -1,3 +1,5 @@
+import numpy as np
+
 from configuration_interaction import CIS
 from configuration_interaction.ci_helper import BITSTRING_SIZE
 
@@ -28,6 +30,5 @@ def test_slater_condon_hamiltonian(odho_ti_small):
     cis_b.compute_ground_state()
     cis.compute_ground_state()
 
-    np.testing.assert_allclose(cis_b.hamiltonian, cis.hamiltonian)
+    np.testing.assert_allclose(cis_b.hamiltonian, cis.hamiltonian, atol=1e-7)
     np.testing.assert_allclose(cis_b.energies, cis.energies)
-    np.testing.assert_allclose(cis_b.C, cis.C)
