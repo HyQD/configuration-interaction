@@ -12,7 +12,7 @@ install:
 - conda update -q conda
 - conda info -a
 - conda env create -f environment.yml
-- source activate cc
+- source activate ci
 script:
 - pytest
 after_success:
