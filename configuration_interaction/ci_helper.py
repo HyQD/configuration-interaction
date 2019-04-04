@@ -403,7 +403,7 @@ def diff_by_two_hamiltonian(state_I, state_J, h, u, n, l):
 
 
 @numba.njit(cache=True)
-def construct_one_body_density_matrix(rho_qp, states, c):
+def construct_one_body_density_matrix_brute_force(rho_qp, states, c):
     num_states = len(states)
     l = len(rho_qp)
 
@@ -425,42 +425,42 @@ def construct_one_body_density_matrix(rho_qp, states, c):
             rho_qp[q, p] = val
 
 
-# def construct_one_body_density_matrix(rho_qp, states, c):
-#    num_states = len(states)
-#    l = len(rho_qp)
-#
-#    for I in range(num_states):
-#        state_I = states[I]
-#
-#        for p in range(l):
-#            if not occupied_index(state_I, p):
-#                continue
-#
-#            rho_qp[p, p] += c[I] * c[I].conjugate()
-#
-#    for I in range(num_states):
-#        state_I = states[I]
-#
-#        for J in range(I + 1, num_states):
-#            state_J = states[J]
-#            diff = state_diff(state_I, state_J)
-#
-#            if diff > 2:
-#                continue
-#
-#            diff_state = state_I ^ state_J
-#
-#            # Index m in state_I, removed from state_J
-#            m = get_index(state_I & diff_state)
-#            sign_m = compute_sign(state_I, m)
-#
-#            # Index p in state_J, not in state_I
-#            p = get_index(state_J & diff_state)
-#            sign_p = compute_sign(state_J, p)
-#
-#            sign = sign_m * sign_p
-#
-#            rho_qp[p, m] += sign * c[I].conjugate() * c[J]
+def construct_one_body_density_matrix(rho_qp, states, c):
+    num_states = len(states)
+    l = len(rho_qp)
+
+    for I in range(num_states):
+        state_I = states[I]
+
+        for p in range(l):
+            if not occupied_index(state_I, p):
+                continue
+
+            rho_qp[p, p] += c[I] * c[I].conjugate()
+
+    for I in range(num_states):
+        state_I = states[I]
+
+        for J in range(I + 1, num_states):
+            state_J = states[J]
+            diff = state_diff(state_I, state_J)
+
+            if diff > 2:
+                continue
+
+            diff_state = state_I ^ state_J
+
+            # Index m in state_I, removed from state_J
+            m = get_index(state_I & diff_state)
+            sign_m = compute_sign(state_I, m)
+
+            # Index p in state_J, not in state_I
+            p = get_index(state_J & diff_state)
+            sign_p = compute_sign(state_J, p)
+
+            sign = sign_m * sign_p
+
+            rho_qp[p, m] += sign * c[I].conjugate() * c[J]
 
 
 def compute_particle_density(rho_qp, spf, np):

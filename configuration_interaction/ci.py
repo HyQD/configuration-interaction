@@ -4,6 +4,7 @@ from configuration_interaction.ci_helper import (
     setup_hamiltonian_brute_force,
     setup_hamiltonian,
     construct_one_body_density_matrix,
+    construct_one_body_density_matrix_brute_force,
     compute_particle_density,
 )
 
@@ -92,8 +93,15 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         rho_qp = self.np.zeros((self.l, self.l), dtype=self._C.dtype)
 
+        density_matrix_function = construct_one_body_density_matrix
+
+        if self.brute_force:
+            density_matrix_function = (
+                construct_one_body_density_matrix_brute_force
+            )
+
         t0 = time.time()
-        construct_one_body_density_matrix(rho_qp, self.states, self._C[:, K])
+        density_matrix_function(rho_qp, self.states, self._C[:, K])
         t1 = time.time()
 
         if self.verbose:
@@ -104,7 +112,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         tr_rho = self.np.trace(rho_qp)
         error_str = (
             f"Trace of one-body density matrix (rho_qp = {tr_rho}) does "
-            + "not equal the number of particles (n = {0})".format(self.n)
+            + f"not equal the number of particles (n = {self.n})"
         )
         assert abs(tr_rho - self.n) < 1e-8, error_str
 
