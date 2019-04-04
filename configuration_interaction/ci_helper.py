@@ -4,6 +4,17 @@ import numpy as np
 BITTYPE = np.uint64
 BITSTRING_SIZE = np.dtype(BITTYPE).itemsize * 8
 
+
+def state_printer(state):
+    """Function creating a string of the bit-representation of a state"""
+
+    s = ""
+    for elem in state:
+        s += bin(elem)[2:].zfill(BITSTRING_SIZE)
+
+    return s
+
+
 # Const used by the Hamming weight algorithm
 m_1 = 0x5555_5555_5555_5555
 m_2 = 0x3333_3333_3333_3333
