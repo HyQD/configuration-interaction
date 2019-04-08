@@ -413,7 +413,7 @@ def diff_by_two_hamiltonian(state_I, state_J, h, u, n, l):
     return sign * u[m, n, p, q]
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def construct_one_body_density_matrix_brute_force(rho_qp, states, c):
     num_states = len(states)
     l = len(rho_qp)
