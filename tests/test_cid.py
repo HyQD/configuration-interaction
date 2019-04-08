@@ -52,22 +52,15 @@ def test_slater_condon_density_matrix(odho_ti_small):
     cid_b.compute_ground_state()
     cid.compute_ground_state()
 
-    for K in range(len(cid.energies)):
-        print(f"K = {K}")
-        rho_b = cid_b.compute_one_body_density_matrix(K=K)
-        rho = cid.compute_one_body_density_matrix(K=K)
+    # Only check ground state as higher order states can be degenerate.
+    # This leads to ambiguity as to which state to compare.
+    K = 0
 
-        for i in np.ndindex(rho.shape):
-            if not abs(rho_b[i] - rho[i]) < 1e-8:
-                I, J = i
-                print(f"rho_b[{i}] = {rho_b[i]}\t|\trho[{i}] = {rho[i]}")
-                np.testing.assert_allclose(cid_b.states[I], cid.states[I])
-                print(f"State I = {state_printer(cid_b.states[I])}")
-                np.testing.assert_allclose(cid_b.states[J], cid.states[J])
-                print(f"State J = {state_printer(cid_b.states[J])}")
-                print(
-                    f"Diff    = {state_printer(cid_b.states[I] ^ cid_b.states[J])}"
-                )
-                print("Diff =", state_diff(cid_b.states[I], cid_b.states[J]))
+    rho_b = cid_b.compute_one_body_density_matrix(K=K)
+    rho = cid.compute_one_body_density_matrix(K=K)
 
-        np.testing.assert_allclose(rho_b, rho, atol=1e-7)
+    for i in np.ndindex(rho.shape):
+        if not abs(rho_b[i] - rho[i]) < 1e-8:
+            print(f"rho_b[{i}] = {rho_b[i]}\t|\trho[{i}] = {rho[i]}")
+
+    np.testing.assert_allclose(rho_b, rho, atol=1e-7)
