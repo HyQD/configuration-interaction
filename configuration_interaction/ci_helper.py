@@ -448,7 +448,10 @@ def construct_one_body_density_matrix(rho_qp, states, c):
     for I in range(num_states):
         state_I = states[I]
 
-        for J in range(I + 1, num_states):
+        for J in range(num_states):
+            if I == J:
+                continue
+
             state_J = states[J]
             diff = state_diff(state_I, state_J)
 
