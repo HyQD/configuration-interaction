@@ -455,7 +455,7 @@ def construct_one_body_density_matrix(rho_qp, states, c):
             state_J = states[J]
             diff = state_diff(state_I, state_J)
 
-            if diff > 2:
+            if diff != 2:
                 continue
 
             diff_state = state_I ^ state_J
