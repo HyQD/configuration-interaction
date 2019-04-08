@@ -413,27 +413,23 @@ def diff_by_two_hamiltonian(state_I, state_J, h, u, n, l):
     return sign * u[m, n, p, q]
 
 
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def construct_one_body_density_matrix_brute_force(rho_qp, states, c):
     num_states = len(states)
     l = len(rho_qp)
 
-    for p in range(l):
-        for q in range(l):
-            val = 0
+    for I in range(num_states):
+        state_I = states[I]
+        for J in range(num_states):
+            state_J = states[J]
 
-            for I in range(num_states):
-                state_I = states[I]
-                for J in range(num_states):
-                    state_J = states[J]
-
-                    val += (
+            for p in range(l):
+                for q in range(l):
+                    rho_qp[q, p] += (
                         c[I].conjugate()
                         * c[J]
                         * evaluate_one_body_overlap(state_I, state_J, p=p, q=q)
                     )
-
-            rho_qp[q, p] = val
 
 
 def construct_one_body_density_matrix(rho_qp, states, c):
