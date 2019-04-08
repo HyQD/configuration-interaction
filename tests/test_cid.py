@@ -62,9 +62,12 @@ def test_slater_condon_density_matrix(odho_ti_small):
                 I, J = i
                 print(f"rho_b[{i}] = {rho_b[i]}\t|\trho[{i}] = {rho[i]}")
                 np.testing.assert_allclose(cid_b.states[I], cid.states[I])
-                print(state_printer(cid_b.states[I]))
+                print(f"State I = {state_printer(cid_b.states[I])}")
                 np.testing.assert_allclose(cid_b.states[J], cid.states[J])
-                print(state_printer(cid_b.states[J]))
-                print(state_diff(cid_b.states[I], cid_b.states[J]))
+                print(f"State J = {state_printer(cid_b.states[J])}")
+                print(
+                    f"Diff    = {state_printer(cid_b.states[I] ^ cid_b.states[J])}"
+                )
+                print("Diff =", state_diff(cid_b.states[I], cid_b.states[J]))
 
         np.testing.assert_allclose(rho_b, rho, atol=1e-7)
