@@ -18,6 +18,7 @@ from configuration_interaction.ci_helper import (
     construct_one_body_density_matrix,
     construct_one_body_density_matrix_brute_force,
 )
+from quantum_systems import CustomSystem
 
 
 def test_popcount_64():
@@ -290,3 +291,27 @@ def test_construct_one_body_density_matrices(odho_ti_small, CI):
         construct_one_body_density_matrix(rho, ci.states, ci.C[:, K])
 
         np.testing.assert_allclose(rho_b, rho, atol=1e-7)
+
+
+def test_construct_one_body_density_matrices_random(CI):
+    n = 2
+    l = 12
+
+    cs = CustomSystem(n, l)
+
+    ci = CI(cs, brute_force=True, verbose=True)
+    ci.setup_ci_space()
+    ci._C = np.random.random(
+        (ci.num_states, ci.num_states)
+    ) + 1j * np.random.random((ci.num_states, ci.num_states))
+
+    rho_b = np.zeros((cs.l, cs.l), dtype=np.complex128)
+    rho = np.zeros((cs.l, cs.l), dtype=np.complex128)
+
+    for K in range(ci.num_states):
+        construct_one_body_density_matrix_brute_force(
+            rho_b, ci.states, ci.C[:, K]
+        )
+        construct_one_body_density_matrix(rho, ci.states, ci.C[:, K])
+
+        np.testing.assert_allclose(rho_b, rho)
