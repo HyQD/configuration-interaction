@@ -39,7 +39,6 @@ def test_slater_condon_hamiltonian(odho_ti_small):
     np.testing.assert_allclose(cid_b.energies, cid.energies)
 
 
-@pytest.mark.skip
 def test_slater_condon_density_matrix(odho_ti_small):
     cid_b = CID(odho_ti_small, brute_force=True, verbose=True)
     cid_b.setup_ci_space()
@@ -52,15 +51,14 @@ def test_slater_condon_density_matrix(odho_ti_small):
     cid_b.compute_ground_state()
     cid.compute_ground_state()
 
-    # Only check ground state as higher order states can be degenerate.
-    # This leads to ambiguity as to which state to compare.
-    K = 0
+    for K in range(cid_b.num_states):
+        # Compare particle densities in order to implicitly compare one-body
+        # density matrices.
+        rho_b = cid_b.compute_particle_density(K=K)
+        rho = cid.compute_particle_density(K=K)
 
-    rho_b = cid_b.compute_one_body_density_matrix(K=K)
-    rho = cid.compute_one_body_density_matrix(K=K)
+        # Normalize particle densities
+        rho_b = cid_b.n * rho_b / np.trapz(rho_b, x=odho_ti_small.grid)
+        rho = cid.n * rho / np.trapz(rho, x=odho_ti_small.grid)
 
-    for i in np.ndindex(rho.shape):
-        if not abs(rho_b[i] - rho[i]) < 1e-8:
-            print(f"rho_b[{i}] = {rho_b[i]}\t|\trho[{i}] = {rho[i]}")
-
-    np.testing.assert_allclose(rho_b, rho, atol=1e-7)
+        np.testing.assert_allclose(rho_b, rho)

@@ -35,7 +35,6 @@ def test_slater_condon_hamiltonian(odho_ti_small):
     np.testing.assert_allclose(cis_b.energies, cis.energies)
 
 
-@pytest.mark.skip
 def test_slater_condon_density_matrix(odho_ti_small):
     cis_b = CIS(odho_ti_small, brute_force=True, verbose=True)
     cis_b.setup_ci_space()
@@ -48,13 +47,14 @@ def test_slater_condon_density_matrix(odho_ti_small):
     cis_b.compute_ground_state()
     cis.compute_ground_state()
 
-    K = 0
+    for K in range(cis_b.num_states):
+        # Compare particle densities in order to implicitly compare one-body
+        # density matrices.
+        rho_b = cis_b.compute_particle_density(K=K)
+        rho = cis.compute_particle_density(K=K)
 
-    rho_b = cis_b.compute_one_body_density_matrix(K=K)
-    rho = cis.compute_one_body_density_matrix(K=K)
+        # Normalize particle densities
+        rho_b = cis_b.n * rho_b / np.trapz(rho_b, x=odho_ti_small.grid)
+        rho = cis.n * rho / np.trapz(rho, x=odho_ti_small.grid)
 
-    for i in np.ndindex(rho.shape):
-        if not abs(rho_b[i] - rho[i]) < 1e-8:
-            print(f"rho_b[{i}] = {rho_b[i]}\t|\trho[{i}] = {rho[i]}")
-
-    np.testing.assert_allclose(rho_b, rho, atol=1e-7)
+        np.testing.assert_allclose(rho_b, rho)
