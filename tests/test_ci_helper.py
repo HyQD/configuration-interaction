@@ -283,7 +283,10 @@ def test_construct_one_body_density_matrices(odho_ti_small, CI):
     rho_b = np.zeros((odho_ti_small.l, odho_ti_small.l), dtype=np.complex128)
     rho = np.zeros((odho_ti_small.l, odho_ti_small.l), dtype=np.complex128)
 
-    construct_one_body_density_matrix_brute_force(rho_b, ci.states, ci.C[:, 0])
-    construct_one_body_density_matrix(rho, ci.states, ci.C[:, 0])
+    for K in range(ci.num_states):
+        construct_one_body_density_matrix_brute_force(
+            rho_b, ci.states, ci.C[:, K]
+        )
+        construct_one_body_density_matrix(rho, ci.states, ci.C[:, K])
 
-    np.testing.assert_allclose(rho_b, rho, atol=1e-7)
+        np.testing.assert_allclose(rho_b, rho, atol=1e-7)
