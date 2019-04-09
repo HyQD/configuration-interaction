@@ -422,6 +422,10 @@ def construct_one_body_density_matrix_brute_force(rho_qp, states, c):
         state_I = states[I]
         for J in range(num_states):
             state_J = states[J]
+            diff = state_diff(state_I, state_J)
+
+            if diff > 2:
+                continue
 
             for p in range(l):
                 for q in range(l):
