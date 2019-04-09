@@ -1,5 +1,6 @@
 import pytest
 
+from configuration_interaction import CIS, CID, CISD
 from quantum_systems import OneDimensionalHarmonicOscillator
 
 
@@ -14,3 +15,8 @@ def odho_ti_small():
     odho.setup_system()
 
     return odho
+
+
+@pytest.fixture(params=[CIS, CID, CISD])
+def CI(request):
+    return request.param
