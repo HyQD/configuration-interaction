@@ -15,6 +15,8 @@ from configuration_interaction.ci_helper import (
     annihilate_particle,
     evaluate_one_body_overlap,
     evaluate_two_body_overlap,
+    construct_one_body_density_matrix,
+    construct_one_body_density_matrix_brute_force,
 )
 
 
@@ -270,3 +272,18 @@ def test_two_body_overlap():
     assert evaluate_two_body_overlap(phi_i, phi_j, p=0, q=1, r=2, s=0) == -1
     assert evaluate_two_body_overlap(phi_i, phi_j, p=0, q=1, r=0, s=2) == 1
     assert evaluate_two_body_overlap(phi_i, phi_j, p=1, q=0, r=0, s=2) == -1
+
+
+def test_construct_one_body_density_matrices(odho_ti_small, CI):
+    ci = CI(odho_ti_small, brute_force=False, verbose=True)
+
+    ci.setup_ci_space()
+    ci.compute_ground_state()
+
+    rho_b = np.zeros((odho_ti_small.l, odho_ti_small.l), dtype=np.complex128)
+    rho = np.zeros((odho_ti_small.l, odho_ti_small.l), dtype=np.complex128)
+
+    construct_one_body_density_matrix_brute_force(rho_b, ci.states, ci.C[:, 0])
+    construct_one_body_density_matrix(rho, ci.states, ci.C[:, 0])
+
+    np.testing.assert_allclose(rho_b, rho, atol=1e-7)
