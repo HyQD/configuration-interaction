@@ -48,13 +48,13 @@ def test_slater_condon_density_matrix(odho_ti_small):
     cis_b.compute_ground_state()
     cis.compute_ground_state()
 
-    for K in range(len(cis.energies)):
-        print(f"K = {K}")
-        rho_b = cis_b.compute_one_body_density_matrix(K=K)
-        rho = cis.compute_one_body_density_matrix(K=K)
+    K = 0
 
-        for i in np.ndindex(rho.shape):
-            if not abs(rho_b[i] - rho[i]) < 1e-8:
-                print(f"rho_b[{i}] = {rho_b[i]}\t|\trho[{i}] = {rho[i]}")
+    rho_b = cis_b.compute_one_body_density_matrix(K=K)
+    rho = cis.compute_one_body_density_matrix(K=K)
 
-        np.testing.assert_allclose(rho_b, rho, atol=1e-7)
+    for i in np.ndindex(rho.shape):
+        if not abs(rho_b[i] - rho[i]) < 1e-8:
+            print(f"rho_b[{i}] = {rho_b[i]}\t|\trho[{i}] = {rho[i]}")
+
+    np.testing.assert_allclose(rho_b, rho, atol=1e-7)
