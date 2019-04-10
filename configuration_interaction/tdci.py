@@ -18,7 +18,15 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     configuration interaction solver.
     """
 
-    def __init__(self, ci, system, np=None, integrator=None, td_verbose=False, **ci_kwargs):
+    def __init__(
+        self,
+        ci,
+        system,
+        np=None,
+        integrator=None,
+        td_verbose=False,
+        **ci_kwargs,
+    ):
         if np is None:
             import numpy as np
 
@@ -134,7 +142,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         overlap = self.np.abs(self._c.conj() @ self._c_0) ** 2
 
-        return overlap / norm_t / norm_0
+        return (overlap / norm_t / norm_0).real
 
     def __call__(self, prev_c, current_time):
         o, v = self.system.o, self.system.v
