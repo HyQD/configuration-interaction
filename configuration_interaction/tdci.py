@@ -18,7 +18,15 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     configuration interaction solver.
     """
 
-    def __init__(self, ci, system, np=None, integrator=None, td_verbose=False, **ci_kwargs):
+    def __init__(
+        self,
+        ci,
+        system,
+        np=None,
+        integrator=None,
+        td_verbose=False,
+        **ci_kwargs,
+    ):
         if np is None:
             import numpy as np
 
