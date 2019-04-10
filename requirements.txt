@@ -19,6 +19,10 @@ numba
 # Install quantum-systems
 git+https://github.com/Schoyen/quantum-systems.git
 
+# Install tdhf
+# This is currently not supported as tdhf is a private repo
+git+ssh://git@github.com/haakoek/tdhf.git
+
 # Install matplotlib for plotting of scripts
 matplotlib
 
