@@ -2,7 +2,14 @@ import pytest
 import numpy as np
 
 from configuration_interaction import CISD
-from configuration_interaction.ci_helper import BITSTRING_SIZE
+from configuration_interaction.ci_helper import (
+    BITSTRING_SIZE,
+    state_printer,
+    create_singles_states,
+    create_doubles_states,
+    create_excited_states,
+    create_reference_state,
+)
 
 
 def test_setup(odho_ti_small):
@@ -18,6 +25,22 @@ def test_setup(odho_ti_small):
             counter += 1
 
     assert counter == cisd.num_states
+
+
+@pytest.mark.skip
+def test_states_setup(odho_ti_small):
+    cisd = CISD(odho_ti_small, verbose=True)
+
+    n, l = cisd.n, cisd.l
+    states_c = cisd.states.copy()
+    create_reference_state(n, l, states_c)
+    create_excited_states(n, l, states_c, 1, order=2)
+
+    cisd.setup_ci_space()
+    for cisd_state, state in zip(cisd.states, states_c):
+        print(f"{state_printer(cisd_state)}\n{state_printer(state)}\n")
+
+    np.testing.assert_allclose(cisd.states, states_c)
 
 
 def test_slater_condon_hamiltonian(odho_ti_small):

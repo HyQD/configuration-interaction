@@ -6,6 +6,9 @@ from configuration_interaction.ci_helper import (
     BITSTRING_SIZE,
     state_printer,
     state_diff,
+    create_doubles_states,
+    create_excited_states,
+    create_reference_state,
 )
 
 
@@ -23,6 +26,22 @@ def test_setup(odho_ti_small):
             counter += 1
 
     assert counter == cid.num_states
+
+
+@pytest.mark.skip
+def test_states_setup(odho_ti_small):
+    cid = CID(odho_ti_small, verbose=True)
+
+    n, l = cid.n, cid.l
+    states_c = cid.states.copy()
+    create_reference_state(n, l, states_c)
+    create_excited_states(n, l, states_c, 1, order=2)
+
+    cid.setup_ci_space()
+    for cid_state, state in zip(cid.states, states_c):
+        print(f"{state_printer(cid_state)}\n{state_printer(state)}\n")
+
+    np.testing.assert_allclose(cid.states, states_c)
 
 
 def test_slater_condon_hamiltonian(odho_ti_small):

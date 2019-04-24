@@ -2,7 +2,13 @@ import pytest
 import numpy as np
 
 from configuration_interaction import CIS
-from configuration_interaction.ci_helper import BITSTRING_SIZE, state_printer
+from configuration_interaction.ci_helper import (
+    BITSTRING_SIZE,
+    state_printer,
+    create_singles_states,
+    create_excited_states,
+    create_reference_state,
+)
 
 
 def test_setup(odho_ti_small):
@@ -19,6 +25,22 @@ def test_setup(odho_ti_small):
             counter += 1
 
     assert counter == cis.num_states
+
+
+@pytest.mark.skip
+def test_states_setup(odho_ti_small):
+    cis = CIS(odho_ti_small, verbose=True)
+
+    n, l = cis.n, cis.l
+    states_c = cis.states.copy()
+    create_reference_state(n, l, states_c)
+    create_excited_states(n, l, states_c, 1, order=1)
+
+    cis.setup_ci_space()
+    for cis_state, state in zip(cis.states, states_c):
+        print(f"{state_printer(cis_state)}\n{state_printer(state)}\n")
+
+    np.testing.assert_allclose(cis.states, states_c)
 
 
 def test_slater_condon_hamiltonian(odho_ti_small):

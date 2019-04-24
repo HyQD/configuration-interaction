@@ -183,6 +183,43 @@ def create_doubles_states(n, l, states, index):
     return index
 
 
+# @numba.njit(cache=True, nogil=True, fastmath=True)
+def create_excited_states(n, l, states, index, order, i_start=0, a_start=0):
+    if order == 0:
+        return index + 1
+
+    if order > n:
+        return index
+
+    a_start = n if a_start == 0 else a_start
+
+    for i in range(i_start, n):
+        elem_i = i // BITSTRING_SIZE
+        for a in range(a_start, l):
+            elem_a = a // BITSTRING_SIZE
+
+            test_val = popcount_64(
+                states[index, elem_i] & (1 << (i - elem_i * BITSTRING_SIZE))
+            )
+            assert (
+                test_val == 1
+            ), f"test_val = {test_val}\nstate = {state_printer(states[index])}"
+            states[index, elem_i] ^= 1 << (i - elem_i * BITSTRING_SIZE)
+            assert (
+                popcount_64(
+                    states[index, elem_a] & (1 << (a - elem_a * BITSTRING_SIZE))
+                )
+                == 0
+            )
+            states[index, elem_a] |= 1 << (a - elem_a * BITSTRING_SIZE)
+
+            index = create_excited_states(
+                n, l, states, index, order - 1, i_start=i + 1, a_start=a + 1
+            )
+
+    return index
+
+
 @numba.njit(cache=True, nogil=True, fastmath=True)
 def compute_sign(state, p):
     elem_i = 0
