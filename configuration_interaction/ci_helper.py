@@ -24,9 +24,9 @@ h_01 = 0x0101_0101_0101_0101
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
 def popcount_64(num):
-    # Implementation of the Hamming weight algorithm shown here:
-    # https://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
-
+    """Implementation of the Hamming weight algorithm shown here:
+    https://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
+    """
     num -= (num >> 1) & m_1
     num = (num & m_2) + ((num >> 2) & m_2)
     num = (num + (num >> 4)) & m_4
@@ -63,8 +63,8 @@ def get_index(state):
 
     This is done by checking if the lowermost bit is set and then rolling the
     bits one position to the right and counting places until a set bit is
-    encountered. Returns -1 if there are no set bits."""
-
+    encountered. Returns -1 if there are no set bits.
+    """
     index = 0
 
     for elem_p in range(len(state)):
@@ -86,7 +86,8 @@ def get_double_index(state):
 
     then get_double_index(state) returns
 
-        get_double_index(state) = (1, 2)."""
+        get_double_index(state) = (1, 2).
+    """
     first_index = 0
     second_index = 0
 
@@ -117,8 +118,8 @@ def state_diff(state_i, state_j):
 
     and counting all non-zero bits. As the states are arrays with bits, we
     iterate through each element in diff and perform popcount_64 to count the
-    bits, which we accumulate."""
-
+    bits, which we accumulate.
+    """
     diff = state_i ^ state_j
 
     num_bits = 0
@@ -234,8 +235,8 @@ def evaluate_one_body_overlap(state_i, state_j, p, q):
         O_{IJ} = <\Phi_I| c_{p}^{\dagger} c_{q} |\Phi_J>,
 
     that is, the overlap between two Slater determinants acted upon by a
-    creation and an annihilation operator."""
-
+    creation and an annihilation operator.
+    """
     state_q, sign_q = annihilate_particle(state_j, q)
 
     if sign_q == 0:
@@ -255,7 +256,7 @@ def evaluate_one_body_overlap(state_i, state_j, p, q):
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
 def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
-    r"""Fnction evaluating the overlap
+    r"""Function evaluating the overlap
 
         O_{IJ} = <\Phi_I| c_{p}^{\dagger} c_{q}^{\dagger} c_{s} c_{r} |\Phi_J>,
 
@@ -265,7 +266,6 @@ def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
 
     Note especially the ordering of the ordering of the annihilation operators.
     """
-
     state_r, sign_r = annihilate_particle(state_j, r)
 
     if sign_r == 0:
