@@ -16,9 +16,7 @@ from configuration_interaction.ci_helper import (
 
 
 class ConfigurationInteraction(metaclass=abc.ABCMeta):
-    def __init__(
-        self, system, excitations, brute_force=False, verbose=False, np=None
-    ):
+    def __init__(self, system, brute_force=False, verbose=False, np=None):
         self.verbose = verbose
 
         if np is None:
@@ -28,7 +26,6 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.brute_force = brute_force
 
         self.system = system
-        self.excitations = excitations
 
         self.n = self.system.n
         self.l = self.system.l
@@ -182,50 +179,51 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         return self._C
 
 
-class CIS(ConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        excitations = ["S"]
-        args = (*args, excitations)
-        super().__init__(*args, **kwargs)
+def excitation_string_handler(excitations):
+    if isinstance(excitations, str):
+        excitations = excitations.upper()
+
+        if excitations.startswith("CI"):
+            excitations = excitations[2:]
+
+        excitations = [excitation for excitation in excitations]
+
+    for excitation in excitations:
+        assert excitation in ORDER, f'"{excitation}" is not a supported order'
+
+    return list(map(lambda x: x.upper(), excitations))
 
 
-class CID(ConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        excitations = ["D"]
-        args = (*args, excitations)
-        super().__init__(*args, **kwargs)
+def get_ci_class(excitations):
+    """Function constructing a truncated CI-class with the specified
+    excitations.
+
+    Parameters
+    ----------
+    excitations : str, iterable
+        The specified excitations to use in the CI-class. For example, to create
+        a CISD class both `excitations="CISD"` and `excitations=["S", "D"]` are
+        valid.
+
+    Returns
+    -------
+    ci_class : class
+        A subclass of `ConfigurationInteraction`.
+    """
+    excitations = excitation_string_handler(excitations)
+    class_name = "CI" + "".join(excitations)
+
+    ci_class = type(
+        class_name, (ConfigurationInteraction,), dict(excitations=excitations)
+    )
+
+    return ci_class
 
 
-class CISD(ConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        excitations = ["S", "D"]
-        args = (*args, excitations)
-        super().__init__(*args, **kwargs)
-
-
-class CIDT(ConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        excitations = ["D", "T"]
-        args = (*args, excitations)
-        super().__init__(*args, **kwargs)
-
-
-class CISDT(ConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        excitations = ["S", "D", "T"]
-        args = (*args, excitations)
-        super().__init__(*args, **kwargs)
-
-
-class CIDTQ(ConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        excitations = ["D", "T", "Q"]
-        args = (*args, excitations)
-        super().__init__(*args, **kwargs)
-
-
-class CISDTQ(ConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        excitations = ["S", "D", "T", "Q"]
-        args = (*args, excitations)
-        super().__init__(*args, **kwargs)
+CIS = get_ci_class("CIS")
+CID = get_ci_class("CID")
+CISD = get_ci_class("CISD")
+CIDT = get_ci_class("CIDT")
+CISDT = get_ci_class("CISDT")
+CIDTQ = get_ci_class("CIDTQ")
+CISDTQ = get_ci_class("CISDTQ")

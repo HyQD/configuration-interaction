@@ -3,7 +3,7 @@ import collections
 import warnings
 import time
 
-from configuration_interaction import CIS, CID, CISD
+from configuration_interaction import get_ci_class, excitation_string_handler
 from configuration_interaction.integrators import RungeKutta4
 from configuration_interaction.ci_helper import (
     compute_particle_density,
@@ -20,13 +20,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     """
 
     def __init__(
-        self,
-        ci,
-        system,
-        np=None,
-        integrator=None,
-        td_verbose=False,
-        **ci_kwargs,
+        self, system, np=None, integrator=None, td_verbose=False, **ci_kwargs
     ):
         if np is None:
             import numpy as np
@@ -39,7 +33,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.verbose = td_verbose
 
         # Initialize ground state solver
-        self.ci = ci(system, **ci_kwargs)
+        self.ci = self.ci_class(system, **ci_kwargs)
         self.system = system
 
         self.h = self.system.h
@@ -177,16 +171,40 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         return new_c
 
 
-class TDCIS(TimeDependentConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        super().__init__(CIS, *args, **kwargs)
+def get_tdci_class(excitations):
+    """Function constructing a truncated TDCI-class with the specified
+    excitations.
+
+    Parameters
+    ----------
+    excitations : str, iterable
+        The specified excitations to use in the TDCI-class. For example, to
+        create a TDCISD class both `excitations="CISD"` and
+        `excitations=["S", "D"]` are valid.
+
+    Returns
+    -------
+    tdci_class : class
+        A subclass of `TimeDependentConfigurationInteraction`.
+    """
+    ci_class = get_ci_class(excitations)
+    excitations = excitation_string_handler(excitations)
+
+    class_name = "TDCI" + "".join(excitations)
+
+    tdci_class = type(
+        class_name,
+        (TimeDependentConfigurationInteraction,),
+        dict(ci_class=ci_class),
+    )
+
+    return tdci_class
 
 
-class TDCID(TimeDependentConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        super().__init__(CID, *args, **kwargs)
-
-
-class TDCISD(TimeDependentConfigurationInteraction):
-    def __init__(self, *args, **kwargs):
-        super().__init__(CISD, *args, **kwargs)
+TDCIS = get_tdci_class("CIS")
+TDCID = get_tdci_class("CID")
+TDCISD = get_tdci_class("CISD")
+TDCIDT = get_tdci_class("CIDT")
+TDCISDT = get_tdci_class("CISDT")
+TDCIDTQ = get_tdci_class("CIDTQ")
+TDCISDTQ = get_tdci_class("CISDTQ")
