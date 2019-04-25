@@ -201,3 +201,31 @@ class CISD(ConfigurationInteraction):
         excitations = ["S", "D"]
         args = (*args, excitations)
         super().__init__(*args, **kwargs)
+
+
+class CIDT(ConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        excitations = ["D", "T"]
+        args = (*args, excitations)
+        super().__init__(*args, **kwargs)
+
+
+class CISDT(ConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        excitations = ["S", "D", "T"]
+        args = (*args, excitations)
+        super().__init__(*args, **kwargs)
+
+
+class CIDTQ(ConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        excitations = ["D", "T", "Q"]
+        args = (*args, excitations)
+        super().__init__(*args, **kwargs)
+
+
+class CISDTQ(ConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        excitations = ["S", "D", "T", "Q"]
+        args = (*args, excitations)
+        super().__init__(*args, **kwargs)
