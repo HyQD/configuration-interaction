@@ -3,7 +3,7 @@ import time
 from configuration_interaction.ci import ConfigurationInteraction
 from configuration_interaction.ci_helper import (
     create_reference_state,
-    create_singles_states,
+    create_excited_states,
     BITTYPE,
     BITSTRING_SIZE,
 )
@@ -37,7 +37,7 @@ class CIS(ConfigurationInteraction):
     def setup_ci_space(self):
         t0 = time.time()
         create_reference_state(self.n, self.l, self.states)
-        create_singles_states(self.n, self.l, self.states, index=1)
+        create_excited_states(self.n, self.l, self.states, index=1, order=1)
         t1 = time.time()
 
         if self.verbose:

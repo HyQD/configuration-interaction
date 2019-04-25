@@ -33,8 +33,8 @@ def test_states_setup(odho_ti_small):
     n, l = cisd.n, cisd.l
     states_c = cisd.states.copy()
     create_reference_state(n, l, states_c)
-    index = create_excited_states(n, l, states_c, 1, order=1)
-    create_excited_states(n, l, states_c, index, order=2)
+    index = create_singles_states(n, l, states_c, index=1)
+    create_doubles_states(n, l, states_c, index=index)
 
     assert create_excited_states(n, l, states_c, index, order=3) == index
 
