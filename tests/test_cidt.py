@@ -2,16 +2,13 @@ import numpy as np
 
 from configuration_interaction import CIDT
 from configuration_interaction.ci_helper import (
-    BITSTRING_SIZE,
     NUM_DOUBLES_STATES,
     NUM_TRIPLES_STATES,
     state_printer,
-    state_diff,
-    create_doubles_states,
-    create_triples_states,
     create_excited_states,
     create_reference_state,
 )
+from tests.helper import create_doubles_states, create_triples_states
 
 
 def test_setup(odho_ti):

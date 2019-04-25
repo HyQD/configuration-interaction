@@ -2,17 +2,17 @@ import numpy as np
 
 from configuration_interaction import CISDT
 from configuration_interaction.ci_helper import (
-    BITSTRING_SIZE,
     NUM_SINGLES_STATES,
     NUM_DOUBLES_STATES,
     NUM_TRIPLES_STATES,
     state_printer,
-    state_diff,
+    create_excited_states,
+    create_reference_state,
+)
+from tests.helper import (
     create_singles_states,
     create_doubles_states,
     create_triples_states,
-    create_excited_states,
-    create_reference_state,
 )
 
 

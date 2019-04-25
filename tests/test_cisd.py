@@ -1,15 +1,12 @@
-import pytest
 import numpy as np
 
 from configuration_interaction import CISD
 from configuration_interaction.ci_helper import (
-    BITSTRING_SIZE,
     state_printer,
-    create_singles_states,
-    create_doubles_states,
     create_excited_states,
     create_reference_state,
 )
+from tests.helper import create_singles_states, create_doubles_states
 
 
 def test_setup(odho_ti_small):
@@ -35,8 +32,6 @@ def test_states_setup(odho_ti_small):
     create_reference_state(n, l, states_c)
     index = create_singles_states(n, l, states_c, index=1)
     create_doubles_states(n, l, states_c, index=index)
-
-    assert create_excited_states(n, l, states_c, index, order=3) == index
 
     cisd.setup_ci_space()
     for cisd_state, state in zip(cisd.states, states_c):

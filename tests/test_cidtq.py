@@ -2,17 +2,17 @@ import numpy as np
 
 from configuration_interaction import CIDTQ
 from configuration_interaction.ci_helper import (
-    BITSTRING_SIZE,
     NUM_DOUBLES_STATES,
     NUM_TRIPLES_STATES,
     NUM_QUADRUPLES_STATES,
     state_printer,
-    state_diff,
+    create_excited_states,
+    create_reference_state,
+)
+from tests.helper import (
     create_doubles_states,
     create_triples_states,
     create_quadruples_states,
-    create_excited_states,
-    create_reference_state,
 )
 
 
