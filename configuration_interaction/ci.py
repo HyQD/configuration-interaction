@@ -77,7 +77,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 f"Time spent setting up CI{''.join(self.excitations)} space: {t1 - t0} sec"
             )
 
-    def compute_ground_state(self):
+    def compute_ground_state(self, k=None):
         """Function constructing the Hamiltonian of the system without any
         optimization such as the Slater-Condon rules, etc. Having constructed
         the Hamiltonian the function diagonalizes the matrix and stores the
@@ -113,7 +113,14 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
 
         t0 = time.time()
-        self._energies, self._C = np.linalg.eigh(self.hamiltonian)
+        if k is None:
+            self._energies, self._C = np.linalg.eigh(self.hamiltonian)
+        else:
+            import scipy.sparse.linalg
+
+            self._energies, self._C = scipy.sparse.linalg.eigsh(
+                self.hamiltonian, k=k
+            )
         t1 = time.time()
 
         if self.verbose:
