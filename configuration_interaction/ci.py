@@ -1,6 +1,12 @@
 import abc
 import time
 from configuration_interaction.ci_helper import (
+    BITTYPE,
+    BITSTRING_SIZE,
+    NUM_STATES,
+    ORDER,
+    create_reference_state,
+    create_excited_states,
     setup_hamiltonian_brute_force,
     setup_hamiltonian,
     construct_one_body_density_matrix,
@@ -10,7 +16,9 @@ from configuration_interaction.ci_helper import (
 
 
 class ConfigurationInteraction(metaclass=abc.ABCMeta):
-    def __init__(self, system, brute_force=False, verbose=False, np=None):
+    def __init__(
+        self, system, excitations, brute_force=False, verbose=False, np=None
+    ):
         self.verbose = verbose
 
         if np is None:
@@ -20,6 +28,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.brute_force = brute_force
 
         self.system = system
+        self.excitations = excitations
 
         self.n = self.system.n
         self.l = self.system.l
@@ -27,9 +36,50 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.o = self.system.o
         self.v = self.system.v
 
-    @abc.abstractmethod
+        # Count the reference state
+        self.num_states = 1
+
+        for excitation in self.excitations:
+            self.num_states += NUM_STATES[excitation](self.n, self.m)
+
+        if self.verbose:
+            print("Number of states to create: {0}".format(self.num_states))
+
+        # Find the shape of the states array
+        # Each state is represented as a bit string padded to the nearest
+        # 32-bit boundary
+        shape = (self.num_states, self.l // BITSTRING_SIZE + 1)
+
+        if self.verbose:
+            print(
+                "Size of a state in bytes: {0}".format(
+                    np.dtype(BITTYPE).itemsize * 1
+                )
+            )
+
+        self.states = np.zeros(shape, dtype=BITTYPE)
+
+    # @abc.abstractmethod
     def setup_ci_space(self):
-        pass
+        t0 = time.time()
+        create_reference_state(self.n, self.l, self.states)
+
+        index = 1
+        for excitation in self.excitations:
+            index = create_excited_states(
+                self.n,
+                self.l,
+                self.states,
+                index=index,
+                order=ORDER[excitation],
+            )
+
+        t1 = time.time()
+
+        if self.verbose:
+            print(
+                f"Time spent setting up CI{''.join(self.excitations)} space: {t1 - t0} sec"
+            )
 
     def compute_ground_state(self):
         """Function constructing the Hamiltonian of the system without any
@@ -130,3 +180,24 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
     @property
     def C(self):
         return self._C
+
+
+class CIS(ConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        excitations = ["S"]
+        args = (*args, excitations)
+        super().__init__(*args, **kwargs)
+
+
+class CID(ConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        excitations = ["D"]
+        args = (*args, excitations)
+        super().__init__(*args, **kwargs)
+
+
+class CISD(ConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        excitations = ["S", "D"]
+        args = (*args, excitations)
+        super().__init__(*args, **kwargs)

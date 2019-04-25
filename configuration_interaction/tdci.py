@@ -3,6 +3,7 @@ import collections
 import warnings
 import time
 
+from configuration_interaction import CIS, CID, CISD
 from configuration_interaction.integrators import RungeKutta4
 from configuration_interaction.ci_helper import (
     compute_particle_density,
@@ -174,3 +175,18 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         new_c = -1j * self.np.dot(self.hamiltonian, prev_c)
 
         return new_c
+
+
+class TDCIS(TimeDependentConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        super().__init__(CIS, *args, **kwargs)
+
+
+class TDCID(TimeDependentConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        super().__init__(CID, *args, **kwargs)
+
+
+class TDCISD(TimeDependentConfigurationInteraction):
+    def __init__(self, *args, **kwargs):
+        super().__init__(CISD, *args, **kwargs)
