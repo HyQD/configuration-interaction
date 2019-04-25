@@ -185,6 +185,36 @@ def create_doubles_states(n, l, states, index):
 
 
 def create_excited_states(n, l, states, index, order):
+    """Driver function to create arbitrary excited states from reference
+    states. The caller is responsible for pointing to the correct start index
+    of the first excited state, and allocating enough reference states in the
+    states array.
+
+    Parameters
+    ----------
+    n : int
+        Number of occupied particles, i.e., set bits in the states arrays.
+    l : int
+        Number of basis states, i.e., the number of bits used in the states
+        arrays.
+    states : np.ndarray
+        Two-dimensional array acting as the number representation of the CI
+        Slater determinant basis.
+    index : int
+        The index to the desired first excited state of the given order.
+    order : int
+        The order of the excitation, e.g.,
+            order == 1 -> Singles excitations,
+            order == 2 -> Doubles excitations,
+            order == 3 -> Triples excitations.
+
+    Returns
+    -------
+    index : int
+        The number of the last excited state of the given order. For
+        combinations of excited states, e.g., CISD, this will be the index of
+        the first excited state in the next order.
+    """
     if order > n:
         warning = (
             f"Order ({order}) is greater than the number of occupied "
