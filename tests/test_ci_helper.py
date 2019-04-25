@@ -1,8 +1,13 @@
+import pytest
 import numpy as np
 
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
+    NUM_SINGLES_STATES,
+    NUM_DOUBLES_STATES,
+    NUM_TRIPLES_STATES,
+    NUM_QUADRUPLES_STATES,
     popcount_64,
     count_state,
     occupied_index,
@@ -19,6 +24,74 @@ from configuration_interaction.ci_helper import (
     construct_one_body_density_matrix_brute_force,
 )
 from quantum_systems import CustomSystem
+
+
+@pytest.fixture
+def nl_num_states():
+    n = 4
+    l = 20
+
+    return n, l
+
+
+def test_num_singles_states(nl_num_states):
+    n, l = nl_num_states
+    m = l - n
+
+    num = 0
+    for i in range(n):
+        for a in range(n, l):
+            num += 1
+
+    assert num == NUM_SINGLES_STATES(n, m)
+
+
+def test_num_doubles_states(nl_num_states):
+    n, l = nl_num_states
+    m = l - n
+
+    num = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            for a in range(n, l):
+                for b in range(a + 1, l):
+                    num += 1
+
+    assert num == NUM_DOUBLES_STATES(n, m)
+
+
+def test_num_triples_states(nl_num_states):
+    n, l = nl_num_states
+    m = l - n
+
+    num = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            for k in range(j + 1, n):
+                for a in range(n, l):
+                    for b in range(a + 1, l):
+                        for c in range(b + 1, l):
+                            num += 1
+
+    assert num == NUM_TRIPLES_STATES(n, m)
+
+
+def test_num_quadruples_states(nl_num_states):
+    n, l = nl_num_states
+    m = l - n
+
+    num = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            for k in range(j + 1, n):
+                for _l in range(k + 1, n):
+                    for a in range(n, l):
+                        for b in range(a + 1, l):
+                            for c in range(b + 1, l):
+                                for d in range(c + 1, l):
+                                    num += 1
+
+    assert num == NUM_QUADRUPLES_STATES(n, m)
 
 
 def test_popcount_64():
