@@ -27,7 +27,6 @@ def test_setup(odho_ti_small):
     assert counter == cis.num_states
 
 
-@pytest.mark.skip
 def test_states_setup(odho_ti_small):
     cis = CIS(odho_ti_small, verbose=True)
 

@@ -27,14 +27,16 @@ def test_setup(odho_ti_small):
     assert counter == cisd.num_states
 
 
-@pytest.mark.skip
 def test_states_setup(odho_ti_small):
     cisd = CISD(odho_ti_small, verbose=True)
 
     n, l = cisd.n, cisd.l
     states_c = cisd.states.copy()
     create_reference_state(n, l, states_c)
-    create_excited_states(n, l, states_c, 1, order=2)
+    index = create_excited_states(n, l, states_c, 1, order=1)
+    create_excited_states(n, l, states_c, index, order=2)
+
+    assert create_excited_states(n, l, states_c, index, order=3) == index
 
     cisd.setup_ci_space()
     for cisd_state, state in zip(cisd.states, states_c):

@@ -1,5 +1,6 @@
 import numba
 import numpy as np
+import warnings
 
 BITTYPE = np.uint64
 BITSTRING_SIZE = np.dtype(BITTYPE).itemsize * 8
@@ -183,41 +184,53 @@ def create_doubles_states(n, l, states, index):
     return index
 
 
-# @numba.njit(cache=True, nogil=True, fastmath=True)
-def create_excited_states(n, l, states, index, order, i_start=0, a_start=0):
-    if order == 0:
-        return index + 1
-
+def create_excited_states(n, l, states, index, order):
     if order > n:
+        warning = (
+            f"Order ({order}) is greater than the number of occupied "
+            + f"particles ({n}). No excitation is done."
+        )
+        warnings.warn(warning)
+
         return index
 
-    a_start = n if a_start == 0 else a_start
+    o_remove = np.zeros(order, dtype=int)
+    v_insert = np.zeros(order, dtype=int)
+
+    return _create_excited_states(
+        n, l, states, index, order, o_remove, v_insert
+    )
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
+def _create_excited_states(n, l, states, index, order, o_remove, v_insert):
+    if order == 0:
+        _excite_state(states[index], o_remove, v_insert)
+        return index + 1
+
+    i_start = 0 if len(o_remove) == order else o_remove[order] + 1
+    a_start = n if len(v_insert) == order else v_insert[order] + 1
 
     for i in range(i_start, n):
-        elem_i = i // BITSTRING_SIZE
+        o_remove[order - 1] = i
         for a in range(a_start, l):
-            elem_a = a // BITSTRING_SIZE
+            v_insert[order - 1] = a
 
-            test_val = popcount_64(
-                states[index, elem_i] & (1 << (i - elem_i * BITSTRING_SIZE))
-            )
-            assert (
-                test_val == 1
-            ), f"test_val = {test_val}\nstate = {state_printer(states[index])}"
-            states[index, elem_i] ^= 1 << (i - elem_i * BITSTRING_SIZE)
-            assert (
-                popcount_64(
-                    states[index, elem_a] & (1 << (a - elem_a * BITSTRING_SIZE))
-                )
-                == 0
-            )
-            states[index, elem_a] |= 1 << (a - elem_a * BITSTRING_SIZE)
-
-            index = create_excited_states(
-                n, l, states, index, order - 1, i_start=i + 1, a_start=a + 1
+            index = _create_excited_states(
+                n, l, states, index, order - 1, o_remove, v_insert
             )
 
     return index
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
+def _excite_state(state, o_remove, v_insert):
+    for i, a in zip(o_remove, v_insert):
+        elem_i = i // BITSTRING_SIZE
+        elem_a = a // BITSTRING_SIZE
+
+        state[elem_i] ^= 1 << (i - elem_i * BITSTRING_SIZE)
+        state[elem_a] |= 1 << (a - elem_a * BITSTRING_SIZE)
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)

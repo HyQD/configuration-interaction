@@ -28,7 +28,6 @@ def test_setup(odho_ti_small):
     assert counter == cid.num_states
 
 
-@pytest.mark.skip
 def test_states_setup(odho_ti_small):
     cid = CID(odho_ti_small, verbose=True)
 
