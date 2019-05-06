@@ -77,6 +77,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 f"Time spent setting up CI{''.join(self.excitations)} space: {t1 - t0} sec"
             )
 
+        self.states = self.np.sort(self.states, axis=0)
+
     def compute_ground_state(self, k=None):
         """Function constructing the Hamiltonian of the system without any
         optimization such as the Slater-Condon rules, etc. Having constructed

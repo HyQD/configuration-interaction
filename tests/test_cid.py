@@ -32,6 +32,7 @@ def test_states_setup(odho_ti_small):
     states_c = cid.states.copy()
     create_reference_state(n, l, states_c)
     create_doubles_states(n, l, states_c, index=1)
+    states_c = np.sort(states_c, axis=0)
 
     cid.setup_ci_space()
     for cid_state, state in zip(cid.states, states_c):
