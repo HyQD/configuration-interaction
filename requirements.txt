@@ -27,3 +27,6 @@ matplotlib
 
 # Install black
 black
+
+# Install tqdm
+tqdm
