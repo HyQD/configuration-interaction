@@ -158,6 +158,36 @@ def state_equality(state_i, state_j):
     return state_diff(state_i, state_j) == 0
 
 
+# Create mask selecting only spin-up or spin-down. We treat all even indices as
+# spin-up whereas odd yields spin-down. The byte 0xaa = 0b10101010 (odd indices
+# starting from index zero) repeated at all byte positions is used for the down
+# mask. For up we have 0x55 = 0b01010101 yielding the even indices.
+DOWN_MASK = sum((0xAA << i * 8) for i in range(np.dtype(BITTYPE).itemsize))
+UP_MASK = sum((0x55 << i * 8) for i in range(np.dtype(BITTYPE).itemsize))
+
+
+def compute_spin_projection_eigenvalue(state):
+    """Function computing the eigenvalue of the spin-projection operator S_z.
+    See "Molecular Electronic-Structure Theory" by T. Helgaker et al, equation
+    2.4.25. Note that we treat even indices as spin-up and odd indices as
+    spin-down.
+
+    Parameters
+    ----------
+    state : np.ndarray
+        A state array with each bit representing a set spin-orbital in a Slater
+        determinant.
+    Returns
+    -------
+    int
+        The eigenvalue of the spin-projection operator.
+    """
+    num_spin_up = count_state(state & UP_MASK)
+    num_spin_down = count_state(state & DOWN_MASK)
+
+    return 0.5 * (num_spin_up - num_spin_down)
+
+
 @numba.njit(cache=True, nogil=True, fastmath=True)
 def create_reference_state(n, l, states):
     ref_index = 0

@@ -12,6 +12,7 @@ from configuration_interaction.ci_helper import (
     construct_one_body_density_matrix,
     construct_one_body_density_matrix_brute_force,
     compute_particle_density,
+    compute_spin_projection_eigenvalue,
 )
 
 
@@ -78,6 +79,29 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
 
         self.states = self.np.sort(self.states, axis=0)
+
+    def spin_reduce_states(self, s=0):
+        """Function removing all states with spin different from `s`. This
+        builds a new `self.states`-array and updates `self.num_states`.
+
+        Parameters
+        ----------
+        s : int
+            Spin projection number to keep.
+        """
+        np = self.np
+
+        new_states = []
+
+        for state in self.states:
+            if compute_spin_projection_eigenvalue(state) == s:
+                new_states.append(state)
+
+        self.states = np.sort(np.array(new_states), axis=0)
+        self.num_states = len(self.states)
+
+        if self.verbose:
+            print(f"Number of states after spin-reduction: {self.num_states}")
 
     def compute_ground_state(self, k=None):
         """Function constructing the Hamiltonian of the system without any
