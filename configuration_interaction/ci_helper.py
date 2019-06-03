@@ -177,6 +177,7 @@ def compute_spin_projection_eigenvalue(state):
     state : np.ndarray
         A state array with each bit representing a set spin-orbital in a Slater
         determinant.
+
     Returns
     -------
     int
