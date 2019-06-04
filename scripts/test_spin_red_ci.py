@@ -11,40 +11,28 @@ from configuration_interaction.integrators import GaussIntegrator
 from quantum_systems import CustomSystem
 import psi4
 
-# Memory for numpy in GB
-numpy_memory = 2
-molecule = """
-Be 0.0 0.0 0.0
-symmetry c1
-"""
+import pyscf
 
-options = {'basis': 'cc-pvdz',
-                  'scf_type': 'pk',
-                  'e_convergence': 1e-8}
+    
+mol = pyscf.gto.Mole()
+mol.unit = "bohr"
+mol.build(atom="be 0.0 0.0 0.0", basis="cc-pvdz", symmetry=False)
+mol.set_common_origin(np.array([0.0, 0.0, 0.0]))
 
+n = mol.nelectron
+l = mol.nao * 2
 
-psi4.core.be_quiet()
-psi4.set_options(options)
-
-mol = psi4.geometry(molecule)
-nuclear_repulsion_energy = mol.nuclear_repulsion_energy()
-
-wavefunction = psi4.core.Wavefunction.build(
-    mol, psi4.core.get_global_option("BASIS")
+H = pyscf.scf.hf.get_hcore(mol)
+S = mol.intor_symmetric("int1e_ovlp")
+I = (
+    mol.intor("int2e")
+    .reshape(l // 2, l // 2, l // 2, l // 2)
+    .transpose(0, 2, 1, 3)
 )
 
-molecular_integrals = psi4.core.MintsHelper(wavefunction.basisset())
 
-kinetic = np.asarray(molecular_integrals.ao_kinetic())
-potential = np.asarray(molecular_integrals.ao_potential())
-
-H = kinetic + potential
-I = np.asarray(molecular_integrals.ao_eri()).transpose(0, 2, 1, 3)
-S = np.asarray(molecular_integrals.ao_overlap())
-n_elec = 4
-
-rhf = RestrictedHartreeFock(n_elec,H,I,S)
-rhf.set_Econv(1e-15)
+rhf = RestrictedHartreeFock(n,H,I,S)
+rhf.set_Econv(1e-10)
 
 C,SCF_E = rhf.doRhf()
 
@@ -60,7 +48,7 @@ I = np.tensordot(C.T, I, axes=(1, 0))
 
 n_spin_orbitals = 2*I.shape[0]
 
-system = CustomSystem(n_elec,n_spin_orbitals)
+system = CustomSystem(n,n_spin_orbitals)
 #print(h_new)
 system.set_h(h_new,add_spin=True)
 #print(system.h)
