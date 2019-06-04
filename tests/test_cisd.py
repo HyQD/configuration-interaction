@@ -5,8 +5,14 @@ from configuration_interaction.ci_helper import (
     state_printer,
     create_excited_states,
     create_reference_state,
+    compute_particle_density,
 )
-from tests.helper import create_singles_states, create_doubles_states
+from tests.helper import (
+    create_singles_states,
+    create_doubles_states,
+    construct_one_body_density_matrix_brute_force,
+    setup_hamiltonian_brute_force,
+)
 
 
 def test_setup(odho_ti_small):
@@ -42,39 +48,42 @@ def test_states_setup(odho_ti_small):
 
 
 def test_slater_condon_hamiltonian(odho_ti_small):
-    cisd_b = CISD(odho_ti_small, brute_force=True, verbose=True)
-    cisd_b.setup_ci_space()
-
     cisd = CISD(odho_ti_small, verbose=True)
     cisd.setup_ci_space()
-
-    cisd_b.compute_ground_state()
     cisd.compute_ground_state()
 
-    np.testing.assert_allclose(cisd_b.hamiltonian, cisd.hamiltonian, atol=1e-7)
-    np.testing.assert_allclose(cisd_b.energies, cisd.energies)
+    hamiltonian_b = np.zeros_like(cisd.hamiltonian)
+    setup_hamiltonian_brute_force(
+        hamiltonian_b,
+        cisd.states,
+        odho_ti_small.h,
+        odho_ti_small.u,
+        odho_ti_small.n,
+        odho_ti_small.l,
+    )
+
+    np.testing.assert_allclose(hamiltonian_b, cisd.hamiltonian, atol=1e-7)
 
 
 def test_slater_condon_density_matrix(odho_ti_small):
-    cisd_b = CISD(odho_ti_small, brute_force=True, verbose=True)
-    cisd_b.setup_ci_space()
-
     cisd = CISD(odho_ti_small, verbose=True)
     cisd.setup_ci_space()
-
-    np.testing.assert_allclose(cisd_b.states, cisd.states)
-
-    cisd_b.compute_ground_state()
     cisd.compute_ground_state()
 
-    for K in range(cisd_b.num_states):
+    for K in range(cisd.num_states):
         # Compare particle densities in order to implicitly compare one-body
         # density matrices.
-        rho_b = cisd_b.compute_particle_density(K=K)
         rho = cisd.compute_particle_density(K=K)
+        rho_qp_b = np.zeros(
+            (odho_ti_small.l, odho_ti_small.l), dtype=np.complex128
+        )
+        construct_one_body_density_matrix_brute_force(
+            rho_qp_b, cisd.states, cisd.C[:, K]
+        )
+        rho_b = compute_particle_density(rho_qp_b, odho_ti_small.spf, np)
 
         # Normalize particle densities
-        rho_b = cisd_b.n * rho_b / np.trapz(rho_b, x=odho_ti_small.grid)
+        rho_b = cisd.n * rho_b / np.trapz(rho_b, x=odho_ti_small.grid)
         rho = cisd.n * rho / np.trapz(rho, x=odho_ti_small.grid)
 
         np.testing.assert_allclose(rho_b, rho)

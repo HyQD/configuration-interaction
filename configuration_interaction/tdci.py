@@ -7,10 +7,9 @@ from configuration_interaction import get_ci_class, excitation_string_handler
 from configuration_interaction.integrators import RungeKutta4
 from configuration_interaction.ci_helper import (
     compute_particle_density,
-    setup_hamiltonian,
-    setup_hamiltonian_brute_force,
+    setup_one_body_hamiltonian,
+    setup_two_body_hamiltonian,
     construct_one_body_density_matrix,
-    construct_one_body_density_matrix_brute_force,
 )
 
 
@@ -104,11 +103,6 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         density_matrix_function = construct_one_body_density_matrix
 
-        if self.ci.brute_force:
-            density_matrix_function = (
-                construct_one_body_density_matrix_brute_force
-            )
-
         t0 = time.time()
         density_matrix_function(rho_qp, self.ci.states, self._c)
         t1 = time.time()
@@ -148,21 +142,29 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         # Empty Hamiltonian matrix
         self.hamiltonian.fill(0)
 
-        # Choose Hamiltonian setup function
-        hamiltonian_function = setup_hamiltonian
-
-        if self.ci.brute_force:
-            hamiltonian_function = setup_hamiltonian_brute_force
-
         t0 = time.time()
         # Compute new Hamiltonian
-        hamiltonian_function(
-            self.hamiltonian, self.ci.states, self.h, self.u, self.n, self.l
+        setup_one_body_hamiltonian(
+            self.hamiltonian, self.ci.states, self.h, self.n, self.l
         )
         t1 = time.time()
 
         if self.verbose:
-            print(f"Time spent constructing Hamiltonian: {t1 - t0} sec")
+            print(
+                f"Time spent constructing one-body Hamiltonian: {t1 - t0} sec"
+            )
+
+        t0 = time.time()
+        # Compute new Hamiltonian
+        setup_two_body_hamiltonian(
+            self.hamiltonian, self.ci.states, self.u, self.n, self.l
+        )
+        t1 = time.time()
+
+        if self.verbose:
+            print(
+                f"Time spent constructing two-body Hamiltonian: {t1 - t0} sec"
+            )
 
         # Compute dot-product of new Hamiltonian with the previous coefficient
         # vector and multiply with -1j.

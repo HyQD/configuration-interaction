@@ -1,7 +1,159 @@
 import numba
 import numpy
 
-from configuration_interaction.ci_helper import BITSTRING_SIZE
+from configuration_interaction.ci_helper import (
+    BITSTRING_SIZE,
+    evaluate_one_body_overlap,
+    evaluate_two_body_overlap,
+    occupied_index,
+    state_diff,
+    get_index,
+    get_double_index,
+    compute_sign,
+)
+
+
+@numba.njit(parallel=True, nogil=True, fastmath=True)
+def setup_hamiltonian_brute_force(hamiltonian, states, h, u, n, l):
+    num_states = len(states)
+
+    for I in numba.prange(num_states):
+        state_I = states[I]
+        for J in range(I, num_states):
+            state_J = states[J]
+
+            val = complex(0)
+
+            for p in range(l):
+                for q in range(l):
+                    sign = evaluate_one_body_overlap(state_I, state_J, p, q)
+                    val += sign * h[p, q]
+
+                    for r in range(l):
+                        for s in range(l):
+                            sign = evaluate_two_body_overlap(
+                                state_I, state_J, p, q, r, s
+                            )
+
+                            if sign == 0:
+                                continue
+
+                            val += 0.25 * sign * u[p, q, r, s]
+
+            hamiltonian[I, J] = val
+
+            if I != J:
+                hamiltonian[J, I] = val.conjugate()
+
+
+@numba.njit(parallel=True, nogil=True, fastmath=True)
+def setup_hamiltonian(hamiltonian, states, h, u, n, l):
+    num_states = len(states)
+
+    for I in range(num_states):
+        state_I = states[I]
+
+        val = complex(0)
+
+        for i in range(l):
+            if not occupied_index(state_I, i):
+                continue
+
+            val += h[i, i]
+            for j in range(i + 1, l):
+                if not occupied_index(state_I, j):
+                    continue
+
+                val += u[i, j, i, j]
+
+        hamiltonian[I, I] += val
+
+    for I in numba.prange(num_states):
+        state_I = states[I]
+
+        for J in range(I + 1, num_states):
+            state_J = states[J]
+            diff = state_diff(state_I, state_J)
+
+            if diff > 4:
+                continue
+
+            val = complex(0)
+
+            if diff == 2:
+                val += diff_by_one_hamiltonian(state_I, state_J, h, u, n, l)
+            elif diff == 4:
+                val += diff_by_two_hamiltonian(state_I, state_J, h, u, n, l)
+
+            hamiltonian[I, J] += val
+            hamiltonian[J, I] += val.conjugate()
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
+def diff_by_one_hamiltonian(state_I, state_J, h, u, n, l):
+    diff = state_I ^ state_J
+
+    # Index m in state_I, removed from state_J
+    m = get_index(state_I & diff)
+    sign_m = compute_sign(state_I, m)
+
+    # Index p in state_J, not in state_I
+    p = get_index(state_J & diff)
+    sign_p = compute_sign(state_J, p)
+
+    sign = sign_m * sign_p
+
+    val = sign * h[m, p]
+
+    for i in range(l):
+        if not occupied_index(state_I, i):
+            continue
+
+        val += sign * u[m, i, p, i]
+
+    return val
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
+def diff_by_two_hamiltonian(state_I, state_J, h, u, n, l):
+    diff = state_I ^ state_J
+
+    # Index m, n in state_I, removed from state_J
+    m, n = get_double_index(state_I & diff)
+    sign_m = compute_sign(state_I, m)
+    sign_n = compute_sign(state_I, n)
+
+    # Index p, q in state_J, not in state_I
+    p, q = get_double_index(state_J & diff)
+    sign_p = compute_sign(state_J, p)
+    sign_q = compute_sign(state_J, q)
+
+    sign = sign_m * sign_n * sign_p * sign_q
+
+    return sign * u[m, n, p, q]
+
+
+@numba.njit(cache=True)
+def construct_one_body_density_matrix_brute_force(rho_qp, states, c):
+    num_states = len(states)
+    l = len(rho_qp)
+
+    for I in range(num_states):
+        state_I = states[I]
+        for J in range(num_states):
+            state_J = states[J]
+            diff = state_diff(state_I, state_J)
+
+            if diff > 2:
+                continue
+
+            for p in range(l):
+                for q in range(l):
+                    rho_qp[q, p] += (
+                        c[I].conjugate()
+                        * c[J]
+                        * evaluate_one_body_overlap(state_I, state_J, p=p, q=q)
+                    )
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
