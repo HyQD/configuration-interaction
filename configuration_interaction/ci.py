@@ -1,5 +1,6 @@
 import abc
 import time
+import warnings
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
@@ -89,6 +90,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         s : int
             Spin projection number to keep.
         """
+        warnings.warn("This method is currently not working")
+
         np = self.np
 
         new_states = []
