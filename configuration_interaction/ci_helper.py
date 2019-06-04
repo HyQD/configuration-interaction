@@ -673,6 +673,7 @@ def construct_one_body_density_matrix_brute_force(rho_qp, states, c):
                     )
 
 
+@numba.njit(cache=True)
 def construct_one_body_density_matrix(rho_qp, states, c):
     num_states = len(states)
     l = len(rho_qp)
