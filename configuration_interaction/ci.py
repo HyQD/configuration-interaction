@@ -1,5 +1,6 @@
 import abc
 import time
+import warnings
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
@@ -7,24 +8,22 @@ from configuration_interaction.ci_helper import (
     ORDER,
     create_reference_state,
     create_excited_states,
-    setup_hamiltonian_brute_force,
-    setup_hamiltonian,
+    setup_one_body_hamiltonian,
+    setup_two_body_hamiltonian,
     construct_one_body_density_matrix,
-    construct_one_body_density_matrix_brute_force,
     compute_particle_density,
     compute_spin_projection_eigenvalue,
 )
 
 
 class ConfigurationInteraction(metaclass=abc.ABCMeta):
-    def __init__(self, system, brute_force=False, verbose=False, np=None):
+    def __init__(self, system, verbose=False, np=None):
         self.verbose = verbose
 
         if np is None:
             import numpy as np
 
         self.np = np
-        self.brute_force = brute_force
 
         self.system = system
 
@@ -89,6 +88,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         s : int
             Spin projection number to keep.
         """
+        warnings.warn("This method is currently not working")
+
         np = self.np
 
         new_states = []
@@ -116,17 +117,30 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.hamiltonian = np.zeros(
             (self.num_states, self.num_states), dtype=np.complex128
         )
-
-        hamiltonian_function = setup_hamiltonian
-
-        if self.brute_force:
-            hamiltonian_function = setup_hamiltonian_brute_force
+        self.one_body_hamiltonian = np.zeros_like(self.hamiltonian)
+        self.two_body_hamiltonian = np.zeros_like(self.hamiltonian)
 
         t0 = time.time()
-        hamiltonian_function(
-            self.hamiltonian,
+        setup_one_body_hamiltonian(
+            self.one_body_hamiltonian,
             self.states,
             self.system.h,
+            self.n,
+            self.l,
+        )
+        t1 = time.time()
+
+        if self.verbose:
+            print(
+                "Time spent constructing one-body Hamiltonian: {0} sec".format(
+                    t1 - t0
+                )
+            )
+
+        t0 = time.time()
+        setup_two_body_hamiltonian(
+            self.two_body_hamiltonian,
+            self.states,
             self.system.u,
             self.n,
             self.l,
@@ -135,8 +149,13 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         if self.verbose:
             print(
-                "Time spent constructing Hamiltonian: {0} sec".format(t1 - t0)
+                "Time spent constructing two-body Hamiltonian: {0} sec".format(
+                    t1 - t0
+                )
             )
+
+        self.hamiltonian += self.one_body_hamiltonian
+        self.hamiltonian += self.two_body_hamiltonian
 
         t0 = time.time()
         if k is None:
@@ -172,15 +191,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         rho_qp = self.np.zeros((self.l, self.l), dtype=self._C.dtype)
 
-        density_matrix_function = construct_one_body_density_matrix
-
-        if self.brute_force:
-            density_matrix_function = (
-                construct_one_body_density_matrix_brute_force
-            )
-
         t0 = time.time()
-        density_matrix_function(rho_qp, self.states, self._C[:, K])
+        construct_one_body_density_matrix(rho_qp, self.states, self._C[:, K])
         t1 = time.time()
 
         if self.verbose:

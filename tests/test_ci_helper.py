@@ -21,9 +21,14 @@ from configuration_interaction.ci_helper import (
     evaluate_one_body_overlap,
     evaluate_two_body_overlap,
     construct_one_body_density_matrix,
+    setup_one_body_hamiltonian,
+    setup_two_body_hamiltonian,
+)
+from tests.helper import (
+    setup_hamiltonian,
     construct_one_body_density_matrix_brute_force,
 )
-from quantum_systems import CustomSystem
+from quantum_systems import CustomSystem, RandomSystem
 
 
 @pytest.fixture
@@ -348,8 +353,32 @@ def test_two_body_overlap():
     assert evaluate_two_body_overlap(phi_i, phi_j, p=1, q=0, r=0, s=2) == -1
 
 
+def test_hamiltonian_setup():
+    n = 2
+    l = 12
+
+    rs = RandomSystem(n, l)
+    rs.setup_system()
+
+    from configuration_interaction import CISD
+
+    cisd = CISD(rs)
+    cisd.setup_ci_space()
+
+    orig_hamiltonian = np.zeros(
+        (cisd.num_states, cisd.num_states), dtype=np.complex128
+    )
+    new_hamiltonian = np.zeros_like(orig_hamiltonian)
+
+    setup_hamiltonian(orig_hamiltonian, cisd.states, rs.h, rs.u, rs.n, rs.l)
+    setup_one_body_hamiltonian(new_hamiltonian, cisd.states, rs.h, rs.n, rs.l)
+    setup_two_body_hamiltonian(new_hamiltonian, cisd.states, rs.u, rs.n, rs.l)
+
+    np.testing.assert_allclose(orig_hamiltonian, new_hamiltonian)
+
+
 def test_construct_one_body_density_matrices(odho_ti_small, CI):
-    ci = CI(odho_ti_small, brute_force=False, verbose=True)
+    ci = CI(odho_ti_small, verbose=True)
 
     ci.setup_ci_space()
     ci.compute_ground_state()
@@ -372,7 +401,7 @@ def test_construct_one_body_density_matrices_random(CI):
 
     cs = CustomSystem(n, l)
 
-    ci = CI(cs, brute_force=True, verbose=True)
+    ci = CI(cs, verbose=True)
     ci.setup_ci_space()
     ci._C = np.random.random(
         (ci.num_states, ci.num_states)
