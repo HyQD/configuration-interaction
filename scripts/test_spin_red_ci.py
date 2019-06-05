@@ -13,7 +13,7 @@ import psi4
 
 import pyscf
 
-    
+
 mol = pyscf.gto.Mole()
 mol.unit = "bohr"
 mol.build(atom="be 0.0 0.0 0.0", basis="cc-pvdz", symmetry=False)
@@ -31,12 +31,12 @@ I = (
 )
 
 
-rhf = RestrictedHartreeFock(n,H,I,S)
+rhf = RestrictedHartreeFock(n, H, I, S)
 rhf.set_Econv(1e-10)
 
-C,SCF_E = rhf.doRhf()
+C, SCF_E = rhf.doRhf()
 
-h_new = np.dot(C.T,np.dot(H,C))
+h_new = np.dot(C.T, np.dot(H, C))
 # abcd, ds -> abcs
 I = np.tensordot(I, C, axes=(3, 0))
 # abcs, cr -> absr -> abrs
@@ -46,13 +46,13 @@ I = np.tensordot(I, C.T, axes=(1, 1)).transpose(0, 3, 1, 2)
 # pa, aqrs -> pqrs
 I = np.tensordot(C.T, I, axes=(1, 0))
 
-n_spin_orbitals = 2*I.shape[0]
+n_spin_orbitals = 2 * I.shape[0]
 
-system = CustomSystem(n,n_spin_orbitals)
-#print(h_new)
-system.set_h(h_new,add_spin=True)
-#print(system.h)
-system.set_u(I,add_spin=True,anti_symmetrize=True)
+system = CustomSystem(n, n_spin_orbitals)
+# print(h_new)
+system.set_h(h_new, add_spin=True)
+# print(system.h)
+system.set_u(I, add_spin=True, anti_symmetrize=True)
 
 cisdtq = CISDTQ(system, verbose=True, np=np)
 cisdtq.setup_ci_space()
