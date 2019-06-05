@@ -108,3 +108,6 @@ venv.bak/
 
 # Psi4 output
 timer.dat
+
+# Numpy datafiles
+*.npy
