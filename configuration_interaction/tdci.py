@@ -62,6 +62,9 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.ci.setup_ci_space()
         # Compute ground state
         self.ci.compute_ground_state(*args, **kwargs)
+        # Fetch pointers to the Hamiltonian
+        self.one_body_hamiltonian = self.ci.one_body_hamiltonian
+        self.two_body_hamiltonian = self.ci.two_body_hamiltonian
         self.hamiltonian = self.ci.hamiltonian.copy()
 
     def set_initial_conditions(self, c=None, K=0):
@@ -139,32 +142,51 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.h = self.system.h_t(current_time)
         self.u = self.system.u_t(current_time)
 
+        if self.system.has_one_body_time_evolution_operator:
+            self.one_body_hamiltonian.fill(0)
+
+            t0 = time.time()
+            # Compute new one-body Hamiltonian
+            setup_one_body_hamiltonian(
+                self.one_body_hamiltonian,
+                self.ci.states,
+                self.h,
+                self.n,
+                self.l,
+            )
+            t1 = time.time()
+
+            if self.verbose:
+                print(
+                    f"Time spent constructing one-body Hamiltonian: {t1 - t0} sec"
+                )
+
+        if self.system.has_two_body_time_evolution_operator:
+            self.two_body_hamiltonian.fill(0)
+
+            t0 = time.time()
+            # Compute new two-body Hamiltonian
+            setup_two_body_hamiltonian(
+                self.two_body_hamiltonian,
+                self.ci.states,
+                self.u,
+                self.n,
+                self.l,
+            )
+            t1 = time.time()
+
+            if self.verbose:
+                print(
+                    f"Time spent constructing two-body Hamiltonian: {t1 - t0} sec"
+                )
+
         # Empty Hamiltonian matrix
         self.hamiltonian.fill(0)
-
-        t0 = time.time()
-        # Compute new Hamiltonian
-        setup_one_body_hamiltonian(
-            self.hamiltonian, self.ci.states, self.h, self.n, self.l
+        self.hamiltonian = self.np.add(
+            self.one_body_hamiltonian,
+            self.two_body_hamiltonian,
+            out=self.hamiltonian,
         )
-        t1 = time.time()
-
-        if self.verbose:
-            print(
-                f"Time spent constructing one-body Hamiltonian: {t1 - t0} sec"
-            )
-
-        t0 = time.time()
-        # Compute new Hamiltonian
-        setup_two_body_hamiltonian(
-            self.hamiltonian, self.ci.states, self.u, self.n, self.l
-        )
-        t1 = time.time()
-
-        if self.verbose:
-            print(
-                f"Time spent constructing two-body Hamiltonian: {t1 - t0} sec"
-            )
 
         # Compute dot-product of new Hamiltonian with the previous coefficient
         # vector and multiply with -1j.
