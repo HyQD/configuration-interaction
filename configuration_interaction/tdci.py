@@ -33,6 +33,8 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         # Initialize ground state solver
         self.ci = self.ci_class(system, **ci_kwargs)
+        self.ci.setup_ci_space()
+
         self.system = system
 
         self.h = self.system.h
@@ -56,10 +58,9 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.compute_ground_state_one_body_density_matrix = (
             self.ci.compute_one_body_density_matrix
         )
+        self.spin_reduce_states = self.ci.spin_reduce_states
 
     def compute_ground_state(self, *args, **kwargs):
-        # Setup ci-space in ground state solver
-        self.ci.setup_ci_space()
         # Compute ground state
         self.ci.compute_ground_state(*args, **kwargs)
         # Fetch pointers to the Hamiltonian
