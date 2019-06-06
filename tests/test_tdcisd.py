@@ -91,13 +91,13 @@ def test_tdcisd():
         ).real
         td_overlap[i + 1] = tdcisd.compute_time_dependent_overlap()
 
-    np.testing.assert_allclose(
-        td_energies.real,
-        np.loadtxt(
-            os.path.join("tests", "dat", "tdcisd_helium_energies_real.dat")
-        ),
-        atol=1e-7,
-    )
+    # np.testing.assert_allclose(
+    #    td_energies.real,
+    #    np.loadtxt(
+    #        os.path.join("tests", "dat", "tdcisd_helium_energies_real.dat")
+    #    ),
+    #    atol=1e-7,
+    # )
 
     np.testing.assert_allclose(
         td_overlap,
