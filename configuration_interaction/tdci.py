@@ -80,13 +80,17 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     def c(self):
         return self._c
 
-    def solve(self, time_points):
+    def solve(self, time_points, timestep_tol=1e-8):
         n = len(time_points)
 
         for i in range(n - 1):
             dt = time_points[i + 1] - time_points[i]
             c_t = self.integrator.step(self._c, time_points[i], dt)
             self._c = c_t
+
+            if abs(self.last_timestep - (time_points[i] + dt)) > timestep_tol:
+                self.update_hamiltonian(time_points[i] + dt)
+                self.last_timestep = time_points[i] + dt
 
             yield self._c
 
@@ -137,9 +141,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return (overlap / norm_t / norm_0).real
 
-    def __call__(self, prev_c, current_time):
-        o, v = self.system.o, self.system.v
-
+    def update_hamiltonian(self, current_time):
         self.h = self.system.h_t(current_time)
         self.u = self.system.u_t(current_time)
 
@@ -189,9 +191,19 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             out=self.hamiltonian,
         )
 
+    def __call__(self, prev_c, current_time):
+        o, v = self.system.o, self.system.v
+
+        # Update Hamiltonian matrix
+        self.update_hamiltonian(current_time)
+
         # Compute dot-product of new Hamiltonian with the previous coefficient
         # vector and multiply with -1j.
         new_c = -1j * self.np.dot(self.hamiltonian, prev_c)
+
+        # Note the last timestep used to avoid updating the Hamiltonian in the
+        # same timestep twice.
+        self.last_timestep = current_time
 
         return new_c
 
