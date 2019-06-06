@@ -3,7 +3,10 @@ from scipy.interpolate import barycentric_interpolate
 
 
 class Integrator(metaclass=abc.ABCMeta):
-    def __init__(self, np):
+    def __init__(self, np=None):
+        if np is None:
+            import numpy as np
+
         self.np = np
 
     def set_rhs(self, rhs):
@@ -44,7 +47,7 @@ class GaussIntegrator(Integrator):
     Thomas Bondo Pedersen.
     """
 
-    def __init__(self, np, s=2, maxit=20, eps=1e-14):
+    def __init__(self, np=None, s=2, maxit=20, eps=1e-14):
         assert maxit > 0
 
         super().__init__(np)
