@@ -106,7 +106,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return energy
 
-    def compute_one_body_density_matrix(self, tol=1e-8):
+    def compute_one_body_density_matrix(self, tol=1e-5):
         rho_qp = self.np.zeros((self.l, self.l), dtype=self._c.dtype)
 
         density_matrix_function = construct_one_body_density_matrix
