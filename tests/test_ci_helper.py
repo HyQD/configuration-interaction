@@ -358,7 +358,7 @@ def test_hamiltonian_setup():
     l = 12
 
     rs = RandomSystem(n, l)
-    rs.setup_system()
+    rs.setup_system(add_spin=True, anti_symmetrize=True)
 
     from configuration_interaction import CISD
 
