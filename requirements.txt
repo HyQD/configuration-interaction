@@ -30,3 +30,7 @@ black
 
 # Install tqdm
 tqdm
+
+# Install sphinx for docs
+sphinx
+sphinx_rtd_theme
