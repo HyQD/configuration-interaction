@@ -1,7 +1,7 @@
 import pytest
 
 from configuration_interaction import CIS, CID, CISD
-from quantum_systems import OneDimensionalHarmonicOscillator
+from quantum_systems import ODQD
 
 
 @pytest.fixture
@@ -11,7 +11,7 @@ def odho_ti_small():
     grid = 10
     num_grid_points = 400
 
-    odho = OneDimensionalHarmonicOscillator(n, l, grid, num_grid_points)
+    odho = ODQD(n, l, grid, num_grid_points)
     odho.setup_system()
 
     return odho
@@ -25,7 +25,7 @@ def odho_ti(request):
     grid = 10
     num_grid_points = 400
 
-    odho = OneDimensionalHarmonicOscillator(n, l, grid, num_grid_points)
+    odho = ODQD(n, l, grid, num_grid_points)
     odho.setup_system()
 
     return odho
