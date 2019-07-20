@@ -54,8 +54,9 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
 
         self.states = np.zeros(shape, dtype=BITTYPE)
+        self._setup_ci_space()
 
-    def setup_ci_space(self):
+    def _setup_ci_space(self):
         t0 = time.time()
         create_reference_state(self.n, self.l, self.states)
 

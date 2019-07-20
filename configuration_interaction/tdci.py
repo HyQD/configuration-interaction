@@ -33,7 +33,6 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         # Initialize ground state solver
         self.ci = self.ci_class(system, **ci_kwargs)
-        self.ci.setup_ci_space()
 
         self.system = system
 

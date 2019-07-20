@@ -18,7 +18,6 @@ from tests.helper import (
 def test_setup(odho_ti_small):
     cisd = CISD(odho_ti_small, verbose=True)
 
-    cisd.setup_ci_space()
     assert cisd.num_states == 66
     assert len(cisd.states) == cisd.num_states
 
@@ -34,13 +33,12 @@ def test_states_setup(odho_ti_small):
     cisd = CISD(odho_ti_small, verbose=True)
 
     n, l = cisd.n, cisd.l
-    states_c = cisd.states.copy()
+    states_c = np.zeros_like(cisd.states)
     create_reference_state(n, l, states_c)
     index = create_singles_states(n, l, states_c, index=1)
     create_doubles_states(n, l, states_c, index=index)
     states_c = np.sort(states_c, axis=0)
 
-    cisd.setup_ci_space()
     for cisd_state, state in zip(cisd.states, states_c):
         print(f"{state_printer(cisd_state)}\n{state_printer(state)}\n")
 
@@ -49,7 +47,6 @@ def test_states_setup(odho_ti_small):
 
 def test_slater_condon_hamiltonian(odho_ti_small):
     cisd = CISD(odho_ti_small, verbose=True)
-    cisd.setup_ci_space()
     cisd.compute_ground_state()
 
     hamiltonian_b = np.zeros_like(cisd.hamiltonian)
@@ -67,7 +64,6 @@ def test_slater_condon_hamiltonian(odho_ti_small):
 
 def test_slater_condon_density_matrix(odho_ti_small):
     cisd = CISD(odho_ti_small, verbose=True)
-    cisd.setup_ci_space()
     cisd.compute_ground_state()
 
     for K in range(cisd.num_states):

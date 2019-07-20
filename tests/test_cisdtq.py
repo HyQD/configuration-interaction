@@ -21,8 +21,6 @@ from tests.helper import (
 def test_setup(odho_ti):
     cisdtq = CISDTQ(odho_ti, verbose=True)
 
-    cisdtq.setup_ci_space()
-
     num_states = 1
     num_states += NUM_SINGLES_STATES(odho_ti.n, odho_ti.m)
     num_states += NUM_DOUBLES_STATES(odho_ti.n, odho_ti.m)
@@ -43,14 +41,13 @@ def test_states_setup(odho_ti):
     cisdtq = CISDTQ(odho_ti, verbose=True)
 
     n, l = cisdtq.n, cisdtq.l
-    states_c = cisdtq.states.copy()
+    states_c = np.zeros_like(cisdtq.states)
     create_reference_state(n, l, states_c)
     index = create_singles_states(n, l, states_c, index=1)
     index = create_doubles_states(n, l, states_c, index=index)
     index = create_triples_states(n, l, states_c, index=index)
     index = create_quadruples_states(n, l, states_c, index=index)
 
-    cisdtq.setup_ci_space()
     for cisdtq_state, state in zip(
         np.sort(cisdtq.states, axis=0), np.sort(states_c, axis=0)
     ):

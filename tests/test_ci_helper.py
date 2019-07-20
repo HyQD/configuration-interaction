@@ -363,7 +363,6 @@ def test_hamiltonian_setup():
     from configuration_interaction import CISD
 
     cisd = CISD(rs)
-    cisd.setup_ci_space()
 
     orig_hamiltonian = np.zeros(
         (cisd.num_states, cisd.num_states), dtype=np.complex128
@@ -380,7 +379,6 @@ def test_hamiltonian_setup():
 def test_construct_one_body_density_matrices(odho_ti_small, CI):
     ci = CI(odho_ti_small, verbose=True)
 
-    ci.setup_ci_space()
     ci.compute_ground_state()
 
     rho_b = np.zeros((odho_ti_small.l, odho_ti_small.l), dtype=np.complex128)
@@ -402,7 +400,6 @@ def test_construct_one_body_density_matrices_random(CI):
     cs = CustomSystem(n, l)
 
     ci = CI(cs, verbose=True)
-    ci.setup_ci_space()
     ci._C = np.random.random(
         (ci.num_states, ci.num_states)
     ) + 1j * np.random.random((ci.num_states, ci.num_states))
