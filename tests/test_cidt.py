@@ -2,8 +2,7 @@ import numpy as np
 
 from configuration_interaction import CIDT
 from configuration_interaction.ci_helper import (
-    NUM_DOUBLES_STATES,
-    NUM_TRIPLES_STATES,
+    num_states,
     state_printer,
     create_excited_states,
     create_reference_state,
@@ -14,10 +13,10 @@ from tests.helper import create_doubles_states, create_triples_states
 def test_setup(odho_ti):
     cidt = CIDT(odho_ti, verbose=True)
 
-    num_states = 1
-    num_states += NUM_DOUBLES_STATES(odho_ti.n, odho_ti.m)
-    num_states += NUM_TRIPLES_STATES(odho_ti.n, odho_ti.m)
-    assert cidt.num_states == num_states
+    num_determinants = 1
+    num_determinants += num_states(odho_ti.n, odho_ti.m, order=2)
+    num_determinants += num_states(odho_ti.n, odho_ti.m, order=3)
+    assert cidt.num_states == num_determinants
     assert len(cidt.states) == cidt.num_states
 
     counter = 0

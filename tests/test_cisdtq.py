@@ -2,10 +2,7 @@ import numpy as np
 
 from configuration_interaction import CISDTQ
 from configuration_interaction.ci_helper import (
-    NUM_SINGLES_STATES,
-    NUM_DOUBLES_STATES,
-    NUM_TRIPLES_STATES,
-    NUM_QUADRUPLES_STATES,
+    num_states,
     state_printer,
     create_excited_states,
     create_reference_state,
@@ -21,12 +18,12 @@ from tests.helper import (
 def test_setup(odho_ti):
     cisdtq = CISDTQ(odho_ti, verbose=True)
 
-    num_states = 1
-    num_states += NUM_SINGLES_STATES(odho_ti.n, odho_ti.m)
-    num_states += NUM_DOUBLES_STATES(odho_ti.n, odho_ti.m)
-    num_states += NUM_TRIPLES_STATES(odho_ti.n, odho_ti.m)
-    num_states += NUM_QUADRUPLES_STATES(odho_ti.n, odho_ti.m)
-    assert cisdtq.num_states == num_states
+    num_determinants = 1
+    num_determinants += num_states(odho_ti.n, odho_ti.m, order=1)
+    num_determinants += num_states(odho_ti.n, odho_ti.m, order=2)
+    num_determinants += num_states(odho_ti.n, odho_ti.m, order=3)
+    num_determinants += num_states(odho_ti.n, odho_ti.m, order=4)
+    assert cisdtq.num_states == num_determinants
     assert len(cisdtq.states) == cisdtq.num_states
 
     counter = 0

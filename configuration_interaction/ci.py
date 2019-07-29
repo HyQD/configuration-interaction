@@ -3,7 +3,7 @@ import time
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
-    NUM_STATES,
+    num_states,
     ORDER,
     create_reference_state,
     create_excited_states,
@@ -36,7 +36,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.num_states = 1
 
         for excitation in self.excitations:
-            self.num_states += NUM_STATES[excitation](self.n, self.m)
+            self.num_states += num_states(self.n, self.m, ORDER[excitation])
 
         if self.verbose:
             print("Number of states to create: {0}".format(self.num_states))
