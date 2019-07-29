@@ -6,26 +6,21 @@ BITTYPE = np.uint64
 BITSTRING_SIZE = np.dtype(BITTYPE).itemsize * 8
 
 
-NUM_SINGLES_STATES = lambda n, m: n * m
-NUM_DOUBLES_STATES = (
-    lambda n, m: NUM_SINGLES_STATES(n, m) * (n - 1) // 2 * (m - 1) // 2
-)
-NUM_TRIPLES_STATES = (
-    lambda n, m: NUM_DOUBLES_STATES(n, m) * (n - 2) // 3 * (m - 2) // 3
-)
-NUM_QUADRUPLES_STATES = (
-    lambda n, m: NUM_TRIPLES_STATES(n, m) * (n - 3) // 4 * (m - 3) // 4
-)
+ORDER = {"S": 1, "D": 2, "T": 3, "Q": 4, "5": 5, "6": 6}
 
 
-NUM_STATES = {
-    "S": NUM_SINGLES_STATES,
-    "D": NUM_DOUBLES_STATES,
-    "T": NUM_TRIPLES_STATES,
-    "Q": NUM_QUADRUPLES_STATES,
-}
+def num_states(n, m, order):
+    if order <= 0:
+        return 1
 
-ORDER = {"S": 1, "D": 2, "T": 3, "Q": 4}
+    num = (
+        num_states(n, m, order - 1)
+        * (n - (order - 1))
+        * (m - (order - 1))
+        // order ** 2
+    )
+
+    return num
 
 
 def state_printer(state):

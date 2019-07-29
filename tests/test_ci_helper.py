@@ -4,10 +4,7 @@ import numpy as np
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
-    NUM_SINGLES_STATES,
-    NUM_DOUBLES_STATES,
-    NUM_TRIPLES_STATES,
-    NUM_QUADRUPLES_STATES,
+    num_states,
     popcount_64,
     count_state,
     occupied_index,
@@ -31,12 +28,39 @@ from tests.helper import (
 from quantum_systems import CustomSystem, RandomSystem
 
 
+NUM_SINGLES_STATES = lambda n, m: n * m
+NUM_DOUBLES_STATES = (
+    lambda n, m: NUM_SINGLES_STATES(n, m) * (n - 1) // 2 * (m - 1) // 2
+)
+NUM_TRIPLES_STATES = (
+    lambda n, m: NUM_DOUBLES_STATES(n, m) * (n - 2) // 3 * (m - 2) // 3
+)
+NUM_QUADRUPLES_STATES = (
+    lambda n, m: NUM_TRIPLES_STATES(n, m) * (n - 3) // 4 * (m - 3) // 4
+)
+
+
 @pytest.fixture
 def nl_num_states():
     n = 4
     l = 20
 
     return n, l
+
+
+def test_num_states(nl_num_states):
+    assert NUM_SINGLES_STATES(*nl_num_states) == num_states(
+        *nl_num_states, order=1
+    )
+    assert NUM_DOUBLES_STATES(*nl_num_states) == num_states(
+        *nl_num_states, order=2
+    )
+    assert NUM_TRIPLES_STATES(*nl_num_states) == num_states(
+        *nl_num_states, order=3
+    )
+    assert NUM_QUADRUPLES_STATES(*nl_num_states) == num_states(
+        *nl_num_states, order=4
+    )
 
 
 def test_num_singles_states(nl_num_states):
