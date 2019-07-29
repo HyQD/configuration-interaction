@@ -11,8 +11,10 @@ install:
 - conda config --set always_yes yes --set changeps1 no
 - conda update -q conda
 - conda info -a
-- conda env create -f environment.yml
-- source activate ci
+- pipenv install
+- pipenv shell
+  #- conda env create -f environment.yml
+  #- source activate ci
 script:
 - pytest
 after_success:
