@@ -112,8 +112,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         """
         np = self.np
 
+        assert self.system.h.dtype == self.system.u.dtype
+
         self.hamiltonian = np.zeros(
-            (self.num_states, self.num_states), dtype=np.complex128
+            (self.num_states, self.num_states), dtype=self.system.h.dtype
         )
         self.one_body_hamiltonian = np.zeros_like(self.hamiltonian)
         self.two_body_hamiltonian = np.zeros_like(self.hamiltonian)
@@ -169,6 +171,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         if self.verbose:
             print(
                 "Time spent diagonalizing Hamiltonian: {0} sec".format(t1 - t0)
+            )
+            print(
+                f"{self.__class__.__name__} ground state energy: "
+                + f"{self.energies[0]}"
             )
 
     def compute_one_body_density_matrix(self, K=0):

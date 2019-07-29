@@ -392,7 +392,7 @@ def setup_one_body_hamiltonian(hamiltonian, states, h, n, l):
     for I in range(num_states):
         state_I = states[I]
 
-        val = complex(0)
+        val = 0
 
         for i in range(l):
             if not occupied_index(state_I, i):
@@ -442,7 +442,7 @@ def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
     for I in range(num_states):
         state_I = states[I]
 
-        val = complex(0)
+        val = 0
 
         for i in range(l):
             if not occupied_index(state_I, i):
@@ -466,7 +466,7 @@ def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
             if diff > 4:
                 continue
 
-            val = complex(0)
+            val = 0
 
             if diff == 2:
                 val += diff_by_one_slater_condon_two_body(
@@ -495,7 +495,7 @@ def diff_by_one_slater_condon_two_body(state_I, state_J, u, n, l):
 
     sign = sign_m * sign_p
 
-    val = complex(0)
+    val = 0
 
     for i in range(l):
         if not occupied_index(state_I, i):
