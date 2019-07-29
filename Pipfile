@@ -1,0 +1,25 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+numpy = "*"
+scipy = "*"
+sympy = "*"
+pandas = "*"
+pytest = "*"
+numba = "*"
+quantum-systems = {editable = true,git = "ssh://git@github.com/Schoyen/quantum-systems.git"}
+tdhf = {editable = true,git = "ssh://git@github.com/haakoek/tdhf.git"}
+black = "==19.3b0"
+matplotlib = "*"
+tqdm = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+pyscf = "*"
+
+[requires]
+python_version = "3.6"
