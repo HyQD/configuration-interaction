@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-from quantum_systems import construct_psi4_system
+from quantum_systems import construct_pyscf_system
 from quantum_systems.time_evolution_operators import LaserField
 from configuration_interaction import TDCISD
 from configuration_interaction.integrators import GaussIntegrator
@@ -28,19 +28,11 @@ class LaserPulse:
 
 
 def test_tdcisd():
-    # System parameters
-    He = """
-    He 0.0 0.0 0.0
-    symmetry c1
-    """
-
-    options = {"basis": "cc-pvdz", "scf_type": "pk", "e_convergence": 1e-6}
     omega = 2.873_564_3
     E = 100
     laser_duration = 5
 
-    system = construct_psi4_system(He, options)
-    system.change_to_hf_basis(verbose=True, tolerance=1e-15)
+    system = construct_pyscf_system(molecule="he 0.0 0.0 0.0", basis="cc-pvdz")
 
     integrator = GaussIntegrator(s=3, np=np, eps=1e-6)
     tdcisd = TDCISD(system, integrator=integrator, np=np, verbose=True)
