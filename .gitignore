@@ -111,3 +111,6 @@ timer.dat
 
 # Numpy datafiles
 *.npy
+
+# Pipfile lock
+Pipfile.lock
