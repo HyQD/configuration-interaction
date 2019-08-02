@@ -6,6 +6,4 @@ install:
 - pipenv install
 script:
 - pytest
-after_success:
-- black .
-- bash push_formatting.sh
+- black --check .
