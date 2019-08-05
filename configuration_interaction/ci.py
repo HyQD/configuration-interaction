@@ -44,7 +44,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         # Find the shape of the states array
         # Each state is represented as a bit string padded to the nearest
         # 32-bit boundary
-        shape = (self.num_states, self.l // BITSTRING_SIZE + 1)
+        shape = (
+            self.num_states,
+            self.l // BITSTRING_SIZE + (self.l % BITSTRING_SIZE > 0),
+        )
 
         if self.verbose:
             print(
