@@ -15,6 +15,26 @@ def sort_states(states):
 
 
 def num_states(n, m, order):
+    """Count the number of Slater determinants for a given number of particles
+    `n`, virtual states `m`, and a specific truncation `order`.
+
+    Parameters
+    ----------
+    n : int
+        Number of particles.
+    m : int
+        Number of virtual states, i.e., `l - n`, where `l` is the number of
+        spin-orbitals.
+    order : int
+        Truncation order, singles implies `order = 1`, doubles is given by
+        `order = 2`, and so on.
+
+    Returns
+    -------
+    int
+        Number of Slater determinants.
+    """
+
     if order <= 0:
         return 1
 
