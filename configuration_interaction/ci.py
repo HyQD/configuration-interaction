@@ -12,6 +12,7 @@ from configuration_interaction.ci_helper import (
     construct_one_body_density_matrix,
     compute_particle_density,
     compute_spin_projection_eigenvalue,
+    sort_states,
 )
 
 
@@ -80,7 +81,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 f"Time spent setting up CI{''.join(self.excitations)} space: {t1 - t0} sec"
             )
 
-        self.states = self.np.sort(self.states, axis=0)
+        self.states = sort_states(self.states)
 
     def spin_reduce_states(self, s=0):
         """Function removing all states with spin different from `s`. This
@@ -99,7 +100,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             if compute_spin_projection_eigenvalue(state) == s:
                 new_states.append(state)
 
-        self.states = np.sort(np.array(new_states), axis=0)
+        self.states = sort_states(np.array(new_states))
         self.num_states = len(self.states)
 
         if self.verbose:

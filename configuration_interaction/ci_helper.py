@@ -9,6 +9,11 @@ BITSTRING_SIZE = np.dtype(BITTYPE).itemsize * 8
 ORDER = {"S": 1, "D": 2, "T": 3, "Q": 4, "5": 5, "6": 6}
 
 
+def sort_states(states):
+    indices = np.sum(states, axis=1).argsort()
+    return states[indices]
+
+
 def num_states(n, m, order):
     if order <= 0:
         return 1

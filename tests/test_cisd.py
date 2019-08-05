@@ -83,3 +83,18 @@ def test_slater_condon_density_matrix(odho_ti_small):
         rho = cisd.n * rho / np.trapz(rho, x=odho_ti_small.grid)
 
         np.testing.assert_allclose(rho_b, rho)
+
+
+def test_large_basis():
+    from quantum_systems import TwoDimensionalHarmonicOscillator
+
+    n = 2
+    l = 66  # Force the use of two uint64 in a determinant
+
+    tdho = TwoDimensionalHarmonicOscillator(n, l, 10, 101)
+    tdho.setup_system(verbose=True)
+
+    cisd = CISD(tdho, verbose=True)
+    cisd.compute_ground_state()
+
+    assert abs(cisd.energies[0] - 3.0094342497034936) < 1e-8
