@@ -15,21 +15,37 @@ from configuration_interaction.ci_helper import (
 
 class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     """Abstract base class defining the skeleton of a time-dependent
-    configuration interaction solver.
+    configuration interaction solver. All subclasses need to provide a subclass
+    of ConfigurationInteraction in the member `self.ci_class`.
+
+    Parameters
+    ----------
+    system : QuantumSystems
+        Quantum systems instance.
+    np : module
+        Array library, defaults to ``numpy``.
+    integrator : Integrator
+        Differential equation integrator. The integrator class must implement a
+        ``step``-function.
+    verbose : bool
+        Print timer and logging info. Default value is ``False``.
+    **ci_kwargs : dict
+        Keyword arguments to ground state solver class.
     """
 
     def __init__(
-        self, system, np=None, integrator=None, td_verbose=False, **ci_kwargs
+        self, system, np=None, integrator=None, verbose=False, **ci_kwargs
     ):
         if np is None:
             import numpy as np
 
         self.np = np
 
+        ci_kwargs["verbose"] = verbose
+        self.verbose = verbose
+
         if not "np" in ci_kwargs:
             ci_kwargs["np"] = self.np
-
-        self.verbose = td_verbose
 
         # Initialize ground state solver
         self.ci = self.ci_class(system, **ci_kwargs)
@@ -94,11 +110,30 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             yield self._c
 
     def compute_energy(self):
-        """Function computing the energy of the time-evolved system with a
+        r"""Function computing the energy of the time-evolved system with a
         time-evolved Hamiltonian.
 
-            E(t) = <\Psi(t)| H(t) |\Psi(t)> / <\Psi(t)|\Psi(t)>
-                = c^{*}(t) H(t) c(t) / [c^{*}(t) c(t)].
+        .. math:: E(t) = \frac{
+                \langle\Psi(t)\rvert \hat{H}(t) \lvert\Psi(t)\rangle
+            }{
+                \langle\Psi(t)\rvert\Psi(t)\rangle
+            }
+            = \frac{
+                \mathbf{c}^{\dagger}(t) \mathbf{H}(t) \mathbf{c}(t)
+            }{
+                \mathbf{c}^{\dagger}(t) \mathbf{c}(t)
+            },
+
+        where :math:`\lvert\Psi(t)\rangle` is the time-evolved state given by
+
+        .. math:: \lvert\Psi(t)\rangle = c_I(t)\lvert\Phi_I\rangle,
+
+        with :math:`\lvert\Phi_I\rangle` being Slater determinants.
+
+        Returns
+        -------
+        float
+            The time-dependent energy :math:`E(t)`.
         """
         norm = self._c.conj() @ self._c
         energy = self._c.conj() @ self.hamiltonian @ self._c / norm
@@ -191,6 +226,29 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         )
 
     def __call__(self, prev_c, current_time):
+        r"""Function computing the right-hand side of the time-dependent
+        Schrödinger equation for the coefficient vector :math:`\mathbf{c}(t)`.
+        That is, this function finds the time-derivative of the coefficient
+        vector from
+
+        .. math:: \dot{\mathbf{c}} = -i\mathbf{H}(t)\mathbf{c}(t).
+
+        This function is made to resemble the right-hand side functions
+        typically used for differential equation solvers.
+
+        Parameters
+        ----------
+        prev_c : np.ndarray
+            Coefficient vector at previous time-step.
+        current_time : float
+            Current time-step.
+
+        Returns
+        -------
+        np.ndarray
+            Time-derivative of coefficient vector at current time-step.
+        """
+
         o, v = self.system.o, self.system.v
 
         # Update Hamiltonian matrix
@@ -213,15 +271,15 @@ def get_tdci_class(excitations):
 
     Parameters
     ----------
-    excitations : str, iterable
+    excitations : str
         The specified excitations to use in the TDCI-class. For example, to
         create a TDCISD class both `excitations="CISD"` and
         `excitations=["S", "D"]` are valid.
 
     Returns
     -------
-    tdci_class : class
-        A subclass of `TimeDependentConfigurationInteraction`.
+    TimeDependentConfigurationInteraction
+        A subclass of ``TimeDependentConfigurationInteraction``.
     """
     ci_class = get_ci_class(excitations)
     excitations = excitation_string_handler(excitations)
