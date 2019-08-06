@@ -203,10 +203,11 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
 
     def compute_one_body_density_matrix(self, K=0):
-        r"""Function computing the one-body density matrix :math:`\rho^{q}_{p}`
-        defined by
+        r"""Function computing the one-body density matrix
+        :math:`(\rho_K)^{q}_{p}` defined by
 
-        .. math:: \rho^{q}_{p} = \langle\Psi_K\rvert \hat{c}_{p}^{\dagger} \hat{c}_{q} \lvert\Psi_K\rangle,
+        .. math:: (\rho_K)^{q}_{p} = \langle\Psi_K\rvert \hat{c}_{p}^{\dagger}
+                \hat{c}_{q} \lvert\Psi_K\rangle,
 
         where :math:`\lvert\Psi_K\rangle` is the :math:`K`'th eigenstate of the
         Hamiltonian defined by
@@ -215,7 +216,18 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         where :math:`\lvert\Phi_J\rangle` is the :math:`J`'th Slater
         determinant and :math:`C_{JK}` is the coefficient matrix found from
-        diagonalizing the Hamiltonian."""
+        diagonalizing the Hamiltonian.
+
+        Parameters
+        ----------
+        K : int
+            The eigenstate to compute the one-body density matrix of.
+
+        Returns
+        -------
+        np.ndarray
+            The one-body density matrix.
+        """
 
         assert 0 <= K < self.num_states
 
@@ -240,6 +252,27 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         return rho_qp
 
     def compute_particle_density(self, K=0):
+        r"""Function computing the particle density :math:`\rho_K(x)` defined
+        by
+
+        .. math:: \rho_K(x) = \phi^{*}_{q}(x) (\rho_K)^{q}_{p} \phi_{p}(x),
+
+        where :math:`\phi_p(x)` are the single-particle functions,
+        :math:`(\rho_K)^{q}_{p}` the one-body density matrix for eigenstate
+        :math:`K`, and :math:`x` some coordinate space.
+        Note the use of the Einstein summation convention in the above expression.
+
+        Parameters
+        ----------
+        K : int
+            The eigenstate to compute the particle density of. Default is ``K =
+            0``.
+
+        Returns
+        -------
+        np.ndarray
+            Particle density on the same grid as the single-particle functions.
+        """
         rho_qp = self.compute_one_body_density_matrix(K=K)
 
         return compute_particle_density(rho_qp, self.system.spf, self.np)
@@ -251,6 +284,9 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
     @property
     def C(self):
         return self._C
+
+    def compute_energy(self):
+        return self._energies[0]
 
 
 def excitation_string_handler(excitations):
