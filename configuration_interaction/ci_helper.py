@@ -271,6 +271,32 @@ def create_excited_states(n, l, states, index, order):
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
 def _create_excited_states(n, l, states, index, order, o_remove, v_insert):
+    """Function creating all Slater determinants of a given truncation level
+    ``order``.
+
+    Parameters
+    ----------
+    n : int
+        Number of particles.
+    l : int
+        Number of spin-orbitals.
+    states : np.ndarray
+        Array with all the Slater determinants.
+    index : int
+        Index of the current determinant we wish to excite.
+    order : int
+        Truncation level, e.g., ``order == 1`` corresponds to
+        singles-excitations.
+    o_remove : np.array
+        Occupied indices to remove from ``states[index]``.
+    v_insert : np.array
+        Virtual indices to create in ``states[index]``.
+
+    Returns
+    -------
+    int
+        Index of the next state to manipulate.
+    """
     if order == 0:
         _excite_state(states[index], o_remove, v_insert)
         return index + 1
@@ -292,6 +318,21 @@ def _create_excited_states(n, l, states, index, order, o_remove, v_insert):
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
 def _excite_state(state, o_remove, v_insert):
+    """Function exciting a state by removing all occupied states with indices
+    in ``o_remove`` and inserting them into ``v_insert``.
+
+    Note that this function assumes that the states array are set up properly
+    and no testing to check if the array is valid is done.
+
+    Parameters
+    ----------
+    state : np.array
+        Array of ``BITTYPE`` representing a Slater determinant.
+    o_remove : np.array
+        Occupied states to remove from ``state``.
+    v_insert : np.array
+        Virtual states to create in ``state``.
+    """
     for i, a in zip(o_remove, v_insert):
         elem_i = i // BITSTRING_SIZE
         elem_a = a // BITSTRING_SIZE
