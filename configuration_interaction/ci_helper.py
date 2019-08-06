@@ -412,6 +412,25 @@ def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
 
 @numba.njit(parallel=True, nogil=True, fastmath=True)
 def setup_one_body_hamiltonian(hamiltonian, states, h, n, l):
+    """Function computing the one-body contributions to the Hamiltonian using
+    the Slater-Condon rules.
+    See rules here:
+    https://en.wikipedia.org/wiki/Slater%E2%80%93Condon_rules#Integrals_of_one-body_operators
+
+    Parameters
+    ----------
+    hamiltonian : np.ndarray
+        Hamiltonian matrix of dimension len(states) ** 2.
+    states : np.ndarray
+        Bit representation of Slater determinants.
+    h : np.ndarray
+        One-body matrix elements, of dimension l ** 2.
+    n : int
+        Number of particles.
+    l : int
+        Number of basis states.
+    """
+
     num_states = len(states)
 
     for I in range(num_states):
