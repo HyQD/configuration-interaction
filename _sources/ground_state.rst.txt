@@ -15,8 +15,8 @@ To create a specific CI-solver a subclass of the
 ``ConfigurationInteraction``-class must be created setting the field
 ``excitations``.
 
-Creating truncated CI-class
----------------------------
+Creating truncated CI-classes
+-----------------------------
 The library includes pre-defined classes for some of the more common truncation
 levels.
 These are:

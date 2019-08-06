@@ -84,7 +84,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ground_state.html">Ground state calculations</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Time-evolution computations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Time-evolution computations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#time-dependent-configuration-interaction-super-class">Time-dependent configuration interaction super class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-truncated-tdci-classes">Creating truncated TDCI-classes</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -151,6 +155,115 @@
             
   <div class="section" id="time-evolution-computations">
 <h1>Time-evolution computations<a class="headerlink" href="#time-evolution-computations" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="time-dependent-configuration-interaction-super-class">
+<h2>Time-dependent configuration interaction super class<a class="headerlink" href="#time-dependent-configuration-interaction-super-class" title="Permalink to this headline">¶</a></h2>
+<p>Similarly to the ground state computations, the truncation level of the Slater
+determinants decides which time-dependent configuration interaction class to
+use.
+However, this time the truncation level of the class decides which ground state
+solver to use, whereas the time-dependent part only requires an initial state
+represented as a coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>.</p>
+<dl class="class">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction">
+<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.tdci.</code><code class="sig-name descname">TimeDependentConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param">system</em>, <em class="sig-param">np=None</em>, <em class="sig-param">integrator=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">**ci_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class defining the skeleton of a time-dependent
+configuration interaction solver. All subclasses need to provide a subclass
+of ConfigurationInteraction in the member <cite>self.ci_class</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<em>QuantumSystems</em>) – Quantum systems instance.</p></li>
+<li><p><strong>np</strong> (<em>module</em>) – Array library, defaults to <code class="docutils literal notranslate"><span class="pre">numpy</span></code>.</p></li>
+<li><p><strong>integrator</strong> (<em>Integrator</em>) – Differential equation integrator. The integrator class must implement a
+<code class="docutils literal notranslate"><span class="pre">step</span></code>-function.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print timer and logging info. Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>**ci_kwargs</strong> (<em>dict</em>) – Keyword arguments to ground state solver class.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">prev_c</em>, <em class="sig-param">current_time</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the right-hand side of the time-dependent
+Schrödinger equation for the coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}(t)\)</span>.
+That is, this function finds the time-derivative of the coefficient
+vector from</p>
+<div class="math notranslate nohighlight">
+\[\dot{\mathbf{c}} = -i\mathbf{H}(t)\mathbf{c}(t).\]</div>
+<p>This function is made to resemble the right-hand side functions
+typically used for differential equation solvers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prev_c</strong> (<em>np.ndarray</em>) – Coefficient vector at previous time-step.</p></li>
+<li><p><strong>current_time</strong> (<em>float</em>) – Current time-step.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Time-derivative of coefficient vector at current time-step.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy">
+<code class="sig-name descname">compute_energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the energy of the time-evolved system with a
+time-evolved Hamiltonian.</p>
+<div class="math notranslate nohighlight">
+\[E(t) = \frac{
+    \langle\Psi(t)\rvert \hat{H}(t) \lvert\Psi(t)\rangle
+}{
+    \langle\Psi(t)\rvert\Psi(t)\rangle
+}
+= \frac{
+    \mathbf{c}^{\dagger}(t) \mathbf{H}(t) \mathbf{c}(t)
+}{
+    \mathbf{c}^{\dagger}(t) \mathbf{c}(t)
+},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lvert\Psi(t)\rangle\)</span> is the time-evolved state given by</p>
+<div class="math notranslate nohighlight">
+\[\lvert\Psi(t)\rangle = c_I(t)\lvert\Phi_I\rangle,\]</div>
+<p>with <span class="math notranslate nohighlight">\(\lvert\Phi_I\rangle\)</span> being Slater determinants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The time-dependent energy <span class="math notranslate nohighlight">\(E(t)\)</span>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="creating-truncated-tdci-classes">
+<h2>Creating truncated TDCI-classes<a class="headerlink" href="#creating-truncated-tdci-classes" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="configuration_interaction.tdci.get_tdci_class">
+<code class="sig-prename descclassname">configuration_interaction.tdci.</code><code class="sig-name descname">get_tdci_class</code><span class="sig-paren">(</span><em class="sig-param">excitations</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.get_tdci_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function constructing a truncated TDCI-class with the specified
+excitations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>excitations</strong> (<em>str</em>) – The specified excitations to use in the TDCI-class. For example, to
+create a TDCISD class both <cite>excitations=”CISD”</cite> and
+<cite>excitations=[“S”, “D”]</cite> are valid.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A subclass of <code class="docutils literal notranslate"><span class="pre">TimeDependentConfigurationInteraction</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction" title="configuration_interaction.tdci.TimeDependentConfigurationInteraction">TimeDependentConfigurationInteraction</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 
 
