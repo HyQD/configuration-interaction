@@ -17,6 +17,20 @@ from configuration_interaction.ci_helper import (
 
 
 class ConfigurationInteraction(metaclass=abc.ABCMeta):
+    """Abstract base class defining the skeleton of a truncated configuration
+    interaction class. All subclasses need to provide the member
+    ``excitations`` as this decides the basis of Slater determinants.
+
+    Parameters
+    ----------
+    system : QuantumSystems
+        Quantum systems instance.
+    verbose : bool
+        Print timer and logging info. Default value is ``False``.
+    np : module
+        Array library, defaults to ``numpy``.
+    """
+
     def __init__(self, system, verbose=False, np=None):
         self.verbose = verbose
 
@@ -84,8 +98,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.states = sort_states(self.states)
 
     def spin_reduce_states(self, s=0):
-        """Function removing all states with spin different from `s`. This
-        builds a new `self.states`-array and updates `self.num_states`.
+        """Function removing all states with spin different from ``s``. This
+        builds a new ``self.states``-array and updates ``self.num_states``.
 
         Parameters
         ----------
@@ -113,7 +127,14 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         eigenenergies and the eigenvectors (coefficients) of the system.
 
         Note that the current solution assumes orthonormal Slater determinants.
+
+        Parameters
+        ----------
+        k : int
+            The number of eigenpairs to compute using an iterative eigensolver.
+            Default is ``None``, which means that all eigenpairs are computed.
         """
+
         np = self.np
 
         assert self.system.h.dtype == self.system.u.dtype
@@ -182,18 +203,19 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
 
     def compute_one_body_density_matrix(self, K=0):
-        r"""Function computing the one-body density matrix \rho^{q}_{p} defined
-        by
+        r"""Function computing the one-body density matrix :math:`\rho^{q}_{p}`
+        defined by
 
-            \rho^{q}_{p} = <\Psi_K|c_{p}^{\dagger} c_{q} |\Psi_K>,
+        .. math:: \rho^{q}_{p} = \langle\Psi_K\rvert \hat{c}_{p}^{\dagger} \hat{c}_{q} \lvert\Psi_K\rangle,
 
-        where |\Psi_K> is the K'th eigenstate of the Hamiltonian defined by
+        where :math:`\lvert\Psi_K\rangle` is the :math:`K`'th eigenstate of the
+        Hamiltonian defined by
 
-            |\Psi_K> = C_{JK} |\Phi_J>,
+        .. math:: \lvert\Psi_K\rangle = C_{JK} \lvert\Phi_J\rangle,
 
-        where |\Phi_J> is the J'th Slater determinant and C_{JK} is the JK
-        element of the coefficient matrix found from diagonalizing the
-        Hamiltonian."""
+        where :math:`\lvert\Phi_J\rangle` is the :math:`J`'th Slater
+        determinant and :math:`C_{JK}` is the coefficient matrix found from
+        diagonalizing the Hamiltonian."""
 
         assert 0 <= K < self.num_states
 
@@ -252,15 +274,15 @@ def get_ci_class(excitations):
 
     Parameters
     ----------
-    excitations : str, iterable
-        The specified excitations to use in the CI-class. For example, to create
-        a CISD class both `excitations="CISD"` and `excitations=["S", "D"]` are
-        valid.
+    excitations : str
+        The specified excitations to use in the CI-class. For example, to
+        create a CISD class both ``excitations="CISD"`` and ``excitations=["S",
+        "D"]`` are valid.
 
     Returns
     -------
-    ci_class : class
-        A subclass of `ConfigurationInteraction`.
+    ConfigurationInteraction
+        A subclass of ``ConfigurationInteraction``.
     """
     excitations = excitation_string_handler(excitations)
     class_name = "CI" + "".join(excitations)
