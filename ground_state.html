@@ -25,6 +25,7 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -83,7 +84,11 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Ground state calculations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ground state calculations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-interaction-super-class">Configuration interaction super class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-truncated-ci-class">Creating truncated CI-class</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="time_evolution.html">Time-evolution computations</a></li>
 </ul>
 
@@ -151,6 +156,161 @@
             
   <div class="section" id="ground-state-calculations">
 <h1>Ground state calculations<a class="headerlink" href="#ground-state-calculations" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="configuration-interaction-super-class">
+<h2>Configuration interaction super class<a class="headerlink" href="#configuration-interaction-super-class" title="Permalink to this headline">¶</a></h2>
+<p>In our implementation the truncation level of the Slater determinant basis
+uniquely decides the configuration interaction class.
+We’ve therefore created a single abstract super-class defining all methods
+needed by the CI-solvers.</p>
+<dl class="class">
+<dt id="configuration_interaction.ci.ConfigurationInteraction">
+<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">ConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param">system</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">np=None</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class defining the skeleton of a truncated configuration
+interaction class. All subclasses need to provide the member
+<code class="docutils literal notranslate"><span class="pre">excitations</span></code> as this decides the basis of Slater determinants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<em>QuantumSystems</em>) – Quantum systems instance.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print timer and logging info. Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>np</strong> (<em>module</em>) – Array library, defaults to <code class="docutils literal notranslate"><span class="pre">numpy</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="configuration_interaction.ci.ConfigurationInteraction.compute_ground_state">
+<code class="sig-name descname">compute_ground_state</code><span class="sig-paren">(</span><em class="sig-param">k=None</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_ground_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function constructing the Hamiltonian of the system without any
+optimization such as the Slater-Condon rules, etc. Having constructed
+the Hamiltonian the function diagonalizes the matrix and stores the
+eigenenergies and the eigenvectors (coefficients) of the system.</p>
+<p>Note that the current solution assumes orthonormal Slater determinants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – The number of eigenpairs to compute using an iterative eigensolver.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which means that all eigenpairs are computed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix">
+<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param">K=0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the one-body density matrix
+<span class="math notranslate nohighlight">\((\rho_K)^{q}_{p}\)</span> defined by</p>
+<div class="math notranslate nohighlight">
+\[(\rho_K)^{q}_{p} = \langle\Psi_K\rvert \hat{c}_{p}^{\dagger}
+\hat{c}_{q} \lvert\Psi_K\rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lvert\Psi_K\rangle\)</span> is the <span class="math notranslate nohighlight">\(K\)</span>’th eigenstate of the
+Hamiltonian defined by</p>
+<div class="math notranslate nohighlight">
+\[\lvert\Psi_K\rangle = C_{JK} \lvert\Phi_J\rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lvert\Phi_J\rangle\)</span> is the <span class="math notranslate nohighlight">\(J\)</span>’th Slater
+determinant and <span class="math notranslate nohighlight">\(C_{JK}\)</span> is the coefficient matrix found from
+diagonalizing the Hamiltonian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>K</strong> (<em>int</em>) – The eigenstate to compute the one-body density matrix of.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The one-body density matrix.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.ci.ConfigurationInteraction.compute_particle_density">
+<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param">K=0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the particle density <span class="math notranslate nohighlight">\(\rho_K(x)\)</span> defined
+by</p>
+<div class="math notranslate nohighlight">
+\[\rho_K(x) = \phi^{*}_{q}(x) (\rho_K)^{q}_{p} \phi_{p}(x),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\phi_p(x)\)</span> are the single-particle functions,
+<span class="math notranslate nohighlight">\((\rho_K)^{q}_{p}\)</span> the one-body density matrix for eigenstate
+<span class="math notranslate nohighlight">\(K\)</span>, and <span class="math notranslate nohighlight">\(x\)</span> some coordinate space.
+Note the use of the Einstein summation convention in the above expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>K</strong> (<em>int</em>) – The eigenstate to compute the particle density of. Default is <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">=</span>
+<span class="pre">0</span></code>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Particle density on the same grid as the single-particle functions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.ci.ConfigurationInteraction.spin_reduce_states">
+<code class="sig-name descname">spin_reduce_states</code><span class="sig-paren">(</span><em class="sig-param">s=0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.spin_reduce_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function removing all states with spin different from <code class="docutils literal notranslate"><span class="pre">s</span></code>. This
+builds a new <code class="docutils literal notranslate"><span class="pre">self.states</span></code>-array and updates <code class="docutils literal notranslate"><span class="pre">self.num_states</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> (<em>int</em>) – Spin projection number to keep.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>To create a specific CI-solver a subclass of the
+<code class="docutils literal notranslate"><span class="pre">ConfigurationInteraction</span></code>-class must be created setting the field
+<code class="docutils literal notranslate"><span class="pre">excitations</span></code>.</p>
+</div>
+<div class="section" id="creating-truncated-ci-class">
+<h2>Creating truncated CI-class<a class="headerlink" href="#creating-truncated-ci-class" title="Permalink to this headline">¶</a></h2>
+<p>The library includes pre-defined classes for some of the more common truncation
+levels.
+These are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CIS</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CID</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CISD</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CIDT</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CISDT</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CIDTQ</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CISDTQ</span></code></p></li>
+</ul>
+<p>However, these classes and others can be created by the function
+<code class="docutils literal notranslate"><span class="pre">get_ci_class</span></code> listed below.</p>
+<dl class="function">
+<dt id="configuration_interaction.ci.get_ci_class">
+<code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">get_ci_class</code><span class="sig-paren">(</span><em class="sig-param">excitations</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.get_ci_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function constructing a truncated CI-class with the specified
+excitations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>excitations</strong> (<em>str</em>) – The specified excitations to use in the CI-class. For example, to
+create a CISD class both <code class="docutils literal notranslate"><span class="pre">excitations=&quot;CISD&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">excitations=[&quot;S&quot;,</span>
+<span class="pre">&quot;D&quot;]</span></code> are valid.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A subclass of <code class="docutils literal notranslate"><span class="pre">ConfigurationInteraction</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction" title="configuration_interaction.ci.ConfigurationInteraction">ConfigurationInteraction</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>As an example, we demonstrate how to create a CISDTQ56-class using this
+function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the object class</span>
+<span class="n">CISDTQ56</span> <span class="o">=</span> <span class="n">get_ci_class</span><span class="p">(</span><span class="s2">&quot;CISDTQ56&quot;</span><span class="p">)</span>
+<span class="c1"># Instantiate the object, and setup the Slater determinants</span>
+<span class="n">cisdtq56</span> <span class="o">=</span> <span class="n">CISDTQ56</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Compute the ground state of the system</span>
+<span class="n">cisdtq56</span><span class="o">.</span><span class="n">compute_ground_state</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
