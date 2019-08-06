@@ -35,7 +35,7 @@ Pipenv
 
 The recommended way to install this project as of now is by using ``pipenv``. Run::
 
-	pipenv install -e git+https://github.com/Schoyen/quantum-systems.git#egg=configuration-interaction
+	pipenv install -e git+https://github.com/Schoyen/configuration-interaction.git#egg=configuration-interaction
 
 This will install the project with all dependencies.
 
