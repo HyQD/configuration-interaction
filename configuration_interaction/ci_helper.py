@@ -462,8 +462,31 @@ def diff_by_one_slater_condon_one_body(state_I, state_J, h, n, l):
 
 @numba.njit(parallel=True, nogil=True, fastmath=True)
 def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
+    """Function computing the two-body contributions to the Hamiltonian using
+    the Slater-Condon rules.
+    See rules here:
+    https://en.wikipedia.org/wiki/Slater%E2%80%93Condon_rules#Integrals_of_two-body_operators
+
+    Note that `u` is the antisymmetric two-body elements thus removing the need
+    for subtractions in the Slater-Condon rules.
+
+    Parameters
+    ----------
+    hamiltonian : np.ndarray
+        Hamiltonian matrix of dimension len(states) ** 2.
+    states : np.ndarray
+        Bit representation of Slater determinants.
+    u : np.ndarray
+        Two-body matrix elements, of dimension l ** 4.
+    n : int
+        Number of particles.
+    l : int
+        Number of basis states.
+    """
+
     num_states = len(states)
 
+    # Compute diagonal elements
     for I in range(num_states):
         state_I = states[I]
 
@@ -473,6 +496,7 @@ def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
             if not occupied_index(state_I, i):
                 continue
 
+            # Avoid double counting and remove the need for a factor 1/2
             for j in range(i + 1, l):
                 if not occupied_index(state_I, j):
                     continue
@@ -481,6 +505,7 @@ def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
 
         hamiltonian[I, I] += val
 
+    # Compute off-diagonal elements
     for I in numba.prange(num_states):
         state_I = states[I]
 
