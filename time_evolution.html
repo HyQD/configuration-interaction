@@ -155,6 +155,12 @@
             
   <div class="section" id="time-evolution-computations">
 <h1>Time-evolution computations<a class="headerlink" href="#time-evolution-computations" title="Permalink to this headline">¶</a></h1>
+<p>The time-evolution of the configuration interaction method is done by computing
+the ground state at a specified truncation level, and choosing initial
+conditions for the coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>.
+The default choice is the ground state coefficient vector found from the ground
+state computations, but other choices are valid as well as long as the
+normalization of the coefficient vector is the same as for the eigenstates.</p>
 <div class="section" id="time-dependent-configuration-interaction-super-class">
 <h2>Time-dependent configuration interaction super class<a class="headerlink" href="#time-dependent-configuration-interaction-super-class" title="Permalink to this headline">¶</a></h2>
 <p>Similarly to the ground state computations, the truncation level of the Slater
