@@ -1,5 +1,11 @@
 Time-evolution computations
 ===========================
+The time-evolution of the configuration interaction method is done by computing
+the ground state at a specified truncation level, and choosing initial
+conditions for the coefficient vector :math:`\mathbf{c}`.
+The default choice is the ground state coefficient vector found from the ground
+state computations, but other choices are valid as well as long as the
+normalization of the coefficient vector is the same as for the eigenstates.
 
 Time-dependent configuration interaction super class
 ----------------------------------------------------
