@@ -76,6 +76,17 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.spin_reduce_states = self.ci.spin_reduce_states
 
     def compute_ground_state(self, *args, **kwargs):
+        r"""Compute the ground state from the defined ``self.ci_class`` and set
+        initial values for the Hamiltonian matrix :math:`\mathbf{H}`.
+
+        Parameters
+        ----------
+        *args
+            Argument list for ground state class ``self.ci_class``.
+        **kwargs
+            Keyward argument for ground state class ``self.ci_class``.
+        """
+
         # Compute ground state
         self.ci.compute_ground_state(*args, **kwargs)
         # Fetch pointers to the Hamiltonian
@@ -84,6 +95,20 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.hamiltonian = self.ci.hamiltonian.copy()
 
     def set_initial_conditions(self, c=None, K=0):
+        r"""Set initial state for the differential equation solver.
+
+        Parameters
+        ----------
+        c : np.array
+            The initial coefficient vector :math:`\mathbf{c}(0)`. Default is
+            ``None`` which defaults to state ``K`` from the ground state
+            calculations.
+        K : int
+            Initial eigenstate from ground state calculations. This argument is
+            ignored if a value for ``c`` is given. Default is ``K = 0`` which
+            is the ground state.
+        """
+
         if c is None:
             # Create copy of the ground state coefficients
             c = self.ci._C[:, K].copy()
@@ -96,6 +121,24 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         return self._c
 
     def solve(self, time_points, timestep_tol=1e-8):
+        """Function creating a generator for stepping through the solution to
+        the differential equation integrator.
+
+        Parameters
+        ----------
+        time_points : np.array
+            Discretized time-points to integrate over.
+        timestep_tol : float
+            Tolerance to check if the last timestep corresponds to the same
+            timestep as used in the evaluation of the right-hand side in the
+            integrator. Default is ``timestep_tol=1e-8``.
+
+        Yields
+        ------
+        np.array
+            The coefficient vector at each timestep.
+        """
+
         n = len(time_points)
 
         for i in range(n - 1):
@@ -141,12 +184,30 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         return energy
 
     def compute_one_body_density_matrix(self, tol=1e-5):
+        r"""Compute one-body density matrix for the time-dependent state
+        :math:`\rvert\Psi(t)\rangle`,
+
+        .. math:: \rho^{q}_{p}(t)
+            = \langle\Psi(t)\rvert
+            \hat{c}^{\dagger}_{p}
+            \hat{c}_{q}
+            \lvert\Psi(t)\rangle.
+
+        Parameters
+        ----------
+        tol : float
+            Tolerance of trace warning. Default is ``tol=1e-5``.
+
+        Returns
+        -------
+        np.ndarray
+            The one-body density matrix :math:`\rho^{q}_{p}(t)`.
+        """
+
         rho_qp = self.np.zeros((self.l, self.l), dtype=self._c.dtype)
 
-        density_matrix_function = construct_one_body_density_matrix
-
         t0 = time.time()
-        density_matrix_function(rho_qp, self.ci.states, self._c)
+        construct_one_body_density_matrix(rho_qp, self.ci.states, self._c)
         t1 = time.time()
 
         if self.verbose:
@@ -161,13 +222,56 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return rho_qp
 
-    def compute_particle_density(self, tol=1e-8):
+    def compute_particle_density(self, tol=1e-5):
+        r"""Compute particle density :math:`\rho(x, t)` for the time-dependent
+        state :math:`\rvert\Psi(t)\rangle`,
+
+        .. math:: \rho(x, t)
+            = \phi^{*}_q(x) \rho^{q}_{p}(t) \phi_p(x).
+
+        Parameters
+        ----------
+        tol : float
+            Tolerance parameter for the one-body density matrix. Default is
+            ``tol=1e-5``.
+
+        Returns
+        -------
+        np.ndarray
+            The particle density on the same grid as the single-particle
+            functions.
+        """
+
         rho_qp = self.compute_one_body_density_matrix(tol=tol)
         rho = compute_particle_density(rho_qp, self.system.spf, np=self.np)
 
         return rho
 
     def compute_time_dependent_overlap(self):
+        r"""Function computing the autocorrelation by
+
+        .. math:: A(t, t_0) = \frac{
+                \lvert \langle \Psi(t) \rvert \Psi(t_0) \rangle \rvert^2
+            }{
+                \langle\Psi(t)\rvert\Psi(t)\rangle
+                \langle\Psi(t_0)\rvert\Psi(t_0)\rangle
+            }
+            =  \frac{
+                \lvert \mathbf{c}^{\dagger}(t) \mathbf{c}(t_0) \rvert^2
+            }{
+                \lvert\mathbf{c}(t)\rvert^2
+                \lvert\mathbf{c}(t_0)\rvert^2
+            },
+
+        where the :math:`\mathbf{c}(t)` are the coefficient vectors of the
+        states :math:`\lvert\Psi(t)\rangle` at specificed time-points.
+
+        Returns
+        -------
+        float
+            The real part of the autocorrelation absolute squared.
+        """
+
         norm_t = self._c.conj() @ self._c
         norm_0 = self._c_0.conj() @ self._c_0
 
@@ -273,8 +377,8 @@ def get_tdci_class(excitations):
     ----------
     excitations : str
         The specified excitations to use in the TDCI-class. For example, to
-        create a TDCISD class both `excitations="CISD"` and
-        `excitations=["S", "D"]` are valid.
+        create a TDCISD class both ``excitations="CISD"`` and
+        ``excitations=["S", "D"]`` are valid.
 
     Returns
     -------
