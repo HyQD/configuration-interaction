@@ -9,7 +9,6 @@ from configuration_interaction.ci_helper import (
     count_state,
     occupied_index,
     get_index,
-    get_double_index,
     state_diff,
     state_equality,
     compute_sign,
@@ -24,6 +23,7 @@ from configuration_interaction.ci_helper import (
 from tests.helper import (
     setup_hamiltonian,
     construct_one_body_density_matrix_brute_force,
+    get_double_index,
 )
 from quantum_systems import CustomSystem, RandomSystem
 
@@ -213,24 +213,59 @@ def test_get_index():
 def test_get_double_index():
     zero = np.array([0, 0, 0, 0]).astype(BITTYPE)
     assert get_double_index(zero) == (-1, -1)
+    p = get_index(zero, index_num=0)
+    q = get_index(zero, index_num=1)
+    assert get_double_index(zero) == (p, q)
 
     one = np.array([1, 0, 0]).astype(BITTYPE)
     assert get_double_index(one) == (-1, -1)
+    p = get_index(one, index_num=0)
+    q = get_index(one, index_num=1)
+    assert get_double_index(one)[0] != p
+    assert get_double_index(one)[1] == q
 
     one[0] |= np.uint32(0b10)
     assert get_double_index(one) == (0, 1)
+    p = get_index(one, index_num=0)
+    q = get_index(one, index_num=1)
+    assert get_double_index(one) == (p, q)
 
     one[0] ^= np.uint32(0b1)
     assert get_double_index(one) == (-1, -1)
+    p = get_index(one, index_num=0)
+    q = get_index(one, index_num=1)
+    assert get_double_index(one)[0] != p
+    assert get_double_index(one)[1] == q
 
     one[0] |= np.uint32(0b10000)
     assert get_double_index(one) == (1, 4)
+    p = get_index(one, index_num=0)
+    q = get_index(one, index_num=1)
+    assert get_double_index(one) == (p, q)
 
     one[0] |= np.uint32(0b1000000)
     assert get_double_index(one) == (1, 4)
+    p = get_index(one, index_num=0)
+    q = get_index(one, index_num=1)
+    assert get_double_index(one) == (p, q)
 
     state = np.array([6]).astype(BITTYPE)
     assert get_double_index(state) == (1, 2)
+    p = get_index(state, index_num=0)
+    q = get_index(state, index_num=1)
+    assert get_double_index(state) == (p, q)
+
+    state = np.array([1, 1]).astype(BITTYPE)
+    assert get_double_index(state) == (0, 64)
+    p = get_index(state, index_num=0)
+    q = get_index(state, index_num=1)
+    assert get_double_index(state) == (p, q)
+
+    state = np.array([1, 2]).astype(BITTYPE)
+    assert get_double_index(state) == (0, 65)
+    p = get_index(state, index_num=0)
+    q = get_index(state, index_num=1)
+    assert get_double_index(state) == (p, q)
 
 
 def test_state_diff():

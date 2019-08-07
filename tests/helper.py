@@ -8,7 +8,6 @@ from configuration_interaction.ci_helper import (
     occupied_index,
     state_diff,
     get_index,
-    get_double_index,
     compute_sign,
 )
 
@@ -278,3 +277,35 @@ def create_quadruples_states(n, l, states, index):
                                     index += 1
 
     return index
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
+def get_double_index(state):
+    """Computes the indices of the two first set bits in state. That is, if
+    state is given by
+
+        state = 0b110 = 6,
+
+    then get_double_index(state) returns
+
+        get_double_index(state) = (1, 2).
+    """
+    first_index = 0
+    second_index = 0
+
+    first_add = 1
+    second_add = 1
+
+    for elem_p in range(len(state)):
+        for p in range(BITSTRING_SIZE):
+            check = (state[elem_p] >> p) & 0b1 != 0
+
+            if check and first_add == 1:
+                first_add = 0
+            elif check and second_add == 1:
+                return first_index, second_index
+
+            first_index += first_add
+            second_index += second_add
+
+    return -1, -1

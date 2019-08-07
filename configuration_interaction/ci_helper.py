@@ -95,61 +95,57 @@ def occupied_index(state, p):
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
-def get_index(state):
-    """Computes the index of the first set bit in state. That is, if state is
+def get_index(state, index_num=0):
+    """Computes the index of a set bit in ``state``. That is, if ``state`` is
+    given by
 
         state = 0b100 = 4,
 
-    then get_index(state) returns
+    then ``get_index(state, index_num=0)`` returns
 
-        get_index(state) = 2.
+        get_index(state, index_num=0) = 2.
 
     This is done by checking if the lowermost bit is set and then rolling the
     bits one position to the right and counting places until a set bit is
-    encountered. Returns -1 if there are no set bits.
+    encountered.
+    To find the index of higher set bits, the argument ``index_num`` can be
+    adjusted. For example, the second set bit in a state
+
+        state = 0b110 = 6,
+
+    can be found by setting ``index_num = 1``. This yields
+
+        get_index(state, index_num=1) = 2.
+
+    If the specified bit is not set, the function returns -1.
+
+    Parameters
+    ----------
+    state : np.array
+        Slater determinant as an array of integers.
+    index_num : int
+        The bit to find, ``index_num = 0`` corresponds to the first bit.
+        Default is 0.
+
+    Returns
+    -------
+    int
+        Index of the set bit, or -1 if the bit is not set.
     """
+
     index = 0
 
     for elem_p in range(len(state)):
         for p in range(BITSTRING_SIZE):
             if (state[elem_p] >> p) & 0b1 != 0:
-                return index
+                if index_num == 0:
+                    return index
+
+                index_num -= 1
 
             index += 1
 
     return -1
-
-
-@numba.njit(cache=True, nogil=True, fastmath=True)
-def get_double_index(state):
-    """Computes the indices of the two first set bits in state. That is, if
-    state is given by
-
-        state = 0b110 = 6,
-
-    then get_double_index(state) returns
-
-        get_double_index(state) = (1, 2).
-    """
-    first_index = 0
-    second_index = 0
-
-    first_add = 1
-    second_add = 1
-
-    for elem_p in range(len(state)):
-        for p in range(BITSTRING_SIZE):
-            check = (state[elem_p] >> p) & 0b1 != 0
-
-            if check and first_add == 1:
-                first_add = 0
-            elif check and second_add == 1:
-                return first_index, second_index
-
-            first_index += first_add
-            second_index += second_add
-
-    return -1, -1
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
@@ -621,12 +617,14 @@ def diff_by_two_slater_condon_two_body(state_I, state_J, u, n, l):
     diff = state_I ^ state_J
 
     # Index m, n in state_I, removed from state_J
-    m, n = get_double_index(state_I & diff)
+    m = get_index(state_I & diff, index_num=0)
+    n = get_index(state_I & diff, index_num=1)
     sign_m = compute_sign(state_I, m)
     sign_n = compute_sign(state_I, n)
 
     # Index p, q in state_J, not in state_I
-    p, q = get_double_index(state_J & diff)
+    p = get_index(state_J & diff, index_num=0)
+    q = get_index(state_J & diff, index_num=1)
     sign_p = compute_sign(state_J, p)
     sign_q = compute_sign(state_J, q)
 
