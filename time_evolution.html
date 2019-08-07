@@ -244,11 +244,142 @@ time-evolved Hamiltonian.</p>
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_ground_state">
+<code class="sig-name descname">compute_ground_state</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_ground_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the ground state from the defined <code class="docutils literal notranslate"><span class="pre">self.ci_class</span></code> and set
+initial values for the Hamiltonian matrix <span class="math notranslate nohighlight">\(\mathbf{H}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> – Argument list for ground state class <code class="docutils literal notranslate"><span class="pre">self.ci_class</span></code>.</p></li>
+<li><p><strong>**kwargs</strong> – Keyward argument for ground state class <code class="docutils literal notranslate"><span class="pre">self.ci_class</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix">
+<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param">tol=1e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute one-body density matrix for the time-dependent state
+<span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\rho^{q}_{p}(t)
+= \langle\Psi(t)\rvert
+\hat{c}^{\dagger}_{p}
+\hat{c}_{q}
+\lvert\Psi(t)\rangle.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tol</strong> (<em>float</em>) – Tolerance of trace warning. Default is <code class="docutils literal notranslate"><span class="pre">tol=1e-5</span></code>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The one-body density matrix <span class="math notranslate nohighlight">\(\rho^{q}_{p}(t)\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density">
+<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param">tol=1e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute particle density <span class="math notranslate nohighlight">\(\rho(x, t)\)</span> for the time-dependent
+state <span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\rho(x, t)
+= \phi^{*}_q(x) \rho^{q}_{p}(t) \phi_p(x).\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tol</strong> (<em>float</em>) – Tolerance parameter for the one-body density matrix. Default is
+<code class="docutils literal notranslate"><span class="pre">tol=1e-5</span></code>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The particle density on the same grid as the single-particle
+functions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_time_dependent_overlap">
+<code class="sig-name descname">compute_time_dependent_overlap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_time_dependent_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the autocorrelation by</p>
+<div class="math notranslate nohighlight">
+\[A(t, t_0) = \frac{
+    \lvert \langle \Psi(t) \rvert \Psi(t_0) \rangle \rvert^2
+}{
+    \langle\Psi(t)\rvert\Psi(t)\rangle
+    \langle\Psi(t_0)\rvert\Psi(t_0)\rangle
+}
+=  \frac{
+    \lvert \mathbf{c}^{\dagger}(t) \mathbf{c}(t_0) \rvert^2
+}{
+    \lvert\mathbf{c}(t)\rvert^2
+    \lvert\mathbf{c}(t_0)\rvert^2
+},\]</div>
+<p>where the <span class="math notranslate nohighlight">\(\mathbf{c}(t)\)</span> are the coefficient vectors of the
+states <span class="math notranslate nohighlight">\(\lvert\Psi(t)\rangle\)</span> at specificed time-points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The real part of the autocorrelation absolute squared.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.set_initial_conditions">
+<code class="sig-name descname">set_initial_conditions</code><span class="sig-paren">(</span><em class="sig-param">c=None</em>, <em class="sig-param">K=0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.set_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set initial state for the differential equation solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>np.array</em>) – The initial coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}(0)\)</span>. Default is
+<code class="docutils literal notranslate"><span class="pre">None</span></code> which defaults to state <code class="docutils literal notranslate"><span class="pre">K</span></code> from the ground state
+calculations.</p></li>
+<li><p><strong>K</strong> (<em>int</em>) – Initial eigenstate from ground state calculations. This argument is
+ignored if a value for <code class="docutils literal notranslate"><span class="pre">c</span></code> is given. Default is <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">=</span> <span class="pre">0</span></code> which
+is the ground state.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.solve">
+<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">time_points</em>, <em class="sig-param">timestep_tol=1e-08</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function creating a generator for stepping through the solution to
+the differential equation integrator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_points</strong> (<em>np.array</em>) – Discretized time-points to integrate over.</p></li>
+<li><p><strong>timestep_tol</strong> (<em>float</em>) – Tolerance to check if the last timestep corresponds to the same
+timestep as used in the evaluation of the right-hand side in the
+integrator. Default is <code class="docutils literal notranslate"><span class="pre">timestep_tol=1e-8</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>np.array</em> – The coefficient vector at each timestep.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
 <div class="section" id="creating-truncated-tdci-classes">
 <h2>Creating truncated TDCI-classes<a class="headerlink" href="#creating-truncated-tdci-classes" title="Permalink to this headline">¶</a></h2>
+<p>This function is the time-dependent equivalent of the function defined for the
+time-independent <a class="reference internal" href="ground_state.html#truncated-ci-classes"><span class="std std-ref">case</span></a></p>
 <dl class="function">
 <dt id="configuration_interaction.tdci.get_tdci_class">
 <code class="sig-prename descclassname">configuration_interaction.tdci.</code><code class="sig-name descname">get_tdci_class</code><span class="sig-paren">(</span><em class="sig-param">excitations</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.get_tdci_class" title="Permalink to this definition">¶</a></dt>
@@ -257,8 +388,8 @@ excitations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>excitations</strong> (<em>str</em>) – The specified excitations to use in the TDCI-class. For example, to
-create a TDCISD class both <cite>excitations=”CISD”</cite> and
-<cite>excitations=[“S”, “D”]</cite> are valid.</p>
+create a TDCISD class both <code class="docutils literal notranslate"><span class="pre">excitations=&quot;CISD&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">excitations=[&quot;S&quot;,</span> <span class="pre">&quot;D&quot;]</span></code> are valid.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A subclass of <code class="docutils literal notranslate"><span class="pre">TimeDependentConfigurationInteraction</span></code>.</p>
@@ -269,6 +400,17 @@ create a TDCISD class both <cite>excitations=”CISD”</cite> and
 </dl>
 </dd></dl>
 
+<p>As an example of the setup of different classes we demonstrate the default
+classes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TDCIS</span> <span class="o">=</span> <span class="n">get_tdci_class</span><span class="p">(</span><span class="s2">&quot;CIS&quot;</span><span class="p">)</span>
+<span class="n">TDCID</span> <span class="o">=</span> <span class="n">get_tdci_class</span><span class="p">(</span><span class="s2">&quot;CID&quot;</span><span class="p">)</span>
+<span class="n">TDCISD</span> <span class="o">=</span> <span class="n">get_tdci_class</span><span class="p">(</span><span class="s2">&quot;CISD&quot;</span><span class="p">)</span>
+<span class="n">TDCIDT</span> <span class="o">=</span> <span class="n">get_tdci_class</span><span class="p">(</span><span class="s2">&quot;CIDT&quot;</span><span class="p">)</span>
+<span class="n">TDCISDT</span> <span class="o">=</span> <span class="n">get_tdci_class</span><span class="p">(</span><span class="s2">&quot;CISDT&quot;</span><span class="p">)</span>
+<span class="n">TDCIDTQ</span> <span class="o">=</span> <span class="n">get_tdci_class</span><span class="p">(</span><span class="s2">&quot;CIDTQ&quot;</span><span class="p">)</span>
+<span class="n">TDCISDTQ</span> <span class="o">=</span> <span class="n">get_tdci_class</span><span class="p">(</span><span class="s2">&quot;CISDTQ&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

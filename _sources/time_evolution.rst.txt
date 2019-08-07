@@ -22,4 +22,18 @@ represented as a coefficient vector :math:`\mathbf{c}`.
 
 Creating truncated TDCI-classes
 -------------------------------
+This function is the time-dependent equivalent of the function defined for the
+time-independent :ref:`case <truncated-ci-classes>`
+
 .. autofunction:: configuration_interaction.tdci.get_tdci_class
+
+As an example of the setup of different classes we demonstrate the default
+classes::
+
+    TDCIS = get_tdci_class("CIS")
+    TDCID = get_tdci_class("CID")
+    TDCISD = get_tdci_class("CISD")
+    TDCIDT = get_tdci_class("CIDT")
+    TDCISDT = get_tdci_class("CISDT")
+    TDCIDTQ = get_tdci_class("CIDTQ")
+    TDCISDTQ = get_tdci_class("CISDTQ")
