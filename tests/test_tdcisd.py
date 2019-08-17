@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 
 from quantum_systems import construct_pyscf_system
 from quantum_systems.time_evolution_operators import LaserField
@@ -63,7 +62,7 @@ def test_tdcisd():
     dip_z = np.zeros(len(time_points))
     td_overlap = np.zeros_like(dip_z)
 
-    rho_qp = tdcisd.compute_one_body_density_matrix(tol=1e6)
+    rho_qp = tdcisd.compute_one_body_density_matrix(tol=1e-3)
     rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
 
     td_energies[0] = tdcisd.compute_energy()
@@ -75,7 +74,7 @@ def test_tdcisd():
     for i, c in enumerate(tdcisd.solve(time_points)):
         td_energies[i + 1] = tdcisd.compute_energy()
 
-        rho_qp = tdcisd.compute_one_body_density_matrix(tol=1e6)
+        rho_qp = tdcisd.compute_one_body_density_matrix(tol=1e-3)
         rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
 
         dip_z[i + 1] = np.einsum(
