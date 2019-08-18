@@ -205,15 +205,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         """
 
         rho_qp = self.np.zeros((self.l, self.l), dtype=self._c.dtype)
-
-        t0 = time.time()
         construct_one_body_density_matrix(rho_qp, self.ci.states, self._c)
-        t1 = time.time()
-
-        if self.verbose:
-            print(
-                "Time spent computing one-body matrix: {0} sec".format(t1 - t0)
-            )
 
         if self.np.abs(self.np.trace(rho_qp) - self.system.n) > tol:
             warn = "Trace of rho_qp = {0} != {1} = number of particles"
@@ -286,7 +278,6 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         if self.system.has_one_body_time_evolution_operator:
             self.one_body_hamiltonian.fill(0)
 
-            t0 = time.time()
             # Compute new one-body Hamiltonian
             setup_one_body_hamiltonian(
                 self.one_body_hamiltonian,
@@ -295,17 +286,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
                 self.n,
                 self.l,
             )
-            t1 = time.time()
-
-            if self.verbose:
-                print(
-                    f"Time spent constructing one-body Hamiltonian: {t1 - t0} sec"
-                )
 
         if self.system.has_two_body_time_evolution_operator:
             self.two_body_hamiltonian.fill(0)
 
-            t0 = time.time()
             # Compute new two-body Hamiltonian
             setup_two_body_hamiltonian(
                 self.two_body_hamiltonian,
@@ -314,12 +298,6 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
                 self.n,
                 self.l,
             )
-            t1 = time.time()
-
-            if self.verbose:
-                print(
-                    f"Time spent constructing two-body Hamiltonian: {t1 - t0} sec"
-                )
 
         # Empty Hamiltonian matrix
         self.hamiltonian.fill(0)
