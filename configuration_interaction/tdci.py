@@ -331,8 +331,6 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             Time-derivative of coefficient vector at current time-step.
         """
 
-        o, v = self.system.o, self.system.v
-
         # Update Hamiltonian matrix
         self.update_hamiltonian(current_time)
 
