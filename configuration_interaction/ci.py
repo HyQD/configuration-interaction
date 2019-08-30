@@ -11,6 +11,7 @@ from configuration_interaction.ci_helper import (
     setup_two_body_hamiltonian,
     construct_one_body_density_matrix,
     compute_particle_density,
+    construct_overlap_one_body_density_matrix,
     compute_spin_projection_eigenvalue,
     sort_states,
 )
@@ -276,6 +277,22 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         rho_qp = self.compute_one_body_density_matrix(K=K)
 
         return compute_particle_density(rho_qp, self.system.spf, self.np)
+
+    def allowed_dipole_transition(self, I, J):
+        assert 0 <= I < self.num_states
+        assert 0 <= J < self.num_states
+
+        np = self.np
+
+        rho_qp_overlap = np.zeros((self.l, self.l), dtype=self._C.dtype)
+
+        construct_overlap_one_body_density_matrix(
+            rho_qp_overlap, self.states, self._C[:, I], self._C[:, J]
+        )
+
+        dip = self.system.dipole_moment
+
+        return [np.trace(dip[i] @ rho_qp_overlap) for i in range(len(dip))]
 
     @property
     def energies(self):

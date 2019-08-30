@@ -684,3 +684,45 @@ def compute_particle_density(rho_qp, spf, np):
         rho[_i] += np.dot(spf[i].conj(), np.dot(rho_qp, spf[i]))
 
     return rho
+
+
+@numba.njit(cache=True)
+def construct_overlap_one_body_density_matrix(rho_qp, states, c_I, c_J):
+    num_states = len(states)
+    l = len(rho_qp)
+
+    for K in range(num_states):
+        state_K = states[K]
+
+        for p in range(l):
+            if not occupied_index(state_K, p):
+                continue
+
+            rho_qp[p, p] += c_J[K] * c_I[K].conjugate()
+
+    for K in range(num_states):
+        state_K = states[K]
+
+        for L in range(num_states):
+            if K == L:
+                continue
+
+            state_L = states[L]
+            diff = state_diff(state_K, state_L)
+
+            if diff != 2:
+                continue
+
+            diff_state = state_K ^ state_L
+
+            # Index m in state_K, removed from state_L
+            m = get_index(state_K & diff_state)
+            sign_m = compute_sign(state_K, m)
+
+            # Index p in state_L, not in state_L
+            p = get_index(state_L & diff_state)
+            sign_p = compute_sign(state_L, p)
+
+            sign = sign_m * sign_p
+
+            rho_qp[p, m] += sign * c_I[K].conjugate() * c_J[L]
