@@ -20,6 +20,4 @@ tqdm = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 pyscf = "*"
-
-[requires]
-python_version = "3.6"
+diffeqpy = "*"
