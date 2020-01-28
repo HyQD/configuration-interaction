@@ -6,7 +6,6 @@ import time
 from configuration_interaction import get_ci_class, excitation_string_handler
 from configuration_interaction.integrators import RungeKutta4
 from configuration_interaction.ci_helper import (
-    compute_particle_density,
     setup_one_body_hamiltonian,
     setup_two_body_hamiltonian,
     construct_one_body_density_matrix,
@@ -235,9 +234,8 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         """
 
         rho_qp = self.compute_one_body_density_matrix(tol=tol)
-        rho = compute_particle_density(rho_qp, self.system.spf, np=self.np)
 
-        return rho
+        return self.system.compute_particle_density(rho_qp)
 
     def compute_time_dependent_overlap(self):
         r"""Function computing the autocorrelation by

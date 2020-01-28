@@ -25,7 +25,7 @@ from tests.helper import (
     construct_one_body_density_matrix_brute_force,
     get_double_index,
 )
-from quantum_systems import CustomSystem, RandomSystem
+from quantum_systems import QuantumSystem, RandomSystem
 
 
 NUM_SINGLES_STATES = lambda n, m: n * m
@@ -456,7 +456,7 @@ def test_construct_one_body_density_matrices_random(CI):
     n = 2
     l = 12
 
-    cs = CustomSystem(n, l)
+    cs = QuantumSystem(n, l)
 
     ci = CI(cs, verbose=True)
     ci._C = np.random.random(

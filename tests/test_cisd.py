@@ -5,7 +5,6 @@ from configuration_interaction.ci_helper import (
     state_printer,
     create_excited_states,
     create_reference_state,
-    compute_particle_density,
 )
 from tests.helper import (
     create_singles_states,
@@ -13,6 +12,7 @@ from tests.helper import (
     construct_one_body_density_matrix_brute_force,
     setup_hamiltonian_brute_force,
 )
+from quantum_systems.system_helper import compute_particle_density
 
 
 def test_setup(odho_ti_small):
@@ -76,7 +76,9 @@ def test_slater_condon_density_matrix(odho_ti_small):
         construct_one_body_density_matrix_brute_force(
             rho_qp_b, cisd.states, cisd.C[:, K]
         )
-        rho_b = compute_particle_density(rho_qp_b, odho_ti_small.spf, np)
+        rho_b = compute_particle_density(
+            rho_qp_b, odho_ti_small.spf, odho_ti_small.spf.conj(), np
+        )
 
         # Normalize particle densities
         rho_b = cisd.n * rho_b / np.trapz(rho_b, x=odho_ti_small.grid)
