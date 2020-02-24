@@ -14,7 +14,7 @@ pytest = "*"
 numba = "*"
 quantum-systems = {editable = true,git = "ssh://git@github.com/Schoyen/quantum-systems.git"}
 tdhf = {editable = true,git = "ssh://git@github.com/haakoek/tdhf.git"}
-black = "==19.3b0"
+black = "*"
 matplotlib = "*"
 tqdm = "*"
 sphinx = "*"
