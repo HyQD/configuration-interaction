@@ -92,7 +92,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         if self.verbose:
             print(
-                f"Time spent setting up CI{''.join(self.excitations)} space: {t1 - t0} sec"
+                f"Time spent setting up CI{''.join(self.excitations)} space: "
+                + f"{t1 - t0} sec"
             )
 
         self.states = sort_states(self.states)
