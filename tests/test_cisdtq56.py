@@ -1,17 +1,22 @@
 import pytest
 
-from quantum_systems import TwoDimensionalHarmonicOscillator
+from quantum_systems import (
+    TwoDimensionalHarmonicOscillator,
+    GeneralOrbitalSystem,
+)
 from configuration_interaction import get_ci_class
 
 
 def get_tdho(omega):
     n = 6
-    l = 12
+    l = 6
 
-    _tdho = TwoDimensionalHarmonicOscillator(
-        n, l, radius_length=10, num_grid_points=101, omega=omega
+    _tdho = GeneralOrbitalSystem(
+        n,
+        TwoDimensionalHarmonicOscillator(
+            l, radius_length=10, num_grid_points=101, omega=omega
+        ),
     )
-    _tdho.setup_system(verbose=True, cast_to_complex=False)
 
     return _tdho
 

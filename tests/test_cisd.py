@@ -12,6 +12,11 @@ from tests.helper import (
     construct_one_body_density_matrix_brute_force,
     setup_hamiltonian_brute_force,
 )
+
+from quantum_systems import (
+    GeneralOrbitalSystem,
+    TwoDimensionalHarmonicOscillator,
+)
 from quantum_systems.system_helper import compute_particle_density
 
 
@@ -88,13 +93,11 @@ def test_slater_condon_density_matrix(odho_ti_small):
 
 
 def test_large_basis():
-    from quantum_systems import TwoDimensionalHarmonicOscillator
 
     n = 2
-    l = 66  # Force the use of two uint64 in a determinant
+    l = 33  # Force the use of two uint64 in a determinant
 
-    tdho = TwoDimensionalHarmonicOscillator(n, l, 10, 101)
-    tdho.setup_system(verbose=True)
+    tdho = GeneralOrbitalSystem(n, TwoDimensionalHarmonicOscillator(l, 10, 101))
 
     cisd = CISD(tdho, verbose=True)
     cisd.compute_ground_state()

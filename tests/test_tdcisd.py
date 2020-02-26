@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from quantum_systems import construct_pyscf_system
+from quantum_systems import construct_pyscf_system_rhf
 from quantum_systems.time_evolution_operators import LaserField
 from configuration_interaction import TDCISD
 from configuration_interaction.integrators import GaussIntegrator
@@ -31,7 +31,9 @@ def test_tdcisd():
     E = 100
     laser_duration = 5
 
-    system = construct_pyscf_system(molecule="he 0.0 0.0 0.0", basis="cc-pvdz")
+    system = construct_pyscf_system_rhf(
+        molecule="he 0.0 0.0 0.0", basis="cc-pvdz"
+    )
 
     integrator = GaussIntegrator(s=3, np=np, eps=1e-6)
     tdcisd = TDCISD(system, integrator=integrator, np=np, verbose=True)

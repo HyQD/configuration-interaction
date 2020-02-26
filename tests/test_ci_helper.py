@@ -25,7 +25,7 @@ from tests.helper import (
     construct_one_body_density_matrix_brute_force,
     get_double_index,
 )
-from quantum_systems import QuantumSystem, RandomSystem
+from quantum_systems import GeneralOrbitalSystem, RandomBasisSet
 
 
 NUM_SINGLES_STATES = lambda n, m: n * m
@@ -415,9 +415,9 @@ def test_two_body_overlap():
 def test_hamiltonian_setup():
     n = 2
     l = 12
+    dim = 2
 
-    rs = RandomSystem(n, l)
-    rs.setup_system(add_spin=True, anti_symmetrize=True)
+    rs = GeneralOrbitalSystem(n, RandomBasisSet(l, dim, includes_spin=True))
 
     from configuration_interaction import CISD
 
@@ -455,16 +455,17 @@ def test_construct_one_body_density_matrices(odho_ti_small, CI):
 def test_construct_one_body_density_matrices_random(CI):
     n = 2
     l = 12
+    dim = 3
 
-    cs = QuantumSystem(n, l)
+    rs = GeneralOrbitalSystem(n, RandomBasisSet(l, dim, includes_spin=True))
 
-    ci = CI(cs, verbose=True)
+    ci = CI(rs, verbose=True)
     ci._C = np.random.random(
         (ci.num_states, ci.num_states)
     ) + 1j * np.random.random((ci.num_states, ci.num_states))
 
-    rho_b = np.zeros((cs.l, cs.l), dtype=np.complex128)
-    rho = np.zeros((cs.l, cs.l), dtype=np.complex128)
+    rho_b = np.zeros((rs.l, rs.l), dtype=np.complex128)
+    rho = np.zeros((rs.l, rs.l), dtype=np.complex128)
 
     for K in range(ci.num_states):
         construct_one_body_density_matrix_brute_force(
