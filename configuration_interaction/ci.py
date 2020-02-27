@@ -25,11 +25,14 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
     ----------
     system : QuantumSystems
         Quantum systems instance.
+    s : int
+        Spin projection number to keep. Default is ``None`` and all
+        determinants are kept.
     verbose : bool
         Print timer and logging info. Default value is ``False``.
     """
 
-    def __init__(self, system, verbose=False):
+    def __init__(self, system, s=None, verbose=False):
         self.verbose = verbose
 
         self.system = system
@@ -42,12 +45,12 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.v = self.system.v
 
         self.states = self.setup_ci_space(
-            self.excitations, self.n, self.l, self.m, self.verbose, self.np
+            self.excitations, self.n, self.l, self.m, self.verbose, self.np, s=s
         )
         self.num_states = len(self.states)
 
     @staticmethod
-    def setup_ci_space(excitations, n, l, m, verbose, np):
+    def setup_ci_space(excitations, n, l, m, verbose, np, s=None):
         # Count the reference state
         num_states = 1
 
@@ -87,35 +90,27 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 + f"{t1 - t0} sec"
             )
 
+        if s is not None:
+            states = ConfigurationInteraction.filter_states_with_spin_projection(
+                states, s, np
+            )
+
+            if verbose:
+                print(f"Number of states after spin-reduction: {len(states)}")
+
         return sort_states(states)
 
     @staticmethod
-    def compute_states_with_spin_projection(self, states, s, np):
-        new_states = []
-
-        for state in states:
-            if compute_spin_projection_eigenvalue(state) == s:
-                new_states.append(state)
-
-        return sort_states(np.array(new_states))
-
-    def spin_reduce_states(self, s=0):
-        """Function removing all states with spin different from ``s``. This
-        builds a new ``self.states``-array and updates ``self.num_states``.
-
-        Parameters
-        ----------
-        s : int
-            Spin projection number to keep.
-        """
-
-        self.states = self.compute_states_with_spin_projection(
-            self.states, s, self.np
+    def filter_states_with_spin_projection(self, states, s, np):
+        return sort_states(
+            np.array(
+                filter(
+                    lambda state: compute_spin_projection_eigenvalue(state)
+                    == s,
+                    states,
+                )
+            )
         )
-        self.num_states = len(self.states)
-
-        if self.verbose:
-            print(f"Number of states after spin-reduction: {self.num_states}")
 
     def compute_ground_state(self, k=None):
         """Function constructing the Hamiltonian of the system without any
@@ -198,6 +193,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 f"{self.__class__.__name__} ground state energy: "
                 + f"{self.energies[0]}"
             )
+
+        return self
 
     def compute_one_body_density_matrix(self, K=0):
         r"""Function computing the one-body density matrix
