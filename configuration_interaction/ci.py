@@ -27,19 +27,13 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         Quantum systems instance.
     verbose : bool
         Print timer and logging info. Default value is ``False``.
-    np : module
-        Array library, defaults to ``numpy``.
     """
 
-    def __init__(self, system, verbose=False, np=None):
+    def __init__(self, system, verbose=False):
         self.verbose = verbose
 
-        if np is None:
-            import numpy as np
-
-        self.np = np
-
         self.system = system
+        self.np = self.system.np
 
         self.n = self.system.n
         self.l = self.system.l
@@ -67,11 +61,11 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         if self.verbose:
             print(
                 "Size of a state in bytes: {0}".format(
-                    np.dtype(BITTYPE).itemsize * 1
+                    self.np.dtype(BITTYPE).itemsize * 1
                 )
             )
 
-        self.states = np.zeros(shape, dtype=BITTYPE)
+        self.states = self.np.zeros(shape, dtype=BITTYPE)
         self._setup_ci_space()
 
     def _setup_ci_space(self):

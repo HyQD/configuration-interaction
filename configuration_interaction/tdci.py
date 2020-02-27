@@ -21,8 +21,6 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     ----------
     system : QuantumSystems
         Quantum systems instance.
-    np : module
-        Array library, defaults to ``numpy``.
     integrator : Integrator
         Differential equation integrator. The integrator class must implement a
         ``step``-function.
@@ -32,24 +30,15 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         Keyword arguments to ground state solver class.
     """
 
-    def __init__(
-        self, system, np=None, integrator=None, verbose=False, **ci_kwargs
-    ):
-        if np is None:
-            import numpy as np
-
-        self.np = np
-
+    def __init__(self, system, integrator=None, verbose=False, **ci_kwargs):
         ci_kwargs["verbose"] = verbose
         self.verbose = verbose
-
-        if not "np" in ci_kwargs:
-            ci_kwargs["np"] = self.np
 
         # Initialize ground state solver
         self.ci = self.ci_class(system, **ci_kwargs)
 
         self.system = system
+        self.np = self.system.np
 
         self.h = self.system.h
         self.u = self.system.u

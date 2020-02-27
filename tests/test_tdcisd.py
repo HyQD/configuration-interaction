@@ -36,7 +36,7 @@ def test_tdcisd():
     )
 
     integrator = GaussIntegrator(s=3, np=np, eps=1e-6)
-    tdcisd = TDCISD(system, integrator=integrator, np=np, verbose=True)
+    tdcisd = TDCISD(system, integrator=integrator, verbose=True)
     tdcisd.compute_ground_state()
     assert (
         abs(tdcisd.compute_ground_state_energy() - -2.887_594_831_090_936)
