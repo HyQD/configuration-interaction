@@ -61,7 +61,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             self.hamiltonian = init_state.hamiltonian
             self.one_body_hamiltonian = init_state.one_body_hamiltonian
             self.two_body_hamiltonian = init_state.two_body_hamiltonian
-            self._c = self.init_state.C[:, k]
+            self._c = init_state.C[:, k]
 
     def setup_initial_hamiltonian(self):
         self.hamiltonian = np.zeros(
@@ -264,7 +264,11 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
             # Compute new one-body Hamiltonian
             setup_one_body_hamiltonian(
-                self.one_body_hamiltonian, self.states, self.h, self.n, self.l,
+                self.one_body_hamiltonian,
+                self.states,
+                self.h,
+                self.system.n,
+                self.system.l,
             )
 
         if self.system.has_two_body_time_evolution_operator:
@@ -272,7 +276,11 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
             # Compute new two-body Hamiltonian
             setup_two_body_hamiltonian(
-                self.two_body_hamiltonian, self.states, self.u, self.n, self.l,
+                self.two_body_hamiltonian,
+                self.states,
+                self.u,
+                self.system.n,
+                self.system.l,
             )
 
         # Empty Hamiltonian matrix
@@ -283,7 +291,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             out=self.hamiltonian,
         )
 
-    def __call__(self, prev_c, current_time):
+    def __call__(self, current_time, prev_c):
         r"""Function computing the right-hand side of the time-dependent
         Schrödinger equation for the coefficient vector :math:`\mathbf{c}(t)`.
         That is, this function finds the time-derivative of the coefficient
