@@ -4,7 +4,7 @@ import numpy as np
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
-    num_states,
+    count_num_states,
     popcount_64,
     count_state,
     occupied_index,
@@ -49,16 +49,16 @@ def nl_num_states():
 
 
 def test_num_states(nl_num_states):
-    assert NUM_SINGLES_STATES(*nl_num_states) == num_states(
+    assert NUM_SINGLES_STATES(*nl_num_states) == count_num_states(
         *nl_num_states, order=1
     )
-    assert NUM_DOUBLES_STATES(*nl_num_states) == num_states(
+    assert NUM_DOUBLES_STATES(*nl_num_states) == count_num_states(
         *nl_num_states, order=2
     )
-    assert NUM_TRIPLES_STATES(*nl_num_states) == num_states(
+    assert NUM_TRIPLES_STATES(*nl_num_states) == count_num_states(
         *nl_num_states, order=3
     )
-    assert NUM_QUADRUPLES_STATES(*nl_num_states) == num_states(
+    assert NUM_QUADRUPLES_STATES(*nl_num_states) == count_num_states(
         *nl_num_states, order=4
     )
 

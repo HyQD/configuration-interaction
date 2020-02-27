@@ -3,7 +3,7 @@ import time
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
-    num_states,
+    count_num_states,
     ORDER,
     create_reference_state,
     create_excited_states,
@@ -41,56 +41,63 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.o = self.system.o
         self.v = self.system.v
 
+        self.states = self.setup_ci_space(
+            self.excitations, self.n, self.l, self.m, self.verbose, self.np
+        )
+        self.num_states = len(self.states)
+
+    @staticmethod
+    def setup_ci_space(excitations, n, l, m, verbose, np):
         # Count the reference state
-        self.num_states = 1
+        num_states = 1
 
-        for excitation in self.excitations:
-            self.num_states += num_states(self.n, self.m, ORDER[excitation])
+        for excitation in excitations:
+            num_states += count_num_states(n, m, ORDER[excitation])
 
-        if self.verbose:
-            print("Number of states to create: {0}".format(self.num_states))
+        if verbose:
+            print(f"Number of states to create: {num_states}")
 
         # Find the shape of the states array
         # Each state is represented as a bit string padded to the nearest
         # 32-bit boundary
         shape = (
-            self.num_states,
-            self.l // BITSTRING_SIZE + (self.l % BITSTRING_SIZE > 0),
+            num_states,
+            l // BITSTRING_SIZE + (l % BITSTRING_SIZE > 0),
         )
 
-        if self.verbose:
-            print(
-                "Size of a state in bytes: {0}".format(
-                    self.np.dtype(BITTYPE).itemsize * 1
-                )
-            )
+        if verbose:
+            print(f"Size of a state in bytes: {np.dtype(BITTYPE).itemsize * 1}")
 
-        self.states = self.np.zeros(shape, dtype=BITTYPE)
-        self._setup_ci_space()
+        states = np.zeros(shape, dtype=BITTYPE)
 
-    def _setup_ci_space(self):
         t0 = time.time()
-        create_reference_state(self.n, self.l, self.states)
+        create_reference_state(n, l, states)
 
         index = 1
-        for excitation in self.excitations:
+        for excitation in excitations:
             index = create_excited_states(
-                self.n,
-                self.l,
-                self.states,
-                index=index,
-                order=ORDER[excitation],
+                n, l, states, index=index, order=ORDER[excitation],
             )
 
         t1 = time.time()
 
-        if self.verbose:
+        if verbose:
             print(
-                f"Time spent setting up CI{''.join(self.excitations)} space: "
+                f"Time spent setting up CI{''.join(excitations)} space: "
                 + f"{t1 - t0} sec"
             )
 
-        self.states = sort_states(self.states)
+        return sort_states(states)
+
+    @staticmethod
+    def compute_states_with_spin_projection(self, states, s, np):
+        new_states = []
+
+        for state in states:
+            if compute_spin_projection_eigenvalue(state) == s:
+                new_states.append(state)
+
+        return sort_states(np.array(new_states))
 
     def spin_reduce_states(self, s=0):
         """Function removing all states with spin different from ``s``. This
@@ -101,15 +108,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         s : int
             Spin projection number to keep.
         """
-        np = self.np
 
-        new_states = []
-
-        for state in self.states:
-            if compute_spin_projection_eigenvalue(state) == s:
-                new_states.append(state)
-
-        self.states = sort_states(np.array(new_states))
+        self.states = self.compute_states_with_spin_projection(
+            self.states, s, self.np
+        )
         self.num_states = len(self.states)
 
         if self.verbose:

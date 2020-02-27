@@ -2,7 +2,7 @@ import numpy as np
 
 from configuration_interaction import CIDTQ
 from configuration_interaction.ci_helper import (
-    num_states,
+    count_num_states,
     state_printer,
     create_excited_states,
     create_reference_state,
@@ -18,9 +18,9 @@ def test_setup(odho_ti):
     cidtq = CIDTQ(odho_ti, verbose=True)
 
     num_determinants = 1
-    num_determinants += num_states(odho_ti.n, odho_ti.m, order=2)
-    num_determinants += num_states(odho_ti.n, odho_ti.m, order=3)
-    num_determinants += num_states(odho_ti.n, odho_ti.m, order=4)
+    num_determinants += count_num_states(odho_ti.n, odho_ti.m, order=2)
+    num_determinants += count_num_states(odho_ti.n, odho_ti.m, order=3)
+    num_determinants += count_num_states(odho_ti.n, odho_ti.m, order=4)
     assert cidtq.num_states == num_determinants
     assert len(cidtq.states) == cidtq.num_states
 

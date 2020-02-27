@@ -14,7 +14,7 @@ def sort_states(states):
     return states[indices]
 
 
-def num_states(n, m, order):
+def count_num_states(n, m, order):
     """Count the number of Slater determinants for a given number of particles
     `n`, virtual states `m`, and a specific truncation `order`.
 
@@ -39,7 +39,7 @@ def num_states(n, m, order):
         return 1
 
     num = (
-        num_states(n, m, order - 1)
+        count_num_states(n, m, order - 1)
         * (n - (order - 1))
         * (m - (order - 1))
         // order ** 2
