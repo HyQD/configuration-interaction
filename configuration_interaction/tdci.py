@@ -3,8 +3,7 @@ import collections
 import warnings
 import time
 
-from configuration_interaction import get_ci_class, excitation_string_handler
-from configuration_interaction.integrators import RungeKutta4
+from .ci import ConfigurationInteraction
 from configuration_interaction.ci_helper import (
     setup_one_body_hamiltonian,
     setup_two_body_hamiltonian,
@@ -330,42 +329,3 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.last_timestep = current_time
 
         return new_c
-
-
-def get_tdci_class(excitations):
-    """Function constructing a truncated TDCI-class with the specified
-    excitations.
-
-    Parameters
-    ----------
-    excitations : str
-        The specified excitations to use in the TDCI-class. For example, to
-        create a TDCISD class both ``excitations="CISD"`` and
-        ``excitations=["S", "D"]`` are valid.
-
-    Returns
-    -------
-    TimeDependentConfigurationInteraction
-        A subclass of ``TimeDependentConfigurationInteraction``.
-    """
-    ci_class = get_ci_class(excitations)
-    excitations = excitation_string_handler(excitations)
-
-    class_name = "TDCI" + "".join(excitations)
-
-    tdci_class = type(
-        class_name,
-        (TimeDependentConfigurationInteraction,),
-        dict(ci_class=ci_class),
-    )
-
-    return tdci_class
-
-
-TDCIS = get_tdci_class("CIS")
-TDCID = get_tdci_class("CID")
-TDCISD = get_tdci_class("CISD")
-TDCIDT = get_tdci_class("CIDT")
-TDCISDT = get_tdci_class("CISDT")
-TDCIDTQ = get_tdci_class("CIDTQ")
-TDCISDTQ = get_tdci_class("CISDTQ")
