@@ -70,7 +70,8 @@ def test_tdcisd():
 
     i = 0
 
-    while r.successful() and r.t <= T:
+    while r.successful() and r.t < T:
+        assert abs(time_points[i] - r.t) < 1e-4
         td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
         rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
@@ -83,23 +84,29 @@ def test_tdcisd():
             r.t, r.y, cisd.C[:, 0]
         )
 
-        r.integrate(r.t + dt)
         i += 1
+        r.integrate(time_points[i])
 
-    import matplotlib.pyplot as plt
+    td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
-    plt.plot(
-        time_points, td_energies.real, label="New",
+    rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
+    rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
+
+    dip_z[i] = np.einsum(
+        "qp,pq->", rho_qp_hermitian, system.dipole_moment[2]
+    ).real
+    td_overlap[i] = tdcisd.compute_time_dependent_overlap(
+        r.t, r.y, cisd.C[:, 0]
     )
-    plt.plot(
-        time_points,
-        np.loadtxt(
-            os.path.join("tests", "dat", "tdcisd_helium_energies_real.dat")
-        ),
-        label="Old",
-    )
-    plt.legend()
-    plt.show()
+
+    # plot_diff(
+    #     time_points,
+    #     td_energies.real,
+    #     np.loadtxt(
+    #         os.path.join("tests", "dat", "tdcisd_helium_energies_real.dat")
+    #     ),
+    #     "energy"
+    # )
 
     np.testing.assert_allclose(
         td_energies.real,
@@ -109,11 +116,25 @@ def test_tdcisd():
         atol=1e-7,
     )
 
+    # plot_diff(
+    #         time_points,
+    #     td_overlap,
+    #     np.loadtxt(os.path.join("tests", "dat", "tdcisd_helium_overlap.dat")),
+    #     "overlap",
+    # )
+
     np.testing.assert_allclose(
         td_overlap,
         np.loadtxt(os.path.join("tests", "dat", "tdcisd_helium_overlap.dat")),
         atol=1e-7,
     )
+
+    # plot_diff(
+    #         time_points,
+    #     dip_z,
+    #     np.loadtxt(os.path.join("tests", "dat", "tdcisd_helium_dipole_z.dat")),
+    #     "dipole",
+    # )
 
     np.testing.assert_allclose(
         dip_z,
@@ -122,5 +143,26 @@ def test_tdcisd():
     )
 
 
-if __name__ == "__main__":
-    test_tdcisd()
+# def plot_diff(time, new, old, title):
+#     import matplotlib.pyplot as plt
+#
+#     diff = np.abs(new - old)
+#
+#     plt.figure()
+#     plt.title(title)
+#
+#     ax1 = plt.subplot(2, 1, 1)
+#     ax2 = plt.subplot(2, 1, 2)
+#
+#     ax1.plot(time, new, label="New")
+#     ax1.plot(time, old, label="Old")
+#     ax1.grid()
+#     ax1.legend()
+#
+#     ax2.plot(time, diff)
+#     ax2.grid()
+#
+# if __name__ == "__main__":
+#     import matplotlib.pyplot as plt
+#     test_tdcisd()
+#     plt.show()
