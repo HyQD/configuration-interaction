@@ -18,17 +18,15 @@ gos = GeneralOrbitalSystem(n, ODQD(l, 11, 201))
 gos.set_time_evolution_operator(LaserField(lambda t: np.sin(omega * t)))
 
 ci = CISD(gos, verbose=True).compute_ground_state()
-tdci = TDCISD(gos, verbose=True, init_state=ci)
+tdci = TDCISD(gos, verbose=True)
 
-r = complex_ode(tdci).set_integrator("dopri5")
-r.set_solout(tdci.solout)
-r.set_initial_value(tdci.c)
+r = complex_ode(tdci).set_integrator("vode")
+r.set_initial_value(ci.C[:, 0])
 
 t_final = 5
 dt = 1e-2
 
 num_steps = int(t_final / dt) + 1
-
 energy = np.zeros(num_steps, dtype=np.complex128)
 
 i = 0
@@ -37,7 +35,7 @@ while r.successful() and r.t <= t_final:
     if i % 100 == 0:
         print(f"{i} / {num_steps}")
 
-    energy[i] = tdci.compute_energy()
+    energy[i] = tdci.compute_energy(r.t, r.y)
     r.integrate(r.t + dt)
 
     i += 1
