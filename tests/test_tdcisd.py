@@ -1,10 +1,14 @@
 import os
 import numpy as np
 
+from scipy.integrate import ode
+
 from quantum_systems import construct_pyscf_system_rhf
 from quantum_systems.time_evolution_operators import LaserField
-from configuration_interaction import TDCISD
-from configuration_interaction.integrators import GaussIntegrator
+
+from configuration_interaction import CISD, TDCISD
+
+from gauss_integrator import GaussIntegrator
 
 
 class LaserPulse:
@@ -35,13 +39,14 @@ def test_tdcisd():
         molecule="he 0.0 0.0 0.0", basis="cc-pvdz"
     )
 
-    integrator = GaussIntegrator(s=3, np=np, eps=1e-6)
-    tdcisd = TDCISD(system, integrator=integrator, verbose=True)
-    tdcisd.compute_ground_state()
-    assert (
-        abs(tdcisd.compute_ground_state_energy() - -2.887_594_831_090_936)
-        < 1e-7
-    )
+    cisd = CISD(system, verbose=True).compute_ground_state()
+    assert abs(cisd.compute_energy() - -2.887_594_831_090_936) < 1e-7
+
+    tdcisd = TDCISD(system, verbose=True)
+    r = ode(tdcisd).set_integrator("GaussIntegrator", s=3, eps=1e-6)
+    r.set_initial_value(cisd.C[:, 0])
+
+    assert abs(tdcisd.compute_energy(r.t, r.y) - -2.887_594_831_090_936) < 1e-7
 
     polarization = np.zeros(3)
     polarization[2] = 1
@@ -52,7 +57,6 @@ def test_tdcisd():
         )
     )
 
-    tdcisd.set_initial_conditions()
     dt = 1e-3
     T = 5
     num_steps = int(T // dt) + 1
@@ -64,25 +68,38 @@ def test_tdcisd():
     dip_z = np.zeros(len(time_points))
     td_overlap = np.zeros_like(dip_z)
 
-    rho_qp = tdcisd.compute_one_body_density_matrix(tol=1e-3)
-    rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
+    i = 0
 
-    td_energies[0] = tdcisd.compute_energy()
-    dip_z[0] = np.einsum(
-        "qp,pq->", rho_qp_hermitian, system.dipole_moment[2]
-    ).real
-    td_overlap[0] = tdcisd.compute_time_dependent_overlap()
+    while r.successful() and r.t <= T:
+        td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
-    for i, c in enumerate(tdcisd.solve(time_points)):
-        td_energies[i + 1] = tdcisd.compute_energy()
-
-        rho_qp = tdcisd.compute_one_body_density_matrix(tol=1e-3)
+        rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
         rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
 
-        dip_z[i + 1] = np.einsum(
+        dip_z[i] = np.einsum(
             "qp,pq->", rho_qp_hermitian, system.dipole_moment[2]
         ).real
-        td_overlap[i + 1] = tdcisd.compute_time_dependent_overlap()
+        td_overlap[i] = tdcisd.compute_time_dependent_overlap(
+            r.t, r.y, cisd.C[:, 0]
+        )
+
+        r.integrate(r.t + dt)
+        i += 1
+
+    import matplotlib.pyplot as plt
+
+    plt.plot(
+        time_points, td_energies.real, label="New",
+    )
+    plt.plot(
+        time_points,
+        np.loadtxt(
+            os.path.join("tests", "dat", "tdcisd_helium_energies_real.dat")
+        ),
+        label="Old",
+    )
+    plt.legend()
+    plt.show()
 
     np.testing.assert_allclose(
         td_energies.real,
@@ -103,3 +120,7 @@ def test_tdcisd():
         np.loadtxt(os.path.join("tests", "dat", "tdcisd_helium_dipole_z.dat")),
         atol=1e-7,
     )
+
+
+if __name__ == "__main__":
+    test_tdcisd()
