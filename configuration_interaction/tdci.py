@@ -44,14 +44,13 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.num_states = len(self.states)
         self.setup_initial_hamiltonian()
 
-            self.states = init_state.states
-            self.num_states = len(self.states)
-            self.hamiltonian = init_state.hamiltonian
-            self.one_body_hamiltonian = init_state.one_body_hamiltonian
-            self.two_body_hamiltonian = init_state.two_body_hamiltonian
-            self._c = init_state.C[:, k]
+        # We initialize the last timestep to be None. This will make sure that
+        # the first evaluation of update_hamiltonian will be run.
+        self.last_timestep = None
 
     def setup_initial_hamiltonian(self):
+        np = self.np
+
         self.hamiltonian = np.zeros(
             (self.num_states, self.num_states), dtype=self.system.h.dtype
         )
@@ -95,11 +94,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         self.hamiltonian += self.one_body_hamiltonian
         self.hamiltonian += self.two_body_hamiltonian
 
-    @property
-    def c(self):
-        return self._c
-
-    def compute_energy(self):
+    def compute_energy(self, current_time, c):
         r"""Function computing the energy of the time-evolved system with a
         time-evolved Hamiltonian.
 
@@ -120,17 +115,28 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         with :math:`\lvert\Phi_I\rangle` being Slater determinants.
 
+        Parameters
+        ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
+
         Returns
         -------
         float
             The time-dependent energy :math:`E(t)`.
         """
-        norm = self._c.conj() @ self._c
-        energy = self._c.conj() @ self.hamiltonian @ self._c / norm
+
+        # Update the Hamiltionian to the current timestep
+        self.update_hamiltonian(current_time)
+
+        norm = c.conj() @ c
+        energy = c.conj() @ self.hamiltonian @ c / norm
 
         return energy
 
-    def compute_one_body_density_matrix(self, tol=1e-5):
+    def compute_one_body_density_matrix(self, current_time, c, tol=1e-5):
         r"""Compute one-body density matrix for the time-dependent state
         :math:`\rvert\Psi(t)\rangle`,
 
@@ -142,6 +148,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
         tol : float
             Tolerance of trace warning. Default is ``tol=1e-5``.
 
@@ -151,8 +161,8 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             The one-body density matrix :math:`\rho^{q}_{p}(t)`.
         """
 
-        rho_qp = self.np.zeros((self.l, self.l), dtype=self._c.dtype)
-        construct_one_body_density_matrix(rho_qp, self.states, self._c)
+        rho_qp = self.np.zeros((self.l, self.l), dtype=c.dtype)
+        construct_one_body_density_matrix(rho_qp, self.states, c)
 
         if self.np.abs(self.np.trace(rho_qp) - self.system.n) > tol:
             warn = "Trace of rho_qp = {0} != {1} = number of particles"
@@ -161,7 +171,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return rho_qp
 
-    def compute_particle_density(self, tol=1e-5):
+    def compute_particle_density(self, current_time, c, tol=1e-5):
         r"""Compute particle density :math:`\rho(x, t)` for the time-dependent
         state :math:`\rvert\Psi(t)\rangle`,
 
@@ -170,6 +180,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
         tol : float
             Tolerance parameter for the one-body density matrix. Default is
             ``tol=1e-5``.
@@ -185,7 +199,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self.system.compute_particle_density(rho_qp)
 
-    def compute_time_dependent_overlap(self, c_0):
+    def compute_time_dependent_overlap(self, current_time, c, c_0):
         r"""Function computing the autocorrelation by
 
         .. math:: A(t, t_0) = \frac{
@@ -206,6 +220,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
         c_0 : np.ndarray
             The state to compare overlap with.
 
@@ -215,35 +233,20 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             The autocorrelation absolute squared.
         """
 
-        assert self._c.shape == c_0.shape
+        assert c.shape == c_0.shape
 
-        norm_t = self._c.conj() @ self._c
+        norm_t = c.conj() @ c
         norm_0 = c_0.conj() @ c_0
 
-        overlap = self.np.abs(self._c.conj() @ c_0) ** 2
+        overlap = self.np.abs(c.conj() @ c_0) ** 2
 
         return (overlap / norm_t / norm_0).real
 
-    def solout(self, current_time, current_c):
-        """Function to be called by the integrator after every successful step.
-
-        Parameters
-        ----------
-        current_time : float
-            Current time step.
-        current_c : np.ndarray
-            Current coefficient vector.
-
-        See Also
-        --------
-        scipy.integrate.ode.set_solout
-            https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.set_solout.html#scipy.integrate.ode.set_solout
-        """
-
-        self._c = current_c
-        self.update_hamiltonian(current_time)
-
     def update_hamiltonian(self, current_time):
+        # Avoid updating the Hamiltonian to the same timestep several times
+        if current_time == self.last_timestep:
+            return
+
         self.h = self.system.h_t(current_time)
         self.u = self.system.u_t(current_time)
 
@@ -279,6 +282,9 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             out=self.hamiltonian,
         )
 
+        # Set last updated timestep to current timestep
+        self.last_timestep = current_time
+
     def __call__(self, current_time, prev_c):
         r"""Function computing the right-hand side of the time-dependent
         Schrödinger equation for the coefficient vector :math:`\mathbf{c}(t)`.
@@ -292,15 +298,15 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        prev_c : np.ndarray
-            Coefficient vector at previous time-step.
         current_time : float
-            Current time-step.
+            Current timestep.
+        prev_c : np.ndarray
+            Coefficient vector at previous timestep.
 
         Returns
         -------
         np.ndarray
-            Time-derivative of coefficient vector at current time-step.
+            Time-derivative of coefficient vector at current timestep.
         """
 
         # Update Hamiltonian matrix
@@ -308,6 +314,9 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         # Compute dot-product of new Hamiltonian with the previous coefficient
         # vector and multiply with -1j.
-        new_c = -1j * self.np.dot(self.hamiltonian, prev_c)
+        delta_c = -1j * self.np.dot(self.hamiltonian, prev_c)
 
-        return new_c
+        # Store current integration step as the last timestep
+        self.last_timestep = current_time
+
+        return delta_c
