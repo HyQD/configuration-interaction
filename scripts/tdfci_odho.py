@@ -8,6 +8,8 @@ from quantum_systems.time_evolution_operators import LaserField
 
 from configuration_interaction import CISD, TDCISD
 
+from gauss_integrator import GaussIntegrator
+
 
 n = 2
 l = 6
@@ -20,7 +22,7 @@ gos.set_time_evolution_operator(LaserField(lambda t: np.sin(omega * t)))
 ci = CISD(gos, verbose=True).compute_ground_state()
 tdci = TDCISD(gos, verbose=True)
 
-r = complex_ode(tdci).set_integrator("vode")
+r = complex_ode(tdci).set_integrator("GaussIntegrator")
 r.set_initial_value(ci.C[:, 0])
 
 t_final = 5
