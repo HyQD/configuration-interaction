@@ -19,12 +19,6 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     ----------
     system : QuantumSystems
         Quantum systems instance.
-    init_state : ConfigurationInteraction
-        An initial state for the time-evolution.
-    k : int
-        Which eigenstate from ``init_state`` to use as the initial state.
-        The default is ``0``, i.e., the ground state. Note that this argument
-        is ignored if ``init_state == None``.
     s : int
         Spin projection number to keep. Default is ``None`` and all
         determinants are kept.
@@ -32,29 +26,23 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         Print timer and logging info. Default value is ``False``.
     """
 
-    def __init__(self, system, init_state=None, k=0, s=None, verbose=False):
+    def __init__(self, system, s=None, verbose=False):
         self.verbose = verbose
 
         self.system = system
         self.np = self.system.np
 
-        if init_state is None:
-            self.states = ConfigurationInteraction.setup_ci_space(
-                self.excitations,
-                self.system.n,
-                self.system.l,
-                self.system.m,
-                self.verbose,
-                self.np,
-                s=s,
-            )
-            self.num_states = len(self.states)
-            self.setup_initial_hamiltonian()
-            self._c = self.np.zeros(self.num_states, dtype=self.system.h.dtype)
-            self._c[0] = 1
-
-        else:
-            assert self.excitations == init_state.excitations
+        self.states = ConfigurationInteraction.setup_ci_space(
+            self.excitations,
+            self.system.n,
+            self.system.l,
+            self.system.m,
+            self.verbose,
+            self.np,
+            s=s,
+        )
+        self.num_states = len(self.states)
+        self.setup_initial_hamiltonian()
 
             self.states = init_state.states
             self.num_states = len(self.states)
