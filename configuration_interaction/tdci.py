@@ -161,7 +161,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             The one-body density matrix :math:`\rho^{q}_{p}(t)`.
         """
 
-        rho_qp = self.np.zeros((self.l, self.l), dtype=c.dtype)
+        rho_qp = self.np.zeros((self.system.l, self.system.l), dtype=c.dtype)
         construct_one_body_density_matrix(rho_qp, self.states, c)
 
         if self.np.abs(self.np.trace(rho_qp) - self.system.n) > tol:
