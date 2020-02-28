@@ -21,3 +21,4 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 pyscf = "*"
 diffeqpy = "*"
+gauss-integrator = {editable = true,git = "ssh://git@github.com/Schoyen/gauss-integrator.git"}
