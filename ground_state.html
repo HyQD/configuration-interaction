@@ -164,7 +164,7 @@ We’ve therefore created a single abstract super-class defining all methods
 needed by the CI-solvers.</p>
 <dl class="class">
 <dt id="configuration_interaction.ci.ConfigurationInteraction">
-<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">ConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param">system</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">np=None</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">ConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param">system</em>, <em class="sig-param">s=None</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class defining the skeleton of a truncated configuration
 interaction class. All subclasses need to provide the member
 <code class="docutils literal notranslate"><span class="pre">excitations</span></code> as this decides the basis of Slater determinants.</p>
@@ -172,8 +172,9 @@ interaction class. All subclasses need to provide the member
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>system</strong> (<em>QuantumSystems</em>) – Quantum systems instance.</p></li>
+<li><p><strong>s</strong> (<em>int</em>) – Spin projection number to keep. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> and all
+determinants are kept.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – Print timer and logging info. Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>np</strong> (<em>module</em>) – Array library, defaults to <code class="docutils literal notranslate"><span class="pre">numpy</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -246,18 +247,6 @@ Note the use of the Einstein summation convention in the above expression.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="configuration_interaction.ci.ConfigurationInteraction.spin_reduce_states">
-<code class="sig-name descname">spin_reduce_states</code><span class="sig-paren">(</span><em class="sig-param">s=0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.spin_reduce_states" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function removing all states with spin different from <code class="docutils literal notranslate"><span class="pre">s</span></code>. This
-builds a new <code class="docutils literal notranslate"><span class="pre">self.states</span></code>-array and updates <code class="docutils literal notranslate"><span class="pre">self.num_states</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>s</strong> (<em>int</em>) – Spin projection number to keep.</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <p>To create a specific CI-solver a subclass of the
@@ -280,26 +269,6 @@ These are:</p>
 </ul>
 <p>However, these classes and others can be created by the function
 <code class="docutils literal notranslate"><span class="pre">get_ci_class</span></code> listed below.</p>
-<dl class="function">
-<dt id="configuration_interaction.ci.get_ci_class">
-<code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">get_ci_class</code><span class="sig-paren">(</span><em class="sig-param">excitations</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.get_ci_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function constructing a truncated CI-class with the specified
-excitations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>excitations</strong> (<em>str</em>) – The specified excitations to use in the CI-class. For example, to
-create a CISD class both <code class="docutils literal notranslate"><span class="pre">excitations=&quot;CISD&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">excitations=[&quot;S&quot;,</span>
-<span class="pre">&quot;D&quot;]</span></code> are valid.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A subclass of <code class="docutils literal notranslate"><span class="pre">ConfigurationInteraction</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction" title="configuration_interaction.ci.ConfigurationInteraction">ConfigurationInteraction</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <p>As an example, we demonstrate how to create a CISDTQ56-class using this
 function:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the object class</span>
