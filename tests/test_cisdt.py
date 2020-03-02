@@ -2,7 +2,7 @@ import numpy as np
 
 from configuration_interaction import CISDT
 from configuration_interaction.ci_helper import (
-    num_states,
+    count_num_states,
     state_printer,
     create_excited_states,
     create_reference_state,
@@ -18,9 +18,9 @@ def test_setup(odho_ti):
     cisdt = CISDT(odho_ti, verbose=True)
 
     num_determinants = 1
-    num_determinants += num_states(odho_ti.n, odho_ti.m, order=1)
-    num_determinants += num_states(odho_ti.n, odho_ti.m, order=2)
-    num_determinants += num_states(odho_ti.n, odho_ti.m, order=3)
+    num_determinants += count_num_states(odho_ti.n, odho_ti.m, order=1)
+    num_determinants += count_num_states(odho_ti.n, odho_ti.m, order=2)
+    num_determinants += count_num_states(odho_ti.n, odho_ti.m, order=3)
     assert cisdt.num_states == num_determinants
     assert len(cisdt.states) == cisdt.num_states
 

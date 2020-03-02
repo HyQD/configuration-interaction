@@ -3,7 +3,7 @@ import time
 from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
-    num_states,
+    count_num_states,
     ORDER,
     create_reference_state,
     create_excited_states,
@@ -25,21 +25,18 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
     ----------
     system : QuantumSystems
         Quantum systems instance.
+    s : int
+        Spin projection number to keep. Default is ``None`` and all
+        determinants are kept.
     verbose : bool
         Print timer and logging info. Default value is ``False``.
-    np : module
-        Array library, defaults to ``numpy``.
     """
 
-    def __init__(self, system, verbose=False, np=None):
+    def __init__(self, system, s=None, verbose=False):
         self.verbose = verbose
 
-        if np is None:
-            import numpy as np
-
-        self.np = np
-
         self.system = system
+        self.np = self.system.np
 
         self.n = self.system.n
         self.l = self.system.l
@@ -47,79 +44,73 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.o = self.system.o
         self.v = self.system.v
 
+        self.states = self.setup_ci_space(
+            self.excitations, self.n, self.l, self.m, self.verbose, self.np, s=s
+        )
+        self.num_states = len(self.states)
+
+    @staticmethod
+    def setup_ci_space(excitations, n, l, m, verbose, np, s=None):
         # Count the reference state
-        self.num_states = 1
+        num_states = 1
 
-        for excitation in self.excitations:
-            self.num_states += num_states(self.n, self.m, ORDER[excitation])
+        for excitation in excitations:
+            num_states += count_num_states(n, m, ORDER[excitation])
 
-        if self.verbose:
-            print("Number of states to create: {0}".format(self.num_states))
+        if verbose:
+            print(f"Number of states to create: {num_states}")
 
         # Find the shape of the states array
         # Each state is represented as a bit string padded to the nearest
         # 32-bit boundary
         shape = (
-            self.num_states,
-            self.l // BITSTRING_SIZE + (self.l % BITSTRING_SIZE > 0),
+            num_states,
+            l // BITSTRING_SIZE + (l % BITSTRING_SIZE > 0),
         )
 
-        if self.verbose:
-            print(
-                "Size of a state in bytes: {0}".format(
-                    np.dtype(BITTYPE).itemsize * 1
-                )
-            )
+        if verbose:
+            print(f"Size of a state in bytes: {np.dtype(BITTYPE).itemsize * 1}")
 
-        self.states = np.zeros(shape, dtype=BITTYPE)
-        self._setup_ci_space()
+        states = np.zeros(shape, dtype=BITTYPE)
 
-    def _setup_ci_space(self):
         t0 = time.time()
-        create_reference_state(self.n, self.l, self.states)
+        create_reference_state(n, l, states)
 
         index = 1
-        for excitation in self.excitations:
+        for excitation in excitations:
             index = create_excited_states(
-                self.n,
-                self.l,
-                self.states,
-                index=index,
-                order=ORDER[excitation],
+                n, l, states, index=index, order=ORDER[excitation],
             )
 
         t1 = time.time()
 
-        if self.verbose:
+        if verbose:
             print(
-                f"Time spent setting up CI{''.join(self.excitations)} space: "
+                f"Time spent setting up CI{''.join(excitations)} space: "
                 + f"{t1 - t0} sec"
             )
 
-        self.states = sort_states(self.states)
+        if s is not None:
+            states = ConfigurationInteraction.filter_states_with_spin_projection(
+                states, s, np
+            )
 
-    def spin_reduce_states(self, s=0):
-        """Function removing all states with spin different from ``s``. This
-        builds a new ``self.states``-array and updates ``self.num_states``.
+            if verbose:
+                print(f"Number of states after spin-reduction: {len(states)}")
 
-        Parameters
-        ----------
-        s : int
-            Spin projection number to keep.
-        """
-        np = self.np
+        return sort_states(states)
 
-        new_states = []
-
-        for state in self.states:
-            if compute_spin_projection_eigenvalue(state) == s:
-                new_states.append(state)
-
-        self.states = sort_states(np.array(new_states))
-        self.num_states = len(self.states)
-
-        if self.verbose:
-            print(f"Number of states after spin-reduction: {self.num_states}")
+    @staticmethod
+    def filter_states_with_spin_projection(self, states, s, np):
+        return sort_states(
+            np.array(
+                filter(
+                    lambda state: compute_spin_projection_eigenvalue(state)
+                    == s,
+                    states,
+                )
+            )
+        )
 
     def compute_ground_state(self, k=None):
         """Function constructing the Hamiltonian of the system without any
@@ -202,6 +193,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 f"{self.__class__.__name__} ground state energy: "
                 + f"{self.energies[0]}"
             )
+
+        return self
 
     def compute_one_body_density_matrix(self, K=0):
         r"""Function computing the one-body density matrix
@@ -304,53 +297,3 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
     def compute_energy(self):
         return self._energies[0]
-
-
-def excitation_string_handler(excitations):
-    if isinstance(excitations, str):
-        excitations = excitations.upper()
-
-        if excitations.startswith("CI"):
-            excitations = excitations[2:]
-
-        excitations = [excitation for excitation in excitations]
-
-    for excitation in excitations:
-        assert excitation in ORDER, f'"{excitation}" is not a supported order'
-
-    return list(map(lambda x: x.upper(), excitations))
-
-
-def get_ci_class(excitations):
-    """Function constructing a truncated CI-class with the specified
-    excitations.
-
-    Parameters
-    ----------
-    excitations : str
-        The specified excitations to use in the CI-class. For example, to
-        create a CISD class both ``excitations="CISD"`` and ``excitations=["S",
-        "D"]`` are valid.
-
-    Returns
-    -------
-    ConfigurationInteraction
-        A subclass of ``ConfigurationInteraction``.
-    """
-    excitations = excitation_string_handler(excitations)
-    class_name = "CI" + "".join(excitations)
-
-    ci_class = type(
-        class_name, (ConfigurationInteraction,), dict(excitations=excitations)
-    )
-
-    return ci_class
-
-
-CIS = get_ci_class("CIS")
-CID = get_ci_class("CID")
-CISD = get_ci_class("CISD")
-CIDT = get_ci_class("CIDT")
-CISDT = get_ci_class("CISDT")
-CIDTQ = get_ci_class("CIDTQ")
-CISDTQ = get_ci_class("CISDTQ")

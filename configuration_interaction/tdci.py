@@ -3,8 +3,7 @@ import collections
 import warnings
 import time
 
-from configuration_interaction import get_ci_class, excitation_string_handler
-from configuration_interaction.integrators import RungeKutta4
+from .ci import ConfigurationInteraction
 from configuration_interaction.ci_helper import (
     setup_one_body_hamiltonian,
     setup_two_body_hamiltonian,
@@ -14,144 +13,88 @@ from configuration_interaction.ci_helper import (
 
 class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
     """Abstract base class defining the skeleton of a time-dependent
-    configuration interaction solver. All subclasses need to provide a subclass
-    of ConfigurationInteraction in the member `self.ci_class`.
+    configuration interaction solver.
 
     Parameters
     ----------
     system : QuantumSystems
         Quantum systems instance.
-    np : module
-        Array library, defaults to ``numpy``.
-    integrator : Integrator
-        Differential equation integrator. The integrator class must implement a
-        ``step``-function.
+    s : int
+        Spin projection number to keep. Default is ``None`` and all
+        determinants are kept.
     verbose : bool
         Print timer and logging info. Default value is ``False``.
-    **ci_kwargs : dict
-        Keyword arguments to ground state solver class.
     """
 
-    def __init__(
-        self, system, np=None, integrator=None, verbose=False, **ci_kwargs
-    ):
-        if np is None:
-            import numpy as np
-
-        self.np = np
-
-        ci_kwargs["verbose"] = verbose
+    def __init__(self, system, s=None, verbose=False):
         self.verbose = verbose
 
-        if not "np" in ci_kwargs:
-            ci_kwargs["np"] = self.np
-
-        # Initialize ground state solver
-        self.ci = self.ci_class(system, **ci_kwargs)
-
         self.system = system
+        self.np = self.system.np
 
-        self.h = self.system.h
-        self.u = self.system.u
-        self.n = self.system.n
-        self.l = self.system.l
-        self.o = self.system.o
-        self.v = self.system.v
-
-        if integrator is None:
-            integrator = RungeKutta4(np=self.np)
-
-        self.integrator = integrator.set_rhs(self)
-        self._c = None
-
-        # Inherit functions from ground state solver
-        self.compute_ground_state_energy = lambda K=0: self.ci.energies[K]
-        self.compute_ground_state_particle_density = (
-            self.ci.compute_particle_density
+        self.states = ConfigurationInteraction.setup_ci_space(
+            self.excitations,
+            self.system.n,
+            self.system.l,
+            self.system.m,
+            self.verbose,
+            self.np,
+            s=s,
         )
-        self.compute_ground_state_one_body_density_matrix = (
-            self.ci.compute_one_body_density_matrix
+        self.num_states = len(self.states)
+        self.setup_initial_hamiltonian()
+
+        # We initialize the last timestep to be None. This will make sure that
+        # the first evaluation of update_hamiltonian will be run.
+        self.last_timestep = None
+
+    def setup_initial_hamiltonian(self):
+        np = self.np
+
+        self.hamiltonian = np.zeros(
+            (self.num_states, self.num_states), dtype=self.system.h.dtype
         )
-        self.spin_reduce_states = self.ci.spin_reduce_states
+        self.one_body_hamiltonian = np.zeros_like(self.hamiltonian)
+        self.two_body_hamiltonian = np.zeros_like(self.hamiltonian)
 
-    def compute_ground_state(self, *args, **kwargs):
-        r"""Compute the ground state from the defined ``self.ci_class`` and set
-        initial values for the Hamiltonian matrix :math:`\mathbf{H}`.
+        t0 = time.time()
+        setup_one_body_hamiltonian(
+            self.one_body_hamiltonian,
+            self.states,
+            self.system.h,
+            self.system.n,
+            self.system.l,
+        )
+        t1 = time.time()
 
-        Parameters
-        ----------
-        *args
-            Argument list for ground state class ``self.ci_class``.
-        **kwargs
-            Keyward argument for ground state class ``self.ci_class``.
-        """
+        if self.verbose:
+            print(
+                "Time spent constructing one-body Hamiltonian: {0} sec".format(
+                    t1 - t0
+                )
+            )
 
-        # Compute ground state
-        self.ci.compute_ground_state(*args, **kwargs)
-        # Fetch pointers to the Hamiltonian
-        self.one_body_hamiltonian = self.ci.one_body_hamiltonian
-        self.two_body_hamiltonian = self.ci.two_body_hamiltonian
-        self.hamiltonian = self.ci.hamiltonian.copy()
+        t0 = time.time()
+        setup_two_body_hamiltonian(
+            self.two_body_hamiltonian,
+            self.states,
+            self.system.u,
+            self.system.n,
+            self.system.l,
+        )
+        t1 = time.time()
 
-    def set_initial_conditions(self, c=None, K=0):
-        r"""Set initial state for the differential equation solver.
+        if self.verbose:
+            print(
+                "Time spent constructing two-body Hamiltonian: {0} sec".format(
+                    t1 - t0
+                )
+            )
 
-        Parameters
-        ----------
-        c : np.array
-            The initial coefficient vector :math:`\mathbf{c}(0)`. Default is
-            ``None`` which defaults to state ``K`` from the ground state
-            calculations.
-        K : int
-            Initial eigenstate from ground state calculations. This argument is
-            ignored if a value for ``c`` is given. Default is ``K = 0`` which
-            is the ground state.
-        """
+        self.hamiltonian += self.one_body_hamiltonian
+        self.hamiltonian += self.two_body_hamiltonian
 
-        if c is None:
-            # Create copy of the ground state coefficients
-            c = self.ci._C[:, K].copy()
-
-        self._c_0 = c.copy()
-        self._c = c
-
-    @property
-    def c(self):
-        return self._c
-
-    def solve(self, time_points, timestep_tol=1e-8):
-        """Function creating a generator for stepping through the solution to
-        the differential equation integrator.
-
-        Parameters
-        ----------
-        time_points : np.array
-            Discretized time-points to integrate over.
-        timestep_tol : float
-            Tolerance to check if the last timestep corresponds to the same
-            timestep as used in the evaluation of the right-hand side in the
-            integrator. Default is ``timestep_tol=1e-8``.
-
-        Yields
-        ------
-        np.array
-            The coefficient vector at each timestep.
-        """
-
-        n = len(time_points)
-
-        for i in range(n - 1):
-            dt = time_points[i + 1] - time_points[i]
-            c_t = self.integrator.step(self._c, time_points[i], dt)
-            self._c = c_t
-
-            if abs(self.last_timestep - (time_points[i] + dt)) > timestep_tol:
-                self.update_hamiltonian(time_points[i] + dt)
-                self.last_timestep = time_points[i] + dt
-
-            yield self._c
-
-    def compute_energy(self):
+    def compute_energy(self, current_time, c):
         r"""Function computing the energy of the time-evolved system with a
         time-evolved Hamiltonian.
 
@@ -172,17 +115,28 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         with :math:`\lvert\Phi_I\rangle` being Slater determinants.
 
+        Parameters
+        ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
+
         Returns
         -------
         float
             The time-dependent energy :math:`E(t)`.
         """
-        norm = self._c.conj() @ self._c
-        energy = self._c.conj() @ self.hamiltonian @ self._c / norm
+
+        # Update the Hamiltionian to the current timestep
+        self.update_hamiltonian(current_time)
+
+        norm = c.conj() @ c
+        energy = c.conj() @ self.hamiltonian @ c / norm
 
         return energy
 
-    def compute_one_body_density_matrix(self, tol=1e-5):
+    def compute_one_body_density_matrix(self, current_time, c, tol=1e-5):
         r"""Compute one-body density matrix for the time-dependent state
         :math:`\rvert\Psi(t)\rangle`,
 
@@ -194,6 +148,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
         tol : float
             Tolerance of trace warning. Default is ``tol=1e-5``.
 
@@ -203,8 +161,8 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             The one-body density matrix :math:`\rho^{q}_{p}(t)`.
         """
 
-        rho_qp = self.np.zeros((self.l, self.l), dtype=self._c.dtype)
-        construct_one_body_density_matrix(rho_qp, self.ci.states, self._c)
+        rho_qp = self.np.zeros((self.system.l, self.system.l), dtype=c.dtype)
+        construct_one_body_density_matrix(rho_qp, self.states, c)
 
         if self.np.abs(self.np.trace(rho_qp) - self.system.n) > tol:
             warn = "Trace of rho_qp = {0} != {1} = number of particles"
@@ -213,7 +171,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return rho_qp
 
-    def compute_particle_density(self, tol=1e-5):
+    def compute_particle_density(self, current_time, c, tol=1e-5):
         r"""Compute particle density :math:`\rho(x, t)` for the time-dependent
         state :math:`\rvert\Psi(t)\rangle`,
 
@@ -222,6 +180,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
         tol : float
             Tolerance parameter for the one-body density matrix. Default is
             ``tol=1e-5``.
@@ -237,7 +199,7 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self.system.compute_particle_density(rho_qp)
 
-    def compute_time_dependent_overlap(self):
+    def compute_time_dependent_overlap(self, current_time, c, c_0):
         r"""Function computing the autocorrelation by
 
         .. math:: A(t, t_0) = \frac{
@@ -256,20 +218,35 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
         where the :math:`\mathbf{c}(t)` are the coefficient vectors of the
         states :math:`\lvert\Psi(t)\rangle` at specificed time-points.
 
+        Parameters
+        ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
+        c_0 : np.ndarray
+            The state to compare overlap with.
+
         Returns
         -------
         float
-            The real part of the autocorrelation absolute squared.
+            The autocorrelation absolute squared.
         """
 
-        norm_t = self._c.conj() @ self._c
-        norm_0 = self._c_0.conj() @ self._c_0
+        assert c.shape == c_0.shape
 
-        overlap = self.np.abs(self._c.conj() @ self._c_0) ** 2
+        norm_t = c.conj() @ c
+        norm_0 = c_0.conj() @ c_0
+
+        overlap = self.np.abs(c.conj() @ c_0) ** 2
 
         return (overlap / norm_t / norm_0).real
 
     def update_hamiltonian(self, current_time):
+        # Avoid updating the Hamiltonian to the same timestep several times
+        if current_time == self.last_timestep:
+            return
+
         self.h = self.system.h_t(current_time)
         self.u = self.system.u_t(current_time)
 
@@ -279,10 +256,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             # Compute new one-body Hamiltonian
             setup_one_body_hamiltonian(
                 self.one_body_hamiltonian,
-                self.ci.states,
+                self.states,
                 self.h,
-                self.n,
-                self.l,
+                self.system.n,
+                self.system.l,
             )
 
         if self.system.has_two_body_time_evolution_operator:
@@ -291,10 +268,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             # Compute new two-body Hamiltonian
             setup_two_body_hamiltonian(
                 self.two_body_hamiltonian,
-                self.ci.states,
+                self.states,
                 self.u,
-                self.n,
-                self.l,
+                self.system.n,
+                self.system.l,
             )
 
         # Empty Hamiltonian matrix
@@ -305,7 +282,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             out=self.hamiltonian,
         )
 
-    def __call__(self, prev_c, current_time):
+        # Set last updated timestep to current timestep
+        self.last_timestep = current_time
+
+    def __call__(self, current_time, prev_c):
         r"""Function computing the right-hand side of the time-dependent
         Schrödinger equation for the coefficient vector :math:`\mathbf{c}(t)`.
         That is, this function finds the time-derivative of the coefficient
@@ -318,15 +298,15 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        prev_c : np.ndarray
-            Coefficient vector at previous time-step.
         current_time : float
-            Current time-step.
+            Current timestep.
+        prev_c : np.ndarray
+            Coefficient vector at previous timestep.
 
         Returns
         -------
         np.ndarray
-            Time-derivative of coefficient vector at current time-step.
+            Time-derivative of coefficient vector at current timestep.
         """
 
         # Update Hamiltonian matrix
@@ -334,49 +314,9 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         # Compute dot-product of new Hamiltonian with the previous coefficient
         # vector and multiply with -1j.
-        new_c = -1j * self.np.dot(self.hamiltonian, prev_c)
+        delta_c = -1j * self.np.dot(self.hamiltonian, prev_c)
 
-        # Note the last timestep used to avoid updating the Hamiltonian in the
-        # same timestep twice.
+        # Store current integration step as the last timestep
         self.last_timestep = current_time
 
-        return new_c
-
-
-def get_tdci_class(excitations):
-    """Function constructing a truncated TDCI-class with the specified
-    excitations.
-
-    Parameters
-    ----------
-    excitations : str
-        The specified excitations to use in the TDCI-class. For example, to
-        create a TDCISD class both ``excitations="CISD"`` and
-        ``excitations=["S", "D"]`` are valid.
-
-    Returns
-    -------
-    TimeDependentConfigurationInteraction
-        A subclass of ``TimeDependentConfigurationInteraction``.
-    """
-    ci_class = get_ci_class(excitations)
-    excitations = excitation_string_handler(excitations)
-
-    class_name = "TDCI" + "".join(excitations)
-
-    tdci_class = type(
-        class_name,
-        (TimeDependentConfigurationInteraction,),
-        dict(ci_class=ci_class),
-    )
-
-    return tdci_class
-
-
-TDCIS = get_tdci_class("CIS")
-TDCID = get_tdci_class("CID")
-TDCISD = get_tdci_class("CISD")
-TDCIDT = get_tdci_class("CIDT")
-TDCISDT = get_tdci_class("CISDT")
-TDCIDTQ = get_tdci_class("CIDTQ")
-TDCISDTQ = get_tdci_class("CISDTQ")
+        return delta_c
