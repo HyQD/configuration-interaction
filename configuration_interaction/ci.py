@@ -101,7 +101,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         return sort_states(states)
 
     @staticmethod
-    def filter_states_with_spin_projection(self, states, s, np):
+    def filter_states_with_spin_projection(states, s, np):
         return sort_states(
             np.array(
                 filter(
