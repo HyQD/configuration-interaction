@@ -104,10 +104,12 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
     def filter_states_with_spin_projection(states, s, np):
         return sort_states(
             np.array(
-                filter(
-                    lambda state: compute_spin_projection_eigenvalue(state)
-                    == s,
-                    states,
+                list(
+                    filter(
+                        lambda state: compute_spin_projection_eigenvalue(state)
+                        == s,
+                        states,
+                    )
                 )
             )
         )
