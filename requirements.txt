@@ -1,23 +1,5 @@
-# Install numpy
-numpy
-
-# Install scipy
-scipy
-
-# Install sympy
-sympy
-
-# Install pandas
-pandas
-
 # Install pytest
 pytest
-
-# Install numba
-numba
-
-# Install quantum-systems
-git+https://github.com/Schoyen/quantum-systems.git
 
 # Install tdhf
 git+ssh://git@github.com/haakoek/tdhf.git
@@ -35,5 +17,5 @@ tqdm
 sphinx
 sphinx_rtd_theme
 
-# Install PySCF
-pyscf
+# Install Gauss-integrator
+git+ssh://git@github.com/Schoyen/gauss-integrator.git
