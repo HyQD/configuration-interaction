@@ -1,9 +1,11 @@
 language: python
 python:
 - '3.6'
+- '3.7'
 install:
 - pip install pipenv
 - pipenv install --skip-lock
+- pip install . -U
 script:
 - pytest
 - black --check .
