@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="Configuration interaction", version="0.0.1", packages=find_packages()
+    name="Configuration interaction", version="0.1.0", packages=find_packages()
 )
