@@ -195,7 +195,9 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             functions.
         """
 
-        rho_qp = self.compute_one_body_density_matrix(tol=tol)
+        rho_qp = self.compute_one_body_density_matrix(
+            current_time=current_time, c=c, tol=tol
+        )
 
         return self.system.compute_particle_density(rho_qp)
 
