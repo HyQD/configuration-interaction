@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from scipy.integrate import ode
+from scipy.integrate import complex_ode
 
 from quantum_systems import construct_pyscf_system_rhf
 from quantum_systems.time_evolution_operators import LaserField
@@ -43,7 +43,7 @@ def test_tdcisd():
     assert abs(cisd.compute_energy() - -2.887_594_831_090_936) < 1e-7
 
     tdcisd = TDCISD(system, verbose=True)
-    r = ode(tdcisd).set_integrator("GaussIntegrator", s=3, eps=1e-6)
+    r = complex_ode(tdcisd).set_integrator("GaussIntegrator", s=3, eps=1e-6)
     r.set_initial_value(cisd.C[:, 0])
 
     assert abs(tdcisd.compute_energy(r.t, r.y) - -2.887_594_831_090_936) < 1e-7
