@@ -77,12 +77,7 @@ def test_tdcisd():
         rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
         rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
 
-        dip_z[i] = np.einsum(
-            "qp,pq->", rho_qp_hermitian, system.dipole_moment[2]
-        ).real
-        td_overlap[i] = tdcisd.compute_time_dependent_overlap(
-            r.t, r.y, cisd.C[:, 0]
-        )
+        td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
         i += 1
         r.integrate(time_points[i])
@@ -92,12 +87,7 @@ def test_tdcisd():
     rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
     rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
 
-    dip_z[i] = np.einsum(
-        "qp,pq->", rho_qp_hermitian, system.dipole_moment[2]
-    ).real
-    td_overlap[i] = tdcisd.compute_time_dependent_overlap(
-        r.t, r.y, cisd.C[:, 0]
-    )
+    td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
     # plot_diff(
     #     time_points,

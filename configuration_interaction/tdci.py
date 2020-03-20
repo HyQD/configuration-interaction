@@ -201,8 +201,8 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self.system.compute_particle_density(rho_qp)
 
-    def compute_time_dependent_overlap(self, current_time, c, c_0):
-        r"""Function computing the autocorrelation by
+    def compute_overlap(self, current_time, c, c_0):
+        r"""Function computing the overlap between two states, viz.
 
         .. math:: A(t, t_0) = \frac{
                 \lvert \langle \Psi(t) \rvert \Psi(t_0) \rangle \rvert^2
