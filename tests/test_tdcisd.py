@@ -75,7 +75,7 @@ def test_tdcisd():
         td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
         rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
-        rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
+        dip_z[i] = np.einsum("qp,pq->", rho_qp, system.dipole_moment[2]).real
 
         td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
@@ -85,7 +85,7 @@ def test_tdcisd():
     td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
     rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
-    rho_qp_hermitian = 0.5 * (rho_qp.conj().T + rho_qp)
+    dip_z[i] = np.einsum("qp,pq->", rho_qp, system.dipole_moment[2]).real
 
     td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
