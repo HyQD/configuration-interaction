@@ -65,8 +65,8 @@ def test_tdcisd():
     time_points = np.linspace(0, T, num_steps)
 
     td_energies = np.zeros(len(time_points), dtype=np.complex128)
-    dip_z = np.zeros(len(time_points))
-    td_overlap = np.zeros_like(dip_z)
+    dip_z = np.zeros(len(time_points), dtype=np.complex128)
+    td_overlap = np.zeros(len(dip_z))
 
     i = 0
 
@@ -74,8 +74,9 @@ def test_tdcisd():
         assert abs(time_points[i] - r.t) < 1e-4
         td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
-        rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
-        dip_z[i] = np.einsum("qp,pq->", rho_qp, system.dipole_moment[2]).real
+        dip_z[i] = tdcisd.compute_one_body_expectation_value(
+            r.t, r.y, system.dipole_moment[2]
+        )
 
         td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
@@ -84,8 +85,9 @@ def test_tdcisd():
 
     td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
-    rho_qp = tdcisd.compute_one_body_density_matrix(r.t, r.y, tol=1e-3)
-    dip_z[i] = np.einsum("qp,pq->", rho_qp, system.dipole_moment[2]).real
+    dip_z[i] = tdcisd.compute_one_body_expectation_value(
+        r.t, r.y, system.dipole_moment[2]
+    )
 
     td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
@@ -127,7 +129,7 @@ def test_tdcisd():
     # )
 
     np.testing.assert_allclose(
-        dip_z,
+        dip_z.real,
         np.loadtxt(os.path.join("tests", "dat", "tdcisd_helium_dipole_z.dat")),
         atol=1e-7,
     )
