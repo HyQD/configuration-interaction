@@ -198,6 +198,37 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self
 
+    def compute_one_body_expectation_value(self, mat, K=0):
+        r"""Function computing the expectation value of a one-body operator.
+        For a given one-body operator :math:`\hat{A}` by
+
+        .. math:: \langle \hat{A} \rangle = \rho^{q}_{p} A^{p}_{q},
+
+        where :math:`p, q` are general single-particle indices.
+
+        Parameters
+        ----------
+        mat : np.ndarray
+            The one-body operator to evalute, as a matrix. The dimensionality
+            of the matrix must be the same as the one-body density matrix,
+            i.e., the number of basis functions ``l``.
+        K : int
+            The eigenstate to use for the one-body density matrix.
+
+        Returns
+        -------
+        complex
+            The expectation value of the one-body operator.
+
+        See Also
+        --------
+        ConfigurationInteraction.compute_one_body_density_matrix
+
+        """
+        rho_qp = self.compute_one_body_density_matrix(K=K)
+
+        return self.np.trace(self.np.dot(rho_qp, mat))
+
     def compute_one_body_density_matrix(self, K=0):
         r"""Function computing the one-body density matrix
         :math:`(\rho_K)^{q}_{p}` defined by
