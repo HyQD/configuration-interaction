@@ -72,23 +72,20 @@ def test_tdcisd():
 
     while r.successful() and r.t < T:
         assert abs(time_points[i] - r.t) < 1e-4
-        td_energies[i] = tdcisd.compute_energy(r.t, r.y)
 
+        td_energies[i] = tdcisd.compute_energy(r.t, r.y)
         dip_z[i] = tdcisd.compute_one_body_expectation_value(
             r.t, r.y, system.dipole_moment[2]
         )
-
         td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
         i += 1
         r.integrate(time_points[i])
 
     td_energies[i] = tdcisd.compute_energy(r.t, r.y)
-
     dip_z[i] = tdcisd.compute_one_body_expectation_value(
         r.t, r.y, system.dipole_moment[2]
     )
-
     td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
     # plot_diff(
