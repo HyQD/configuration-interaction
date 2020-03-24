@@ -16,6 +16,7 @@ from tests.helper import (
 from quantum_systems import (
     GeneralOrbitalSystem,
     TwoDimensionalHarmonicOscillator,
+    ODQD,
 )
 from quantum_systems.system_helper import compute_particle_density
 
@@ -99,7 +100,21 @@ def test_large_basis():
 
     tdho = GeneralOrbitalSystem(n, TwoDimensionalHarmonicOscillator(l, 10, 101))
 
-    cisd = CISD(tdho, verbose=True)
-    cisd.compute_ground_state()
+    cisd = CISD(tdho, verbose=True).compute_ground_state()
 
     assert abs(cisd.energies[0] - 3.0094342497034936) < 1e-8
+
+
+def test_one_body_expectation_value():
+    n = 2
+    l = 10
+
+    odho = GeneralOrbitalSystem(n, ODQD(l, 11, 201))
+
+    cisd = CISD(odho, verbose=True).compute_ground_state()
+
+    assert abs(n - cisd.compute_one_body_expectation_value(odho.s)) < 1e-8
+    assert (
+        abs(cisd.compute_one_body_expectation_value(odho.dipole_moment[0]))
+        < 1e-8
+    )

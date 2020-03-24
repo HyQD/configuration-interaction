@@ -136,6 +136,46 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return energy
 
+    def compute_one_body_expectation_value(
+        self, current_time, c, mat, tol=1e-5
+    ):
+        r"""Function computing the expectation value of a one-body operator.
+        For a given one-body operator :math:`\hat{A}` by
+
+        .. math:: \langle \hat{A} \rangle = \rho^{q}_{p} A^{p}_{q},
+
+        where :math:`p, q` are general single-particle indices.
+
+        Parameters
+        ----------
+        current_time : float
+            The current time step.
+        c : np.ndarray
+            The coefficient vector at the current time step.
+        mat : np.ndarray
+            The one-body operator to evalute, as a matrix. The dimensionality
+            of the matrix must be the same as the one-body density matrix,
+            i.e., the number of basis functions ``l``.
+        tol : float
+            Tolerance for the one-body density matrix construction. Default
+            value is ``1e-5``.
+
+        Returns
+        -------
+        complex
+            The expectation value of the one-body operator.
+
+        See Also
+        --------
+        TimeDependentConfigurationInteraction.compute_one_body_density_matrix
+        """
+        # Update the Hamiltionian to the current timestep
+        self.update_hamiltonian(current_time)
+
+        rho_qp = self.compute_one_body_density_matrix(current_time, c, tol=tol)
+
+        return self.np.trace(self.np.dot(rho_qp, mat))
+
     def compute_one_body_density_matrix(self, current_time, c, tol=1e-5):
         r"""Compute one-body density matrix for the time-dependent state
         :math:`\rvert\Psi(t)\rangle`,
@@ -201,8 +241,8 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self.system.compute_particle_density(rho_qp)
 
-    def compute_time_dependent_overlap(self, current_time, c, c_0):
-        r"""Function computing the autocorrelation by
+    def compute_overlap(self, current_time, c, c_0):
+        r"""Function computing the overlap between two states, viz.
 
         .. math:: A(t, t_0) = \frac{
                 \lvert \langle \Psi(t) \rvert \Psi(t_0) \rangle \rvert^2
