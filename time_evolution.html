@@ -169,9 +169,9 @@ use.
 However, this time the truncation level of the class decides which ground state
 solver to use, whereas the time-dependent part only requires an initial state
 represented as a coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction">
-<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.tdci.</code><code class="sig-name descname">TimeDependentConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param">system</em>, <em class="sig-param">s=None</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.tdci.</code><code class="sig-name descname">TimeDependentConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class defining the skeleton of a time-dependent
 configuration interaction solver.</p>
 <dl class="field-list simple">
@@ -184,9 +184,9 @@ determinants are kept.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">current_time</em>, <em class="sig-param">prev_c</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">prev_c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the right-hand side of the time-dependent
 Schrödinger equation for the coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}(t)\)</span>.
 That is, this function finds the time-derivative of the coefficient
@@ -211,9 +211,9 @@ typically used for differential equation solvers.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy">
-<code class="sig-name descname">compute_energy</code><span class="sig-paren">(</span><em class="sig-param">current_time</em>, <em class="sig-param">c</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_energy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the energy of the time-evolved system with a
 time-evolved Hamiltonian.</p>
 <div class="math notranslate nohighlight">
@@ -247,9 +247,9 @@ time-evolved Hamiltonian.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix">
-<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param">current_time</em>, <em class="sig-param">c</em>, <em class="sig-param">tol=1e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-05</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute one-body density matrix for the time-dependent state
 <span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>,</p>
 <div class="math notranslate nohighlight">
@@ -275,37 +275,43 @@ time-evolved Hamiltonian.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density">
-<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param">current_time</em>, <em class="sig-param">c</em>, <em class="sig-param">tol=1e-05</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute particle density <span class="math notranslate nohighlight">\(\rho(x, t)\)</span> for the time-dependent
-state <span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>,</p>
+<dl class="py method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_expectation_value">
+<code class="sig-name descname">compute_one_body_expectation_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">mat</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-05</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_expectation_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the expectation value of a one-body operator.
+For a given one-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span> by</p>
 <div class="math notranslate nohighlight">
-\[\rho(x, t)
-= \phi^{*}_q(x) \rho^{q}_{p}(t) \phi_p(x).\]</div>
+\[\langle \hat{A} \rangle = \rho^{q}_{p} A^{p}_{q},\]</div>
+<p>where <span class="math notranslate nohighlight">\(p, q\)</span> are general single-particle indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_time</strong> (<em>float</em>) – Current timestep.</p></li>
-<li><p><strong>c</strong> (<em>np.ndarray</em>) – Coefficient vector at current timestep.</p></li>
-<li><p><strong>tol</strong> (<em>float</em>) – Tolerance parameter for the one-body density matrix. Default is
-<code class="docutils literal notranslate"><span class="pre">tol=1e-5</span></code>.</p></li>
+<li><p><strong>current_time</strong> (<em>float</em>) – The current time step.</p></li>
+<li><p><strong>c</strong> (<em>np.ndarray</em>) – The coefficient vector at the current time step.</p></li>
+<li><p><strong>mat</strong> (<em>np.ndarray</em>) – The one-body operator to evalute, as a matrix. The dimensionality
+of the matrix must be the same as the one-body density matrix,
+i.e., the number of basis functions <code class="docutils literal notranslate"><span class="pre">l</span></code>.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance for the one-body density matrix construction. Default
+value is <code class="docutils literal notranslate"><span class="pre">1e-5</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The particle density on the same grid as the single-particle
-functions.</p>
+<dd class="field-even"><p>The expectation value of the one-body operator.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p>complex</p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TimeDependentConfigurationInteraction.compute_one_body_density_matrix()</span></code></a></p>
+</div>
 </dd></dl>
 
-<dl class="method">
-<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_time_dependent_overlap">
-<code class="sig-name descname">compute_time_dependent_overlap</code><span class="sig-paren">(</span><em class="sig-param">current_time</em>, <em class="sig-param">c</em>, <em class="sig-param">c_0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_time_dependent_overlap" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function computing the autocorrelation by</p>
+<dl class="py method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_overlap">
+<code class="sig-name descname">compute_overlap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">c_0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the overlap between two states, viz.</p>
 <div class="math notranslate nohighlight">
 \[A(t, t_0) = \frac{
     \lvert \langle \Psi(t) \rvert \Psi(t_0) \rangle \rvert^2
@@ -334,6 +340,33 @@ states <span class="math notranslate nohighlight">\(\lvert\Psi(t)\rangle\)</span
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density">
+<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-05</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute particle density <span class="math notranslate nohighlight">\(\rho(x, t)\)</span> for the time-dependent
+state <span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\rho(x, t)
+= \phi^{*}_q(x) \rho^{q}_{p}(t) \phi_p(x).\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_time</strong> (<em>float</em>) – Current timestep.</p></li>
+<li><p><strong>c</strong> (<em>np.ndarray</em>) – Coefficient vector at current timestep.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Tolerance parameter for the one-body density matrix. Default is
+<code class="docutils literal notranslate"><span class="pre">tol=1e-5</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The particle density on the same grid as the single-particle
+functions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>

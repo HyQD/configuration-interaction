@@ -162,9 +162,9 @@
 uniquely decides the configuration interaction class.
 We’ve therefore created a single abstract super-class defining all methods
 needed by the CI-solvers.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="configuration_interaction.ci.ConfigurationInteraction">
-<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">ConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param">system</em>, <em class="sig-param">s=None</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">ConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class defining the skeleton of a truncated configuration
 interaction class. All subclasses need to provide the member
 <code class="docutils literal notranslate"><span class="pre">excitations</span></code> as this decides the basis of Slater determinants.</p>
@@ -178,9 +178,9 @@ determinants are kept.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_ground_state">
-<code class="sig-name descname">compute_ground_state</code><span class="sig-paren">(</span><em class="sig-param">k=None</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_ground_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_ground_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_ground_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function constructing the Hamiltonian of the system without any
 optimization such as the Slater-Condon rules, etc. Having constructed
 the Hamiltonian the function diagonalizes the matrix and stores the
@@ -194,9 +194,9 @@ Default is <code class="docutils literal notranslate"><span class="pre">None</sp
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix">
-<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param">K=0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the one-body density matrix
 <span class="math notranslate nohighlight">\((\rho_K)^{q}_{p}\)</span> defined by</p>
 <div class="math notranslate nohighlight">
@@ -222,9 +222,39 @@ diagonalizing the Hamiltonian.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
+<dt id="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_expectation_value">
+<code class="sig-name descname">compute_one_body_expectation_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mat</span></em>, <em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_expectation_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the expectation value of a one-body operator.
+For a given one-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span> by</p>
+<div class="math notranslate nohighlight">
+\[\langle \hat{A} \rangle = \rho^{q}_{p} A^{p}_{q},\]</div>
+<p>where <span class="math notranslate nohighlight">\(p, q\)</span> are general single-particle indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> (<em>np.ndarray</em>) – The one-body operator to evalute, as a matrix. The dimensionality
+of the matrix must be the same as the one-body density matrix,
+i.e., the number of basis functions <code class="docutils literal notranslate"><span class="pre">l</span></code>.</p></li>
+<li><p><strong>K</strong> (<em>int</em>) – The eigenstate to use for the one-body density matrix.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The expectation value of the one-body operator.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>complex</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ConfigurationInteraction.compute_one_body_density_matrix()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_particle_density">
-<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param">K=0</em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the particle density <span class="math notranslate nohighlight">\(\rho_K(x)\)</span> defined
 by</p>
 <div class="math notranslate nohighlight">
