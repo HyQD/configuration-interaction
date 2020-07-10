@@ -118,3 +118,22 @@ def test_one_body_expectation_value():
         abs(cisd.compute_one_body_expectation_value(odho.dipole_moment[0]))
         < 1e-8
     )
+
+
+def test_spin_projection():
+    n = 2
+    l = 20  # Force the use of two uint64 in a determinant
+
+    tdho = GeneralOrbitalSystem(n, TwoDimensionalHarmonicOscillator(l, 10, 101))
+    cisd = CISD(tdho, verbose=True, s=0).compute_ground_state()
+
+    for K in range(cisd.num_states):
+        # Test if the expectation value of the S_z-operator is zero for all
+        # states. This should be the case when we've removed all the
+        # determinants with a spin-projection number different from 0.
+        np.testing.assert_allclose(
+            cisd.compute_one_body_expectation_value(tdho.spin_z),
+            0,
+            atol=1e-12,
+            rtol=1e-12,
+        )
