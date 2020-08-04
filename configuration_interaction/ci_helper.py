@@ -448,7 +448,7 @@ def evaluate_two_body_overlap(state_i, state_j, p, q, r, s):
 
 
 @numba.njit(parallel=True, nogil=True, fastmath=True)
-def setup_one_body_hamiltonian(hamiltonian, states, h, n, l):
+def setup_one_body_hamiltonian(hamiltonian, states, h, n):
     """Function computing the one-body contributions to the Hamiltonian using
     the Slater-Condon rules.
     See rules here:
@@ -464,11 +464,10 @@ def setup_one_body_hamiltonian(hamiltonian, states, h, n, l):
         One-body matrix elements, of dimension l ** 2.
     n : int
         Number of particles.
-    l : int
-        Number of basis states.
     """
 
     num_states = len(states)
+    l = len(h)
 
     for I in range(num_states):
         state_I = states[I]
@@ -493,14 +492,14 @@ def setup_one_body_hamiltonian(hamiltonian, states, h, n, l):
             if diff != 2:
                 continue
 
-            val = diff_by_one_slater_condon_one_body(state_I, state_J, h, n, l)
+            val = diff_by_one_slater_condon_one_body(state_I, state_J, h)
 
             hamiltonian[I, J] += val
             hamiltonian[J, I] += val.conjugate()
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
-def diff_by_one_slater_condon_one_body(state_I, state_J, h, n, l):
+def diff_by_one_slater_condon_one_body(state_I, state_J, h):
     diff = state_I ^ state_J
 
     # Index m in state_I, removed from state_J
@@ -517,7 +516,7 @@ def diff_by_one_slater_condon_one_body(state_I, state_J, h, n, l):
 
 
 @numba.njit(parallel=True, nogil=True, fastmath=True)
-def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
+def setup_two_body_hamiltonian(hamiltonian, states, u, n):
     """Function computing the two-body contributions to the Hamiltonian using
     the Slater-Condon rules.
     See rules here:
@@ -536,11 +535,10 @@ def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
         Two-body matrix elements, of dimension l ** 4.
     n : int
         Number of particles.
-    l : int
-        Number of basis states.
     """
 
     num_states = len(states)
+    l = len(u)
 
     # Compute diagonal elements
     for I in range(num_states):
@@ -575,20 +573,16 @@ def setup_two_body_hamiltonian(hamiltonian, states, u, n, l):
             val = 0
 
             if diff == 2:
-                val += diff_by_one_slater_condon_two_body(
-                    state_I, state_J, u, n, l
-                )
+                val += diff_by_one_slater_condon_two_body(state_I, state_J, u)
             elif diff == 4:
-                val += diff_by_two_slater_condon_two_body(
-                    state_I, state_J, u, n, l
-                )
+                val += diff_by_two_slater_condon_two_body(state_I, state_J, u)
 
             hamiltonian[I, J] += val
             hamiltonian[J, I] += val.conjugate()
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
-def diff_by_one_slater_condon_two_body(state_I, state_J, u, n, l):
+def diff_by_one_slater_condon_two_body(state_I, state_J, u):
     diff = state_I ^ state_J
 
     # Index m in state_I, removed from state_J
@@ -603,7 +597,7 @@ def diff_by_one_slater_condon_two_body(state_I, state_J, u, n, l):
 
     val = 0
 
-    for i in range(l):
+    for i in range(len(u)):
         if not occupied_index(state_I, i):
             continue
 
@@ -613,7 +607,7 @@ def diff_by_one_slater_condon_two_body(state_I, state_J, u, n, l):
 
 
 @numba.njit(cache=True, nogil=True, fastmath=True)
-def diff_by_two_slater_condon_two_body(state_I, state_J, u, n, l):
+def diff_by_two_slater_condon_two_body(state_I, state_J, u):
     diff = state_I ^ state_J
 
     # Index m, n in state_I, removed from state_J

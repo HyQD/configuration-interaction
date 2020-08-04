@@ -429,8 +429,8 @@ def test_hamiltonian_setup():
     new_hamiltonian = np.zeros_like(orig_hamiltonian)
 
     setup_hamiltonian(orig_hamiltonian, cisd.states, rs.h, rs.u, rs.n, rs.l)
-    setup_one_body_hamiltonian(new_hamiltonian, cisd.states, rs.h, rs.n, rs.l)
-    setup_two_body_hamiltonian(new_hamiltonian, cisd.states, rs.u, rs.n, rs.l)
+    setup_one_body_hamiltonian(new_hamiltonian, cisd.states, rs.h, rs.n)
+    setup_two_body_hamiltonian(new_hamiltonian, cisd.states, rs.u, rs.n)
 
     np.testing.assert_allclose(orig_hamiltonian, new_hamiltonian)
 

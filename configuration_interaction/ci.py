@@ -141,11 +141,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         t0 = time.time()
         setup_one_body_hamiltonian(
-            self.one_body_hamiltonian,
-            self.states,
-            self.system.h,
-            self.n,
-            self.l,
+            self.one_body_hamiltonian, self.states, self.system.h, self.n,
         )
         t1 = time.time()
 
@@ -158,11 +154,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         t0 = time.time()
         setup_two_body_hamiltonian(
-            self.two_body_hamiltonian,
-            self.states,
-            self.system.u,
-            self.n,
-            self.l,
+            self.two_body_hamiltonian, self.states, self.system.u, self.n,
         )
         t1 = time.time()
 
