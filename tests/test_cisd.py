@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 
 from configuration_interaction import CISD
@@ -17,6 +18,7 @@ from quantum_systems import (
     GeneralOrbitalSystem,
     TwoDimensionalHarmonicOscillator,
     ODQD,
+    construct_pyscf_system_ao,
 )
 from quantum_systems.system_helper import compute_particle_density
 
@@ -136,4 +138,74 @@ def test_spin_projection():
             0,
             atol=1e-12,
             rtol=1e-12,
+        )
+
+
+@pytest.mark.skip
+def test_spin_squared():
+    n = 2
+    l = 20
+
+    # tdho = GeneralOrbitalSystem(n, TwoDimensionalHarmonicOscillator(l, 10, 101))
+    # cisd = CISD(tdho, verbose=True, s=None).compute_ground_state()
+
+    # for K in range(10):
+    #     # Test if the expectation value of the S^2-operator is zero for all
+    #     # states. That is, check that we only include singlet states. This
+    #     # should be the case when we've removed all the determinants with a
+    #     # spin-projection number different from 0.
+    #     np.testing.assert_allclose(
+    #         cisd.compute_two_body_expectation_value(tdho.spin_2),
+    #         0,
+    #         atol=1e-12,
+    #         rtol=1e-12,
+    #     )
+
+    he = construct_pyscf_system_ao("he")
+    cisd = CISD(he, verbose=True, s=1).compute_ground_state()
+
+    for K in range(cisd.num_states):
+        print(cisd.allowed_dipole_transition(0, K))
+
+    for K in range(cisd.num_states):
+        print(
+            (
+                K,
+                cisd.energies[K],
+                cisd.compute_two_body_expectation_value(he.spin_2),
+            )
+        )
+        # np.testing.assert_allclose(
+        #     cisd.compute_two_body_expectation_value(he.spin_2),
+        #     0,
+        #     atol=1e-12,
+        #     rtol=1e-12,
+        # )
+    assert False
+
+
+def test_energy_expectation_values():
+    n = 2
+    l = 20
+
+    tdho = GeneralOrbitalSystem(n, TwoDimensionalHarmonicOscillator(l, 10, 101))
+    cisd = CISD(tdho, verbose=True, s=None).compute_ground_state()
+
+    for K in range(10):
+        E_K = cisd.compute_one_body_expectation_value(
+            tdho.h, K=K
+        ) + cisd.compute_two_body_expectation_value(tdho.u, K=K)
+        np.testing.assert_allclose(
+            cisd.energies[K], E_K,
+        )
+
+    he = construct_pyscf_system_ao("he")
+    cisd = CISD(he, verbose=True, s=None).compute_ground_state()
+
+    for K in range(10):
+        E_K = cisd.compute_one_body_expectation_value(
+            he.h, K=K
+        ) + cisd.compute_two_body_expectation_value(he.u, K=K)
+        np.testing.assert_allclose(
+            cisd.energies[K], E_K,
         )
