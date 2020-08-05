@@ -11,6 +11,7 @@ from configuration_interaction.ci_helper import (
     setup_two_body_hamiltonian,
     construct_one_body_density_matrix,
     construct_overlap_one_body_density_matrix,
+    construct_two_body_density_matrix,
     compute_spin_projection_eigenvalue,
     sort_states,
 )
@@ -269,6 +270,96 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         assert abs(tr_rho - self.n) < 1e-8, error_str
 
         return rho_qp
+
+    def compute_two_body_expectation_value(self, op, K=0):
+        r"""Function computing the expectation value of a two-body operator.
+        For a given two-body operator :math:`\hat{A}`, we compute the
+        expectation value by
+
+        .. math:: \langle \hat{A} \rangle = \rho^{rs}_{pq} A^{pq}_{rs},
+
+        where :math:`p, q, r, s` are general single-particle indices.
+
+        Parameters
+        ----------
+        op : np.ndarray
+            The two-body operator to evalute, as a 4-axis array. The
+            dimensionality of the array must be the same as the two-body
+            density matrix, i.e., the number of basis functions ``l``.
+        K : int
+            The eigenstate to use for the two-body density matrix.
+
+        Returns
+        -------
+        complex
+            The expectation value of the two-body operator.
+
+        See Also
+        --------
+        ConfigurationInteraction.compute_two_body_density_matrix
+
+        """
+        rho_rspq = self.compute_two_body_density_matrix(K=K)
+
+        return 0.25 * self.np.tensordot(
+            op, rho_rspq, axes=((0, 1, 2, 3), (2, 3, 0, 1))
+        )
+
+    def compute_two_body_density_matrix(self, K=0):
+        r"""Function computing the two-body density matrix
+        :math:`(\rho_K)^{rs}_{pq}` defined by
+
+        .. math:: (\rho_K)^{rs}_{pq}
+                = \langle\Psi_K\rvert
+                \hat{c}_{p}^{\dagger}
+                \hat{c}_{q}^{\dagger}
+                \hat{c}_{s}
+                \hat{c}_{r}
+                \lvert\Psi_K\rangle,
+
+        where :math:`\lvert\Psi_K\rangle` is the :math:`K`'th eigenstate of the
+        Hamiltonian defined by
+
+        .. math:: \lvert\Psi_K\rangle = C_{JK} \lvert\Phi_J\rangle,
+
+        where :math:`\lvert\Phi_J\rangle` is the :math:`J`'th Slater
+        determinant and :math:`C_{JK}` is the coefficient matrix found from
+        diagonalizing the Hamiltonian.
+
+        Parameters
+        ----------
+        K : int
+            The eigenstate to compute the two-body density matrix from.
+
+        Returns
+        -------
+        np.ndarray
+            The two-body density matrix.
+        """
+
+        assert 0 <= K < self.num_states
+
+        rho_rspq = self.np.zeros(
+            (self.l, self.l, self.l, self.l), dtype=self._C.dtype
+        )
+
+        t0 = time.time()
+        construct_two_body_density_matrix(rho_rspq, self.states, self._C[:, K])
+        t1 = time.time()
+
+        if self.verbose:
+            print(
+                "Time spent computing two-body matrix: {0} sec".format(t1 - t0)
+            )
+
+        tr_rho = self.np.trace(self.np.trace(rho_rspq, axis1=0, axis2=2))
+        error_str = (
+            f"Trace of two-body density matrix (rho_rspq = {tr_rho}) does "
+            + f"not equal (n * (n - 1) = {self.n * (self.n - 1)})"
+        )
+        assert abs(tr_rho - self.n * (self.n - 1)) < 1e-8, error_str
+
+        return rho_rspq
 
     def compute_particle_density(self, K=0):
         r"""Function computing the particle density :math:`\rho_K(x)` defined

@@ -709,3 +709,94 @@ def construct_overlap_one_body_density_matrix(rho_qp, states, c_I, c_J):
             sign = sign_m * sign_p
 
             rho_qp[p, m] += sign * c_I[K].conjugate() * c_J[L]
+
+
+@numba.njit(parallel=True, nogil=True, fastmath=True)
+def construct_two_body_density_matrix(rho_rspq, states, c):
+    num_states = len(states)
+    l = len(rho_rspq)
+
+    for I in range(num_states):
+        state_I = states[I]
+
+        for p in range(l):
+            if not occupied_index(state_I, p):
+                continue
+
+            for q in range(p + 1, l):
+                if not occupied_index(state_I, q):
+                    continue
+
+                val = c[I] * c[I].conjugate()
+
+                rho_rspq[p, q, p, q] += val
+                rho_rspq[p, q, q, p] -= val
+                rho_rspq[q, p, p, q] -= val
+                rho_rspq[q, p, q, p] += val
+
+    for I in numba.prange(num_states):
+        state_I = states[I]
+
+        for J in range(num_states):
+            if I == J:
+                continue
+
+            state_J = states[J]
+            diff = state_diff(state_I, state_J)
+
+            if diff == 2:
+                diff_by_one_rho_rspq(rho_rspq, state_I, state_J, I, J, c)
+            elif diff == 4:
+                diff_by_two_rho_rspq(rho_rspq, state_I, state_J, I, J, c)
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
+def diff_by_one_rho_rspq(rho_rspq, state_I, state_J, I, J, c):
+    diff = state_I ^ state_J
+
+    # Index m in state_I, removed from state_J
+    m = get_index(state_I & diff)
+    sign_m = compute_sign(state_I, m)
+
+    # Index p in state_J, not in state_I
+    p = get_index(state_J & diff)
+    sign_p = compute_sign(state_J, p)
+
+    sign = sign_m * sign_p
+
+    for i in range(len(rho_rspq)):
+        if not occupied_index(state_I, i):
+            continue
+
+        val = sign * c[I].conjugate() * c[J]
+
+        rho_rspq[m, i, p, i] += val
+        rho_rspq[m, i, i, p] -= val
+        rho_rspq[i, m, p, i] -= val
+        rho_rspq[i, m, i, p] += val
+
+
+@numba.njit(cache=True, nogil=True, fastmath=True)
+def diff_by_two_rho_rspq(rho_rspq, state_I, state_J, I, J, c):
+    diff = state_I ^ state_J
+
+    # Index m, n in state_I, removed from state_J
+    m = get_index(state_I & diff, index_num=0)
+    n = get_index(state_I & diff, index_num=1)
+    sign_m = compute_sign(state_I, m)
+    sign_n = compute_sign(state_I, n)
+
+    # Index p, q in state_J, not in state_I
+    p = get_index(state_J & diff, index_num=0)
+    q = get_index(state_J & diff, index_num=1)
+    sign_p = compute_sign(state_J, p)
+    sign_q = compute_sign(state_J, q)
+
+    sign = sign_m * sign_n * sign_p * sign_q
+
+    val = sign * c[I].conjugate() * c[J]
+
+    rho_rspq[m, n, p, q] += val
+    rho_rspq[m, n, q, p] -= val
+    rho_rspq[n, m, p, q] -= val
+    rho_rspq[n, m, q, p] += val
