@@ -193,7 +193,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
     def compute_one_body_expectation_value(self, mat, K=0):
         r"""Function computing the expectation value of a one-body operator.
-        For a given one-body operator :math:`\hat{A}` by
+        For a given one-body operator :math:`\hat{A}` we compute the
+        expectation value by
 
         .. math:: \langle \hat{A} \rangle = \rho^{q}_{p} A^{p}_{q},
 
@@ -241,7 +242,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         Parameters
         ----------
         K : int
-            The eigenstate to compute the one-body density matrix of.
+            The eigenstate to compute the one-body density matrix from.
 
         Returns
         -------
