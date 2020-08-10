@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -25,15 +30,11 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Time-evolution computations" href="time_evolution.html" />
@@ -51,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> Configuration Interaction
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Configuration Interaction
           
 
           
@@ -74,6 +75,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -95,6 +97,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -133,7 +136,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Ground state calculations</li>
     
@@ -171,10 +174,10 @@ interaction class. All subclasses need to provide the member
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<em>QuantumSystems</em>) – Quantum systems instance.</p></li>
-<li><p><strong>s</strong> (<em>int</em>) – Spin projection number to keep. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> and all
+<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumSystems</span></code>) – Quantum systems instance.</p></li>
+<li><p><strong>s</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Spin projection number to keep. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> and all
 determinants are kept.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Print timer and logging info. Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Print timer and logging info. Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -188,7 +191,7 @@ eigenenergies and the eigenvectors (coefficients) of the system.</p>
 <p>Note that the current solution assumes orthonormal Slater determinants.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – The number of eigenpairs to compute using an iterative eigensolver.
+<dd class="field-odd"><p><strong>k</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of eigenpairs to compute using an iterative eigensolver.
 Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which means that all eigenpairs are computed.</p>
 </dd>
 </dl>
@@ -211,7 +214,7 @@ determinant and <span class="math notranslate nohighlight">\(C_{JK}\)</span> is 
 diagonalizing the Hamiltonian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>K</strong> (<em>int</em>) – The eigenstate to compute the one-body density matrix of.</p>
+<dd class="field-odd"><p><strong>K</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The eigenstate to compute the one-body density matrix from.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The one-body density matrix.</p>
@@ -226,17 +229,18 @@ diagonalizing the Hamiltonian.</p>
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_expectation_value">
 <code class="sig-name descname">compute_one_body_expectation_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mat</span></em>, <em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_expectation_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the expectation value of a one-body operator.
-For a given one-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span> by</p>
+For a given one-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span> we compute the
+expectation value by</p>
 <div class="math notranslate nohighlight">
 \[\langle \hat{A} \rangle = \rho^{q}_{p} A^{p}_{q},\]</div>
 <p>where <span class="math notranslate nohighlight">\(p, q\)</span> are general single-particle indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mat</strong> (<em>np.ndarray</em>) – The one-body operator to evalute, as a matrix. The dimensionality
+<li><p><strong>mat</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The one-body operator to evalute, as a matrix. The dimensionality
 of the matrix must be the same as the one-body density matrix,
 i.e., the number of basis functions <code class="docutils literal notranslate"><span class="pre">l</span></code>.</p></li>
-<li><p><strong>K</strong> (<em>int</em>) – The eigenstate to use for the one-body density matrix.</p></li>
+<li><p><strong>K</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The eigenstate to use for the one-body density matrix.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -265,7 +269,7 @@ by</p>
 Note the use of the Einstein summation convention in the above expression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>K</strong> (<em>int</em>) – The eigenstate to compute the particle density of. Default is <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">=</span>
+<dd class="field-odd"><p><strong>K</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The eigenstate to compute the particle density of. Default is <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">=</span>
 <span class="pre">0</span></code>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -275,6 +279,70 @@ Note the use of the Einstein summation convention in the above expression.</p>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix">
+<code class="sig-name descname">compute_two_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the two-body density matrix
+<span class="math notranslate nohighlight">\((\rho_K)^{rs}_{pq}\)</span> defined by</p>
+<div class="math notranslate nohighlight">
+\[(\rho_K)^{rs}_{pq}
+= \langle\Psi_K\rvert
+\hat{c}_{p}^{\dagger}
+\hat{c}_{q}^{\dagger}
+\hat{c}_{s}
+\hat{c}_{r}
+\lvert\Psi_K\rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lvert\Psi_K\rangle\)</span> is the <span class="math notranslate nohighlight">\(K\)</span>’th eigenstate of the
+Hamiltonian defined by</p>
+<div class="math notranslate nohighlight">
+\[\lvert\Psi_K\rangle = C_{JK} \lvert\Phi_J\rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lvert\Phi_J\rangle\)</span> is the <span class="math notranslate nohighlight">\(J\)</span>’th Slater
+determinant and <span class="math notranslate nohighlight">\(C_{JK}\)</span> is the coefficient matrix found from
+diagonalizing the Hamiltonian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>K</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The eigenstate to compute the two-body density matrix from.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The two-body density matrix.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="configuration_interaction.ci.ConfigurationInteraction.compute_two_body_expectation_value">
+<code class="sig-name descname">compute_two_body_expectation_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">op</span></em>, <em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_expectation_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function computing the expectation value of a two-body operator.
+For a given two-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span>, we compute the
+expectation value by</p>
+<div class="math notranslate nohighlight">
+\[\langle \hat{A} \rangle = \rho^{rs}_{pq} A^{pq}_{rs},\]</div>
+<p>where <span class="math notranslate nohighlight">\(p, q, r, s\)</span> are general single-particle indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The two-body operator to evalute, as a 4-axis array. The
+dimensionality of the array must be the same as the two-body
+density matrix, i.e., the number of basis functions <code class="docutils literal notranslate"><span class="pre">l</span></code>.</p></li>
+<li><p><strong>K</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The eigenstate to use for the two-body density matrix.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The expectation value of the two-body operator.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>complex</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix" title="configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ConfigurationInteraction.compute_two_body_density_matrix()</span></code></a></p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -332,11 +400,19 @@ function:</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Øyvind Sigmundson Schøyen
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -347,7 +423,6 @@ function:</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -25,15 +30,11 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Ground state calculations" href="ground_state.html" /> 
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> Configuration Interaction
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Configuration Interaction
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -94,6 +96,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -132,7 +135,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Time-evolution computations</li>
     
@@ -177,10 +180,10 @@ configuration interaction solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<em>QuantumSystems</em>) – Quantum systems instance.</p></li>
-<li><p><strong>s</strong> (<em>int</em>) – Spin projection number to keep. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> and all
+<li><p><strong>system</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumSystems</span></code>) – Quantum systems instance.</p></li>
+<li><p><strong>s</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Spin projection number to keep. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> and all
 determinants are kept.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Print timer and logging info. Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Print timer and logging info. Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -198,8 +201,8 @@ typically used for differential equation solvers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_time</strong> (<em>float</em>) – Current timestep.</p></li>
-<li><p><strong>prev_c</strong> (<em>np.ndarray</em>) – Coefficient vector at previous timestep.</p></li>
+<li><p><strong>current_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Current timestep.</p></li>
+<li><p><strong>prev_c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Coefficient vector at previous timestep.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -234,8 +237,8 @@ time-evolved Hamiltonian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_time</strong> (<em>float</em>) – Current timestep.</p></li>
-<li><p><strong>c</strong> (<em>np.ndarray</em>) – Coefficient vector at current timestep.</p></li>
+<li><p><strong>current_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Current timestep.</p></li>
+<li><p><strong>c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Coefficient vector at current timestep.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -261,9 +264,9 @@ time-evolved Hamiltonian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_time</strong> (<em>float</em>) – Current timestep.</p></li>
-<li><p><strong>c</strong> (<em>np.ndarray</em>) – Coefficient vector at current timestep.</p></li>
-<li><p><strong>tol</strong> (<em>float</em>) – Tolerance of trace warning. Default is <code class="docutils literal notranslate"><span class="pre">tol=1e-5</span></code>.</p></li>
+<li><p><strong>current_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Current timestep.</p></li>
+<li><p><strong>c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Coefficient vector at current timestep.</p></li>
+<li><p><strong>tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance of trace warning. Default is <code class="docutils literal notranslate"><span class="pre">tol=1e-5</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -286,12 +289,12 @@ For a given one-body operator <span class="math notranslate nohighlight">\(\hat{
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_time</strong> (<em>float</em>) – The current time step.</p></li>
-<li><p><strong>c</strong> (<em>np.ndarray</em>) – The coefficient vector at the current time step.</p></li>
-<li><p><strong>mat</strong> (<em>np.ndarray</em>) – The one-body operator to evalute, as a matrix. The dimensionality
+<li><p><strong>current_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The current time step.</p></li>
+<li><p><strong>c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The coefficient vector at the current time step.</p></li>
+<li><p><strong>mat</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The one-body operator to evalute, as a matrix. The dimensionality
 of the matrix must be the same as the one-body density matrix,
 i.e., the number of basis functions <code class="docutils literal notranslate"><span class="pre">l</span></code>.</p></li>
-<li><p><strong>tol</strong> (<em>float</em>) – Tolerance for the one-body density matrix construction. Default
+<li><p><strong>tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance for the one-body density matrix construction. Default
 value is <code class="docutils literal notranslate"><span class="pre">1e-5</span></code>.</p></li>
 </ul>
 </dd>
@@ -330,9 +333,9 @@ states <span class="math notranslate nohighlight">\(\lvert\Psi(t)\rangle\)</span
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_time</strong> (<em>float</em>) – Current timestep.</p></li>
-<li><p><strong>c</strong> (<em>np.ndarray</em>) – Coefficient vector at current timestep.</p></li>
-<li><p><strong>c_0</strong> (<em>np.ndarray</em>) – The state to compare overlap with.</p></li>
+<li><p><strong>current_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Current timestep.</p></li>
+<li><p><strong>c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Coefficient vector at current timestep.</p></li>
+<li><p><strong>c_0</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The state to compare overlap with.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -355,9 +358,9 @@ state <span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_time</strong> (<em>float</em>) – Current timestep.</p></li>
-<li><p><strong>c</strong> (<em>np.ndarray</em>) – Coefficient vector at current timestep.</p></li>
-<li><p><strong>tol</strong> (<em>float</em>) – Tolerance parameter for the one-body density matrix. Default is
+<li><p><strong>current_time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Current timestep.</p></li>
+<li><p><strong>c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Coefficient vector at current timestep.</p></li>
+<li><p><strong>tol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Tolerance parameter for the one-body density matrix. Default is
 <code class="docutils literal notranslate"><span class="pre">tol=1e-5</span></code>.</p></li>
 </ul>
 </dd>
@@ -410,11 +413,19 @@ classes:</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Øyvind Sigmundson Schøyen
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -425,7 +436,6 @@ classes:</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
