@@ -39,6 +39,9 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.system = system
         self.np = self.system.np
 
+        # TODO: This should be inferred from the system
+        self.spin_independent = True
+
         self.n = self.system.n
         self.l = self.system.l
         self.m = self.system.m
@@ -139,6 +142,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         np = self.np
 
         assert self.system.h.dtype == self.system.u.dtype
+        assert self.system.h.dtype == self.system.spin_2.dtype
 
         self.hamiltonian = np.zeros(
             (self.num_states, self.num_states), dtype=self.system.h.dtype
@@ -178,18 +182,84 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 )
             )
 
+        self.spin_z = None
+        self.spin_2 = None
+
+        if self.spin_independent:
+            self.spin_z = np.zeros_like(self.hamiltonian)
+            self.spin_2 = np.zeros_like(self.hamiltonian)
+
+            np.testing.assert_allclose(
+                self.system.spin_2.shape, self.system.u.shape
+            )
+
+            t0 = time.time()
+            setup_one_body_hamiltonian(
+                self.spin_z,
+                self.states,
+                self.system.spin_z,
+                self.n,
+            )
+            t1 = time.time()
+
+            if self.verbose:
+                print("Time spent constructing S_z: {0} sec".format(t1 - t0))
+
+            t0 = time.time()
+            setup_two_body_hamiltonian(
+                self.spin_2,
+                self.states,
+                self.system.spin_2,
+                self.n,
+            )
+            t1 = time.time()
+
+            if self.verbose:
+                print("Time spent constructing S^2: {0} sec".format(t1 - t0))
+
         self.hamiltonian += self.one_body_hamiltonian
         self.hamiltonian += self.two_body_hamiltonian
 
-        t0 = time.time()
-        if k is None:
-            self._energies, self._C = np.linalg.eigh(self.hamiltonian)
-        else:
-            import scipy.sparse.linalg
+        prod_mat = self.hamiltonian + self.spin_z + self.spin_2
 
-            self._energies, self._C = scipy.sparse.linalg.eigsh(
-                self.hamiltonian, k=k
-            )
+        # Check that the two matrices commute
+        # TODO: Figure out this one. I think this only needs to commute when we
+        # the eigenstates.
+        # np.testing.assert_allclose(prod_mat, self.spin_2 @ self.hamiltonian)
+
+        t0 = time.time()
+
+        eigvals, self._C = np.linalg.eigh(prod_mat)
+
+        self._energies = np.zeros(len(self._C))
+        self._s_z = np.zeros_like(self._energies)
+        self._s_2 = np.zeros_like(self._energies)
+
+        for i in range(len(self._energies)):
+            self._energies[i] = (
+                self._C[:, i].T.conj() @ self.hamiltonian @ self._C[:, i]
+            ).real
+            self._s_z[i] = (
+                self._C[:, i].T.conj() @ self.spin_z @ self._C[:, i]
+            ).real
+            self._s_2[i] = (
+                self._C[:, i].T.conj() @ self.spin_2 @ self._C[:, i]
+            ).real
+
+        ind = np.argsort(self._energies)
+        self._energies = self._energies[ind]
+        self._s_z = self._s_z[ind]
+        self._s_2 = self._s_2[ind]
+        self._C = self._C[:, ind]
+
+        # if k is None:
+        #     self._energies, self._C = np.linalg.eigh(self.hamiltonian)
+        # else:
+        #     import scipy.sparse.linalg
+
+        #     self._energies, self._C = scipy.sparse.linalg.eigsh(
+        #         self.hamiltonian, k=k
+        #     )
         t1 = time.time()
 
         if self.verbose:
