@@ -14,3 +14,5 @@ tqdm = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 gauss-integrator = {editable = true,git = "ssh://git@github.com/Schoyen/gauss-integrator.git"}
+jupyterlab = "*"
+nb-black = "*"
