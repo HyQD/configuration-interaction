@@ -289,7 +289,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         For a given two-body operator :math:`\hat{A}`, we compute the
         expectation value by
 
-        .. math:: \langle \hat{A} \rangle = \rho^{rs}_{pq} A^{pq}_{rs},
+        .. math:: \langle \hat{A} \rangle
+            = \frac{1}{2} \rho^{rs}_{pq} A^{pq}_{rs},
 
         where :math:`p, q, r, s` are general single-particle indices.
 
@@ -314,7 +315,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         """
         rho_rspq = self.compute_two_body_density_matrix(K=K)
 
-        return 0.25 * self.np.tensordot(
+        return 0.5 * self.np.tensordot(
             op, rho_rspq, axes=((0, 1, 2, 3), (2, 3, 0, 1))
         )
 
