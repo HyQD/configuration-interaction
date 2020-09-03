@@ -80,7 +80,11 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         index = 1
         for excitation in excitations:
             index = create_excited_states(
-                n, l, states, index=index, order=ORDER[excitation],
+                n,
+                l,
+                states,
+                index=index,
+                order=ORDER[excitation],
             )
 
         t1 = time.time()
@@ -92,8 +96,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
 
         if s is not None:
-            states = ConfigurationInteraction.filter_states_with_spin_projection(
-                states, s, np
+            states = (
+                ConfigurationInteraction.filter_states_with_spin_projection(
+                    states, s, np
+                )
             )
 
             if verbose:
@@ -142,7 +148,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         t0 = time.time()
         setup_one_body_hamiltonian(
-            self.one_body_hamiltonian, self.states, self.system.h, self.n,
+            self.one_body_hamiltonian,
+            self.states,
+            self.system.h,
+            self.n,
         )
         t1 = time.time()
 
@@ -155,7 +164,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         t0 = time.time()
         setup_two_body_hamiltonian(
-            self.two_body_hamiltonian, self.states, self.system.u, self.n,
+            self.two_body_hamiltonian,
+            self.states,
+            self.system.u,
+            self.n,
         )
         t1 = time.time()
 

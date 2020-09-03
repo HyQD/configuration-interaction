@@ -196,7 +196,8 @@ def test_energy_expectation_values():
             tdho.h, K=K
         ) + cisd.compute_two_body_expectation_value(tdho.u, K=K)
         np.testing.assert_allclose(
-            cisd.energies[K], E_K,
+            cisd.energies[K],
+            E_K,
         )
 
     he = construct_pyscf_system_ao("he")
@@ -207,5 +208,6 @@ def test_energy_expectation_values():
             he.h, K=K
         ) + cisd.compute_two_body_expectation_value(he.u, K=K)
         np.testing.assert_allclose(
-            cisd.energies[K], E_K,
+            cisd.energies[K],
+            E_K,
         )
