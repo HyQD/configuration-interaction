@@ -573,9 +573,17 @@ def setup_two_body_hamiltonian(hamiltonian, states, u, n):
             val = 0
 
             if diff == 2:
-                val += diff_by_one_slater_condon_two_body(state_I, state_J, u)
+                val += diff_by_one_slater_condon_two_body(
+                    state_I,
+                    state_J,
+                    u,
+                )
             elif diff == 4:
-                val += diff_by_two_slater_condon_two_body(state_I, state_J, u)
+                val += diff_by_two_slater_condon_two_body(
+                    state_I,
+                    state_J,
+                    u,
+                )
 
             hamiltonian[I, J] += val
             hamiltonian[J, I] += val.conjugate()
