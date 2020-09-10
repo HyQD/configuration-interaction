@@ -186,8 +186,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 )
             )
 
-        self.spin_z = None
-        self.spin_2 = None
+        self.spin_z = 0
+        self.spin_2 = 0
 
         if self.spin_independent:
             self.spin_z = np.zeros_like(self.hamiltonian)
