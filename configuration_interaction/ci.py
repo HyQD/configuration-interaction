@@ -213,7 +213,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             setup_two_body_hamiltonian(
                 self.spin_2,
                 self.states,
-                self.system.spin_2,
+                self.system._basis_set.anti_symmetrize_u(self.system.spin_2),
                 self.n,
             )
             t1 = time.time()
