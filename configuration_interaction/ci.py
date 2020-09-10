@@ -124,7 +124,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
         )
 
-    def compute_ground_state(self, k=None):
+    def compute_ground_state(self, k=None, decimals=10):
         """Function constructing the Hamiltonian of the system without any
         optimization such as the Slater-Condon rules, etc. Having constructed
         the Hamiltonian the function diagonalizes the matrix and stores the
@@ -137,6 +137,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         k : int
             The number of eigenpairs to compute using an iterative eigensolver.
             Default is ``None``, which means that all eigenpairs are computed.
+        decimals : int
+            Number of decimals to use in ``np.round`` when sorting the
+            eigenvalues using ``np.lexsort``. This provides a hacky way of
+            getting fuzzy sorting. Default is ``10``.
         """
 
         np = self.np
@@ -246,7 +250,14 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 self._C[:, i].T.conj() @ self.spin_2 @ self._C[:, i]
             ).real
 
-        ind = np.argsort(self._energies)
+        ind = np.lexsort(
+            (
+                np.round(self._s_z, decimals=decimals),
+                np.round(self._s_2, decimals=decimals),
+                np.round(self._energies, decimals=decimals),
+            )
+        )
+
         self._energies = self._energies[ind]
         self._s_z = self._s_z[ind]
         self._s_2 = self._s_2[ind]
