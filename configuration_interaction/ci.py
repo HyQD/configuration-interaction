@@ -194,7 +194,11 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             self.spin_2 = np.zeros_like(self.hamiltonian)
 
             np.testing.assert_allclose(
-                self.system.spin_2.shape, self.system.u.shape
+                self.system.spin_2.shape, self.system.h.shape
+            )
+
+            np.testing.assert_allclose(
+                self.system.spin_2_tb.shape, self.system.u.shape
             )
 
             t0 = time.time()
@@ -210,10 +214,18 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 print("Time spent constructing S_z: {0} sec".format(t1 - t0))
 
             t0 = time.time()
+            setup_one_body_hamiltonian(
+                self.spin_2,
+                self.states,
+                self.system.spin_2,
+                self.n,
+            )
+
             setup_two_body_hamiltonian(
                 self.spin_2,
                 self.states,
-                self.system._basis_set.anti_symmetrize_u(self.system.spin_2),
+                # Slater-Condon rules for two-body Hamiltonian contains a factor 1/2 somewhere...
+                2 * self.system.spin_2_tb,
                 self.n,
             )
             t1 = time.time()
@@ -226,9 +238,9 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         prod_mat = self.hamiltonian + self.spin_z + self.spin_2
 
-        # Check that the two matrices commute
-        # TODO: Figure out this one. I think this only needs to commute when we
-        # the eigenstates.
+        # Check that the two matrices commute TODO: Figure out this one. I
+        # think this only needs to commute when we have transformed to the
+        # eigenbasis.
         # np.testing.assert_allclose(prod_mat, self.spin_2 @ self.hamiltonian)
 
         t0 = time.time()
