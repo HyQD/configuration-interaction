@@ -295,7 +295,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
             # Compute new one-body Hamiltonian
             setup_one_body_hamiltonian(
-                self.one_body_hamiltonian, self.states, self.h, self.system.n,
+                self.one_body_hamiltonian,
+                self.states,
+                self.h,
+                self.system.n,
             )
 
         if self.system.has_two_body_time_evolution_operator:
@@ -303,7 +306,10 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
             # Compute new two-body Hamiltonian
             setup_two_body_hamiltonian(
-                self.two_body_hamiltonian, self.states, self.u, self.system.n,
+                self.two_body_hamiltonian,
+                self.states,
+                self.u,
+                self.system.n,
             )
 
         # Empty Hamiltonian matrix
