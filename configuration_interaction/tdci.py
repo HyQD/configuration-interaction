@@ -8,6 +8,7 @@ from configuration_interaction.ci_helper import (
     setup_one_body_hamiltonian,
     setup_two_body_hamiltonian,
     construct_one_body_density_matrix,
+    construct_two_body_density_matrix,
 )
 
 
@@ -174,6 +175,49 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self.np.trace(self.np.dot(rho_qp, mat))
 
+    def compute_two_body_expectation_value(self, current_time, c, op, tol=1e-8):
+        r"""Function computing the expectation value of a two-body operator.
+        For a given two-body operator :math:`\hat{A}`, we compute the
+        expectation value by
+
+        .. math:: \langle \hat{A} \rangle
+            = \frac{1}{2} \rho^{rs}_{pq} A^{pq}_{rs},
+
+        where :math:`p, q, r, s` are general single-particle indices.
+
+        Parameters
+        ----------
+        current_time : float
+            The current time step.
+        c : np.ndarray
+            The coefficient vector at the current time step.
+        op : np.ndarray
+            The two-body operator to evalute, as a 4-axis array. The
+            dimensionality of the array must be the same as the two-body
+            density matrix, i.e., the number of basis functions ``l``.
+        tol: float
+            Tolerance for the trace of the two-body density matrix to be
+            :math:`n(n - 1)`, where :math:`n` is the number of particles.
+            Default is ``1e-8``.
+
+        Returns
+        -------
+        complex
+            The expectation value of the two-body operator.
+
+        See Also
+        --------
+        TimeDependentConfigurationInteraction.compute_two_body_density_matrix
+
+        """
+        rho_rspq = self.compute_two_body_density_matrix(
+            current_time, c, tol=tol
+        )
+
+        return 0.5 * self.np.tensordot(
+            op, rho_rspq, axes=((0, 1, 2, 3), (2, 3, 0, 1))
+        )
+
     def compute_one_body_density_matrix(self, current_time, c, tol=1e-5):
         r"""Compute one-body density matrix for the time-dependent state
         :math:`\rvert\Psi(t)\rangle`,
@@ -208,6 +252,68 @@ class TimeDependentConfigurationInteraction(metaclass=abc.ABCMeta):
             warnings.warn(warn)
 
         return rho_qp
+
+    def compute_two_body_density_matrix(self, current_time, c, tol=1e-8):
+        r"""Function computing the two-body density matrix
+        :math:`\rho^{rs}_{pq}` defined by
+
+        .. math:: \rho^{rs}_{pq}
+                = \langle\Psi\rvert
+                \hat{c}_{p}^{\dagger}
+                \hat{c}_{q}^{\dagger}
+                \hat{c}_{s}
+                \hat{c}_{r}
+                \lvert\Psi\rangle,
+
+        where :math:`\lvert\Psi\rangle` is the state defined by the coefficient
+        vector ``c``, defined by
+
+        .. math:: \lvert\Psi\rangle = c_{J} \lvert\Phi_J\rangle,
+
+        where :math:`\lvert\Phi_J\rangle` is the :math:`J`'th Slater
+        determinant.
+
+        Parameters
+        ----------
+        current_time : float
+            Current timestep.
+        c : np.ndarray
+            Coefficient vector at current timestep.
+        tol: float
+            Tolerance for the trace of the two-body density matrix to be
+            :math:`n(n - 1)`, where :math:`n` is the number of particles.
+            Default is ``1e-8``.
+
+        Returns
+        -------
+        np.ndarray
+            The two-body density matrix.
+        """
+
+        rho_rspq = self.np.zeros(
+            (self.system.l, self.system.l, self.system.l, self.system.l),
+            dtype=c.dtype,
+        )
+
+        t0 = time.time()
+        construct_two_body_density_matrix(rho_rspq, self.states, c)
+        t1 = time.time()
+
+        if self.verbose:
+            print(
+                "Time spent computing two-body matrix: {0} sec".format(t1 - t0)
+            )
+
+        tr_rho = self.np.trace(self.np.trace(rho_rspq, axis1=0, axis2=2))
+        error_str = (
+            f"Trace of two-body density matrix (rho_rspq = {tr_rho}) does "
+            + f"not equal (n * (n - 1) = {self.system.n * (self.system.n - 1)})"
+        )
+        assert (
+            abs(tr_rho - self.system.n * (self.system.n - 1)) < tol
+        ), error_str
+
+        return rho_rspq
 
     def compute_particle_density(self, current_time, c, tol=1e-5):
         r"""Compute particle density :math:`\rho(x, t)` for the time-dependent
