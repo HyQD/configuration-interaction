@@ -377,7 +377,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return rho_qp
 
-    def compute_two_body_expectation_value(self, op, K=0):
+    def compute_two_body_expectation_value(self, op, K=0, tol=1e-8):
         r"""Function computing the expectation value of a two-body operator.
         For a given two-body operator :math:`\hat{A}`, we compute the
         expectation value by
@@ -394,7 +394,12 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             dimensionality of the array must be the same as the two-body
             density matrix, i.e., the number of basis functions ``l``.
         K : int
-            The eigenstate to use for the two-body density matrix.
+            The eigenstate to use for the two-body density matrix. Default is
+            ``0``, i.e., the ground state.
+        tol: float
+            Tolerance for the trace of the two-body density matrix to be
+            :math:`n(n - 1)`, where :math:`n` is the number of particles.
+            Default is ``1e-8``.
 
         Returns
         -------
@@ -406,13 +411,13 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         ConfigurationInteraction.compute_two_body_density_matrix
 
         """
-        rho_rspq = self.compute_two_body_density_matrix(K=K)
+        rho_rspq = self.compute_two_body_density_matrix(K=K, tol=tol)
 
         return 0.5 * self.np.tensordot(
             op, rho_rspq, axes=((0, 1, 2, 3), (2, 3, 0, 1))
         )
 
-    def compute_two_body_density_matrix(self, K=0):
+    def compute_two_body_density_matrix(self, K=0, tol=1e-8):
         r"""Function computing the two-body density matrix
         :math:`(\rho_K)^{rs}_{pq}` defined by
 
@@ -437,6 +442,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         ----------
         K : int
             The eigenstate to compute the two-body density matrix from.
+        tol: float
+            Tolerance for the trace of the two-body density matrix to be
+            :math:`n(n - 1)`, where :math:`n` is the number of particles.
+            Default is ``1e-8``.
 
         Returns
         -------
@@ -464,7 +473,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             f"Trace of two-body density matrix (rho_rspq = {tr_rho}) does "
             + f"not equal (n * (n - 1) = {self.n * (self.n - 1)})"
         )
-        assert abs(tr_rho - self.n * (self.n - 1)) < 1e-8, error_str
+        assert abs(tr_rho - self.n * (self.n - 1)) < tol, error_str
 
         return rho_rspq
 
