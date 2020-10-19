@@ -48,6 +48,13 @@ def test_tdcisd():
 
     assert abs(tdcisd.compute_energy(r.t, r.y) - -2.887_594_831_090_936) < 1e-7
 
+    init_energy = tdcisd.compute_one_body_expectation_value(r.t, r.y, system.h)
+    init_energy += 0.5 * tdcisd.compute_two_body_expectation_value(
+        r.t, r.y, system.u
+    )
+
+    assert abs(tdcisd.compute_energy(r.t, r.y) - init_energy) < 1e-7
+
     polarization = np.zeros(3)
     polarization[2] = 1
     system.set_time_evolution_operator(
