@@ -224,7 +224,8 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             setup_two_body_hamiltonian(
                 self.spin_2,
                 self.states,
-                # Slater-Condon rules for two-body Hamiltonian contains a factor 1/2 somewhere...
+                # Slater-Condon rules for two-body Hamiltonian contains a
+                # factor 1/2 somewhere...
                 2 * self.system.spin_2_tb,
                 self.n,
             )
@@ -236,16 +237,11 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.hamiltonian += self.one_body_hamiltonian
         self.hamiltonian += self.two_body_hamiltonian
 
-        prod_mat = self.hamiltonian + self.spin_z + self.spin_2
-
-        # Check that the two matrices commute TODO: Figure out this one. I
-        # think this only needs to commute when we have transformed to the
-        # eigenbasis.
-        # np.testing.assert_allclose(prod_mat, self.spin_2 @ self.hamiltonian)
+        sum_mat = self.hamiltonian + self.spin_z + self.spin_2
 
         t0 = time.time()
 
-        eigvals, self._C = np.linalg.eigh(prod_mat)
+        eigvals, self._C = np.linalg.eigh(sum_mat)
 
         self._energies = np.zeros(len(self._C))
         self._s_z = np.zeros_like(self._energies)
