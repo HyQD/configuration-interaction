@@ -400,6 +400,11 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self.system.compute_particle_density(rho_qp)
 
+    def compute_two_body_particle_density(self, K=0):
+        rho_rspq = self.compute_two_body_density_matrix(K=K)
+
+        return self.system.compute_two_body_particle_density(rho_rspq)
+
     def allowed_dipole_transition(self, I, J):
         assert 0 <= I < self.num_states
         assert 0 <= J < self.num_states
