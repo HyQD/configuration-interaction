@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Ground state calculations &mdash; Configuration Interaction  documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -52,7 +54,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Configuration Interaction
+            <a href="index.html" class="icon icon-home"> Configuration Interaction
           
 
           
@@ -132,6 +134,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -143,7 +147,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/ground_state.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -167,7 +171,7 @@ We’ve therefore created a single abstract super-class defining all methods
 needed by the CI-solvers.</p>
 <dl class="py class">
 <dt id="configuration_interaction.ci.ConfigurationInteraction">
-<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.ci.</code><code class="sig-name descname">ConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">configuration_interaction.ci.</span></code><code class="sig-name descname"><span class="pre">ConfigurationInteraction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class defining the skeleton of a truncated configuration
 interaction class. All subclasses need to provide the member
 <code class="docutils literal notranslate"><span class="pre">excitations</span></code> as this decides the basis of Slater determinants.</p>
@@ -183,7 +187,7 @@ determinants are kept.</p></li>
 </dl>
 <dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_ground_state">
-<code class="sig-name descname">compute_ground_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_ground_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_ground_state</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_ground_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function constructing the Hamiltonian of the system without any
 optimization such as the Slater-Condon rules, etc. Having constructed
 the Hamiltonian the function diagonalizes the matrix and stores the
@@ -199,7 +203,7 @@ Default is <code class="docutils literal notranslate"><span class="pre">None</sp
 
 <dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix">
-<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_one_body_density_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the one-body density matrix
 <span class="math notranslate nohighlight">\((\rho_K)^{q}_{p}\)</span> defined by</p>
 <div class="math notranslate nohighlight">
@@ -227,7 +231,7 @@ diagonalizing the Hamiltonian.</p>
 
 <dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_expectation_value">
-<code class="sig-name descname">compute_one_body_expectation_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mat</span></em>, <em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_expectation_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_one_body_expectation_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_expectation_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the expectation value of a one-body operator.
 For a given one-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span> we compute the
 expectation value by</p>
@@ -252,13 +256,13 @@ i.e., the number of basis functions <code class="docutils literal notranslate"><
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ConfigurationInteraction.compute_one_body_density_matrix()</span></code></a></p>
+<p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix" title="configuration_interaction.ci.ConfigurationInteraction.compute_one_body_density_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigurationInteraction.compute_one_body_density_matrix</span></code></a></p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_particle_density">
-<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_particle_density</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the particle density <span class="math notranslate nohighlight">\(\rho_K(x)\)</span> defined
 by</p>
 <div class="math notranslate nohighlight">
@@ -283,7 +287,7 @@ Note the use of the Einstein summation convention in the above expression.</p>
 
 <dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix">
-<code class="sig-name descname">compute_two_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_two_body_density_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the two-body density matrix
 <span class="math notranslate nohighlight">\((\rho_K)^{rs}_{pq}\)</span> defined by</p>
 <div class="math notranslate nohighlight">
@@ -316,7 +320,7 @@ diagonalizing the Hamiltonian.</p>
 
 <dl class="py method">
 <dt id="configuration_interaction.ci.ConfigurationInteraction.compute_two_body_expectation_value">
-<code class="sig-name descname">compute_two_body_expectation_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">op</span></em>, <em class="sig-param"><span class="n">K</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_expectation_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_two_body_expectation_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asym</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_expectation_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the expectation value of a two-body operator.
 For a given two-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span>, we compute the
 expectation value by</p>
@@ -330,6 +334,9 @@ expectation value by</p>
 dimensionality of the array must be the same as the two-body
 density matrix, i.e., the number of basis functions <code class="docutils literal notranslate"><span class="pre">l</span></code>.</p></li>
 <li><p><strong>K</strong> (<em>int</em>) – The eigenstate to use for the two-body density matrix.</p></li>
+<li><p><strong>asym</strong> (<em>bool</em>) – Toggle whether or not <code class="docutils literal notranslate"><span class="pre">op</span></code> is anti-symmetrized or not. This
+determines the prefactor when tracing the two-body density matrix
+with the two-body operator. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -341,7 +348,7 @@ density matrix, i.e., the number of basis functions <code class="docutils litera
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix" title="configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ConfigurationInteraction.compute_two_body_density_matrix()</span></code></a></p>
+<p><a class="reference internal" href="#configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix" title="configuration_interaction.ci.ConfigurationInteraction.compute_two_body_density_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigurationInteraction.compute_two_body_density_matrix</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -385,37 +392,29 @@ function:</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="time_evolution.html" class="btn btn-neutral float-right" title="Time-evolution computations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="time_evolution.html" class="btn btn-neutral float-right" title="Time-evolution computations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Øyvind Sigmundson Schøyen
+        &#169; Copyright 2019, Øyvind Sigmundson Schøyen.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

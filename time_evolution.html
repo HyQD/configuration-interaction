@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Time-evolution computations &mdash; Configuration Interaction  documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -51,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Configuration Interaction
+            <a href="index.html" class="icon icon-home"> Configuration Interaction
           
 
           
@@ -131,6 +133,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -142,7 +146,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/time_evolution.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -174,7 +178,7 @@ solver to use, whereas the time-dependent part only requires an initial state
 represented as a coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>.</p>
 <dl class="py class">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction">
-<em class="property">class </em><code class="sig-prename descclassname">configuration_interaction.tdci.</code><code class="sig-name descname">TimeDependentConfigurationInteraction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">configuration_interaction.tdci.</span></code><code class="sig-name descname"><span class="pre">TimeDependentConfigurationInteraction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract base class defining the skeleton of a time-dependent
 configuration interaction solver.</p>
 <dl class="field-list simple">
@@ -189,7 +193,7 @@ determinants are kept.</p></li>
 </dl>
 <dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">prev_c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev_c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the right-hand side of the time-dependent
 Schrödinger equation for the coefficient vector <span class="math notranslate nohighlight">\(\mathbf{c}(t)\)</span>.
 That is, this function finds the time-derivative of the coefficient
@@ -216,7 +220,7 @@ typically used for differential equation solvers.</p>
 
 <dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy">
-<code class="sig-name descname">compute_energy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the energy of the time-evolved system with a
 time-evolved Hamiltonian.</p>
 <div class="math notranslate nohighlight">
@@ -252,7 +256,7 @@ time-evolved Hamiltonian.</p>
 
 <dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix">
-<code class="sig-name descname">compute_one_body_density_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-05</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_one_body_density_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute one-body density matrix for the time-dependent state
 <span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>,</p>
 <div class="math notranslate nohighlight">
@@ -280,7 +284,7 @@ time-evolved Hamiltonian.</p>
 
 <dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_expectation_value">
-<code class="sig-name descname">compute_one_body_expectation_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">mat</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-05</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_expectation_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_one_body_expectation_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_expectation_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the expectation value of a one-body operator.
 For a given one-body operator <span class="math notranslate nohighlight">\(\hat{A}\)</span> by</p>
 <div class="math notranslate nohighlight">
@@ -307,13 +311,13 @@ value is <code class="docutils literal notranslate"><span class="pre">1e-5</span
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TimeDependentConfigurationInteraction.compute_one_body_density_matrix()</span></code></a></p>
+<p><a class="reference internal" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix" title="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_one_body_density_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDependentConfigurationInteraction.compute_one_body_density_matrix</span></code></a></p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_overlap">
-<code class="sig-name descname">compute_overlap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">c_0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_overlap" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_overlap</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_overlap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function computing the overlap between two states, viz.</p>
 <div class="math notranslate nohighlight">
 \[A(t, t_0) = \frac{
@@ -349,7 +353,7 @@ states <span class="math notranslate nohighlight">\(\lvert\Psi(t)\rangle\)</span
 
 <dl class="py method">
 <dt id="configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density">
-<code class="sig-name descname">compute_particle_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">current_time</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-05</span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_particle_density</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#configuration_interaction.tdci.TimeDependentConfigurationInteraction.compute_particle_density" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute particle density <span class="math notranslate nohighlight">\(\rho(x, t)\)</span> for the time-dependent
 state <span class="math notranslate nohighlight">\(\rvert\Psi(t)\rangle\)</span>,</p>
 <div class="math notranslate nohighlight">
@@ -400,35 +404,28 @@ classes:</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="ground_state.html" class="btn btn-neutral float-left" title="Ground state calculations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="ground_state.html" class="btn btn-neutral float-left" title="Ground state calculations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Øyvind Sigmundson Schøyen
+        &#169; Copyright 2019, Øyvind Sigmundson Schøyen.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
