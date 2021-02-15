@@ -194,7 +194,7 @@ def test_energy_expectation_values():
     for K in range(10):
         E_K = cisd.compute_one_body_expectation_value(
             tdho.h, K=K
-        ) + cisd.compute_two_body_expectation_value(tdho.u, K=K)
+        ) + 0.5 * cisd.compute_two_body_expectation_value(tdho.u, K=K)
         np.testing.assert_allclose(
             cisd.energies[K],
             E_K,
@@ -206,7 +206,7 @@ def test_energy_expectation_values():
     for K in range(10):
         E_K = cisd.compute_one_body_expectation_value(
             he.h, K=K
-        ) + cisd.compute_two_body_expectation_value(he.u, K=K)
+        ) + 0.5 * cisd.compute_two_body_expectation_value(he.u, K=K)
         np.testing.assert_allclose(
             cisd.energies[K],
             E_K,

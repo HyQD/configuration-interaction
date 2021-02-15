@@ -318,7 +318,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         """
         rho_rspq = self.compute_two_body_density_matrix(K=K)
 
-        return (0.25 if asym else 0.5) * self.np.tensordot(
+        return (0.5 if asym else 1.0) * self.np.tensordot(
             op, rho_rspq, axes=((0, 1, 2, 3), (2, 3, 0, 1))
         )
 
