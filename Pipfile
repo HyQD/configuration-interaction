@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 pytest = "*"
-tdhf = {editable = true,git = "ssh://git@github.com/haakoek/tdhf.git"}
 black = "*"
 matplotlib = "*"
 tqdm = "*"
