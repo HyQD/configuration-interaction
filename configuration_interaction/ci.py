@@ -373,7 +373,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return rho_qp
 
-    def compute_two_body_expectation_value(self, op, K=0, tol=1e-8):
+    def compute_two_body_expectation_value(self, op, K=0, tol=1e-8, asym=True):
         r"""Function computing the expectation value of a two-body operator.
         For a given two-body operator :math:`\hat{A}`, we compute the
         expectation value by
@@ -396,6 +396,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             Tolerance for the trace of the two-body density matrix to be
             :math:`n(n - 1)`, where :math:`n` is the number of particles.
             Default is ``1e-8``.
+        asym: bool
+            Toggle whether or not ``op`` is anti-symmetrized or not. This
+            determines the prefactor when tracing the two-body density matrix
+            with the two-body operator. Default is ``True``.
 
         Returns
         -------
@@ -409,7 +413,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         """
         rho_rspq = self.compute_two_body_density_matrix(K=K, tol=tol)
 
-        return 0.5 * self.np.tensordot(
+        return (0.5 if asym else 1.0) * self.np.tensordot(
             op, rho_rspq, axes=((0, 1, 2, 3), (2, 3, 0, 1))
         )
 
