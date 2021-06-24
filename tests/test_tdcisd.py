@@ -4,7 +4,7 @@ import numpy as np
 from scipy.integrate import complex_ode
 
 from quantum_systems import construct_pyscf_system_rhf
-from quantum_systems.time_evolution_operators import LaserField
+from quantum_systems.time_evolution_operators import DipoleFieldInteraction
 
 from configuration_interaction import CISD, TDCISD
 
@@ -58,7 +58,7 @@ def test_tdcisd():
     polarization = np.zeros(3)
     polarization[2] = 1
     system.set_time_evolution_operator(
-        LaserField(
+        DipoleFieldInteraction(
             LaserPulse(td=laser_duration, omega=omega, E=E),
             polarization_vector=polarization,
         )
@@ -82,7 +82,7 @@ def test_tdcisd():
 
         td_energies[i] = tdcisd.compute_energy(r.t, r.y)
         dip_z[i] = tdcisd.compute_one_body_expectation_value(
-            r.t, r.y, system.dipole_moment[2]
+            r.t, r.y, system.position[2]
         )
         td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 
@@ -91,7 +91,7 @@ def test_tdcisd():
 
     td_energies[i] = tdcisd.compute_energy(r.t, r.y)
     dip_z[i] = tdcisd.compute_one_body_expectation_value(
-        r.t, r.y, system.dipole_moment[2]
+        r.t, r.y, system.position[2]
     )
     td_overlap[i] = tdcisd.compute_overlap(r.t, r.y, cisd.C[:, 0])
 

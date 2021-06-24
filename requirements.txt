@@ -1,9 +1,6 @@
 # Install pytest
 pytest
 
-# Install tdhf
-git+ssh://git@github.com/haakoek/tdhf.git
-
 # Install matplotlib for plotting of scripts
 matplotlib
 
