@@ -404,6 +404,41 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return self.system.compute_particle_density(rho_qp)
 
+    def compute_one_body_transition_density_matrix(self, I, J):
+        r"""Function constructing the one-body transition density matrix.
+        This is defined as the one-body density matrix between two different
+        eigenstates, viz.,
+
+        .. math:: (\rho_{IJ})_{qp} \equiv \langle \Psi_I |
+            \hat{c}_{p}^{\dagger} \hat{c}_{q} | \Psi_J \rangle,
+
+        where :math:`p, q` are general single-particle indices, and
+        :math:`| \Psi_I \rangle` and :math:`| \Psi_J \rangle` are the
+        :math:`I` and :math:`J`'th eigenstates.
+
+        Parameters
+        ----------
+        I : int
+            The eigenstate of the bra-state.
+        J : int
+            The eigenstate of the ket-state.
+
+        Returns
+        -------
+        np.ndarray
+            The one-body transition density matrix.
+        """
+        assert 0 <= I < self.num_states
+        assert 0 <= J < self.num_states
+
+        np = self.np
+
+        rho_qp_overlap = np.zeros((self.l, self.l), dtype=self._C.dtype)
+
+        return construct_overlap_one_body_density_matrix(
+            rho_qp_overlap, self.states, self._C[:, I], self._C[:, J]
+        )
+
     def allowed_dipole_transition(self, I, J):
         assert 0 <= I < self.num_states
         assert 0 <= J < self.num_states
