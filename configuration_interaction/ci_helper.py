@@ -42,7 +42,7 @@ def count_num_states(n, m, order):
         count_num_states(n, m, order - 1)
         * (n - (order - 1))
         * (m - (order - 1))
-        // order ** 2
+        // order**2
     )
 
     return num
