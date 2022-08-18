@@ -534,9 +534,11 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         rho_qp_overlap = np.zeros((self.l, self.l), dtype=self._C.dtype)
 
-        return construct_overlap_one_body_density_matrix(
+        construct_overlap_one_body_density_matrix(
             rho_qp_overlap, self.states, self._C[:, I], self._C[:, J]
         )
+
+        return rho_qp_overlap
 
     def allowed_dipole_transition(self, I, J):
         assert 0 <= I < self.num_states
