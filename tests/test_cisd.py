@@ -211,3 +211,61 @@ def test_energy_expectation_values():
             cisd.energies[K],
             E_K,
         )
+
+
+def test_hellman_feynman():
+    from quantum_systems import construct_pyscf_system_rhf
+
+    def compute_cisd_with_static_field(e_str, num_states=5):
+
+        system = construct_pyscf_system_rhf(
+            molecule="h 0.0 0.0 -0.7; h 0.0 0.0 0.7",
+            basis="cc-pvdz",
+            add_spin=False,
+            anti_symmetrize=False,
+        )
+
+        # Add an electric field that is uniformly polarized in all spatial directions, i.e.,
+        # the polarization vector is given by n=(1,1,1)/sqrt(3).
+        system._basis_set.h = system.h + e_str * (
+            system.position[0] + system.position[1] + system.position[2]
+        ) / np.sqrt(3)
+
+        system_gos = system.construct_general_orbital_system()
+
+        cisd = CISD(system_gos, verbose=True).compute_ground_state()
+
+        expec_r_cisd = np.zeros((3, num_states), dtype=np.complex128)
+        for i in range(3):
+            for I in range(num_states):
+                expec_r_cisd[i, I] = cisd.compute_one_body_expectation_value(
+                    system_gos.position[i], K=I
+                )
+
+        return cisd.energies, expec_r_cisd
+
+    e_str = 0.01
+    de = 0.001
+    num_states = 5
+
+    e_cisd, expec_r_cisd = compute_cisd_with_static_field(e_str, num_states)
+    e_cisd_p_de, expec_r_cisd_p_de = compute_cisd_with_static_field(
+        e_str + de, num_states
+    )
+    e_cisd_m_de, expec_r_cisd_m_de = compute_cisd_with_static_field(
+        e_str - de, num_states
+    )
+
+    expec_r_fdm_cisd = np.zeros(num_states, dtype=np.complex128)
+    diff_expec_r = np.zeros(num_states, dtype=np.complex128)
+
+    for I in range(num_states):
+        expec_r_fdm_cisd[I] = (e_cisd_p_de[I] - e_cisd_m_de[I]) / (2 * de)
+        isotropic_expec_r = np.sum(expec_r_cisd[:, I]) / np.sqrt(3)
+        diff_expec_r[I] = expec_r_fdm_cisd[I] - isotropic_expec_r
+
+    print(diff_expec_r)
+
+
+if __name__ == "__main__":
+    test_hellman_feynman()
