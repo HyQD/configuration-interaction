@@ -264,8 +264,8 @@ def test_hellman_feynman():
         isotropic_expec_r = np.sum(expec_r_cisd[:, I]) / np.sqrt(3)
         diff_expec_r[I] = expec_r_fdm_cisd[I] - isotropic_expec_r
 
-    print(diff_expec_r)
-
-
-if __name__ == "__main__":
-    test_hellman_feynman()
+    assert abs(diff_expec_r[0]) < 1e-7
+    assert abs(diff_expec_r[1]) < 1e-6
+    assert abs(diff_expec_r[2]) < 1e-6
+    assert abs(diff_expec_r[3]) < 1e-6
+    assert abs(diff_expec_r[4]) < 1e-6
