@@ -35,7 +35,6 @@ def test_states_setup(odho_ti_small):
     states_c = np.zeros_like(cis.states)
     create_reference_state(n, l, states_c)
     create_singles_states(n, l, states_c, index=1)
-    states_c = np.sort(states_c, axis=0)
 
     for cis_state, state in zip(cis.states, states_c):
         print(f"{state_printer(cis_state)}\n{state_printer(state)}\n")

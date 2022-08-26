@@ -37,10 +37,14 @@ def test_states_setup(odho_ti):
     index = create_triples_states(n, l, states_c, index=index)
 
     for cidt_state, state in zip(
-        np.sort(cidt.states, axis=0), np.sort(states_c, axis=0)
+        cidt.states,
+        states_c
+        # np.sort(cidt.states, axis=0), np.sort(states_c, axis=0)
     ):
         print(f"{state_printer(cidt_state)}\n{state_printer(state)}\n")
 
     np.testing.assert_allclose(
-        np.sort(cidt.states, axis=0), np.sort(states_c, axis=0)
+        cidt.states,
+        states_c,
+        # np.sort(cidt.states, axis=0), np.sort(states_c, axis=0)
     )
