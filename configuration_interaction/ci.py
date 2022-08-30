@@ -13,7 +13,6 @@ from configuration_interaction.ci_helper import (
     construct_overlap_one_body_density_matrix,
     construct_two_body_density_matrix,
     compute_spin_projection_eigenvalue,
-    sort_states,
 )
 
 
@@ -105,18 +104,16 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             if verbose:
                 print(f"Number of states after spin-reduction: {len(states)}")
 
-        return sort_states(states)
+        return states
 
     @staticmethod
     def filter_states_with_spin_projection(states, s, np):
-        return sort_states(
-            np.array(
-                list(
-                    filter(
-                        lambda state: compute_spin_projection_eigenvalue(state)
-                        == s,
-                        states,
-                    )
+        return np.array(
+            list(
+                filter(
+                    lambda state: compute_spin_projection_eigenvalue(state)
+                    == s,
+                    states,
                 )
             )
         )
