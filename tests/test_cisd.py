@@ -45,10 +45,6 @@ def test_states_setup(odho_ti_small):
     create_reference_state(n, l, states_c)
     index = create_singles_states(n, l, states_c, index=1)
     create_doubles_states(n, l, states_c, index=index)
-    states_c = np.sort(states_c, axis=0)
-
-    for cisd_state, state in zip(cisd.states, states_c):
-        print(f"{state_printer(cisd_state)}\n{state_printer(state)}\n")
 
     np.testing.assert_allclose(cisd.states, states_c)
 
