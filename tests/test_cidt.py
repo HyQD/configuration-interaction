@@ -36,11 +36,10 @@ def test_states_setup(odho_ti):
     index = create_doubles_states(n, l, states_c, index=1)
     index = create_triples_states(n, l, states_c, index=index)
 
-    for cidt_state, state in zip(
-        np.sort(cidt.states, axis=0), np.sort(states_c, axis=0)
-    ):
-        print(f"{state_printer(cidt_state)}\n{state_printer(state)}\n")
-
     np.testing.assert_allclose(
-        np.sort(cidt.states, axis=0), np.sort(states_c, axis=0)
+        # The ordering of the states from the helper functions and the
+        # ci_helper differs. Sorting is the lazy way of checking that all the
+        # states are included.
+        np.sort(cidt.states, axis=0),
+        np.sort(states_c, axis=0),
     )
