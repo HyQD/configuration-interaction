@@ -15,13 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: ['3.10']
 
     steps:
     - uses: actions/checkout@v2
-    - uses: webfactory/ssh-agent@v0.5.4
-      with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_GAUSS_INTEGRATOR }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
