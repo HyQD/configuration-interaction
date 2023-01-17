@@ -4,8 +4,11 @@ pytest
 # Install matplotlib for plotting of scripts
 matplotlib
 
+# Install jupyter
+jupyter
+
 # Install black
-black
+black[jupyter]
 
 # Install tqdm
 tqdm
