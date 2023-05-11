@@ -4,8 +4,11 @@ pytest
 # Install matplotlib for plotting of scripts
 matplotlib
 
+# Install jupyter
+jupyter
+
 # Install black
-black
+black[jupyter]
 
 # Install tqdm
 tqdm
@@ -15,4 +18,4 @@ sphinx
 sphinx_rtd_theme
 
 # Install Gauss-integrator
-git+ssh://git@github.com/Schoyen/gauss-integrator.git
+git+https://github.com/HyQD/gauss-integrator.git

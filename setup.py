@@ -8,6 +8,6 @@ setup(
         "numpy",
         "numba",
         "scipy",
-        "quantum-systems @ git+https://github.com/Schoyen/quantum-systems.git",
+        "quantum-systems @ git+https://github.com/HyQD/quantum-systems.git",
     ],
 )
