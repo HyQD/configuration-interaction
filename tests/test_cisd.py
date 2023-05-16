@@ -19,6 +19,7 @@ from quantum_systems import (
     TwoDimensionalHarmonicOscillator,
     ODQD,
     construct_pyscf_system_ao,
+    construct_pyscf_system_rhf,
 )
 from quantum_systems.system_helper import compute_particle_density
 
@@ -136,47 +137,58 @@ def test_spin_projection():
         )
 
 
-@pytest.mark.skip
 def test_spin_squared():
     n = 2
     l = 20
 
-    # tdho = GeneralOrbitalSystem(n, TwoDimensionalHarmonicOscillator(l, 10, 101))
-    # cisd = CISD(tdho, verbose=True, s=None).compute_ground_state()
+    tdho = GeneralOrbitalSystem(n, TwoDimensionalHarmonicOscillator(l, 10, 101))
+    cisd = CISD(tdho, verbose=True).compute_ground_state()
 
-    # for K in range(10):
-    #     # Test if the expectation value of the S^2-operator is zero for all
-    #     # states. That is, check that we only include singlet states. This
-    #     # should be the case when we've removed all the determinants with a
-    #     # spin-projection number different from 0.
-    #     np.testing.assert_allclose(
-    #         cisd.compute_two_body_expectation_value(tdho.spin_2),
-    #         0,
-    #         atol=1e-12,
-    #         rtol=1e-12,
-    #     )
+    gs_energy = cisd.compute_energy()
 
-    he = construct_pyscf_system_ao("he")
-    cisd = CISD(he, verbose=True, s=1).compute_ground_state()
+    # Check that the ground state is a singlet state
+    s_2 = cisd.compute_one_body_expectation_value(
+        tdho.spin_2, K=0
+    ) + cisd.compute_two_body_expectation_value(tdho.spin_2_tb, K=0)
+    np.testing.assert_allclose(s_2, 0, atol=1e-12)
 
-    for K in range(cisd.num_states):
-        print(cisd.allowed_dipole_transition(0, K))
+    # Check triplet states
+    for K in range(1, 4):
+        # The triplet states have slightly higher energy
+        assert cisd.energies[K] > gs_energy
+        s_2 = cisd.compute_one_body_expectation_value(
+            tdho.spin_2, K=K
+        ) + cisd.compute_two_body_expectation_value(tdho.spin_2_tb, K=K)
 
-    for K in range(cisd.num_states):
-        print(
-            (
-                K,
-                cisd.energies[K],
-                cisd.compute_two_body_expectation_value(he.spin_2),
-            )
+        np.testing.assert_allclose(
+            s_2,
+            2,
         )
-        # np.testing.assert_allclose(
-        #     cisd.compute_two_body_expectation_value(he.spin_2),
-        #     0,
-        #     atol=1e-12,
-        #     rtol=1e-12,
-        # )
-    assert False
+
+    he = construct_pyscf_system_rhf("he")
+    cisd = CISD(he, verbose=True).compute_ground_state()
+
+    gs_energy = cisd.compute_energy()
+    print(gs_energy)
+
+    # Check that the ground state is a singlet state
+    s_2 = cisd.compute_one_body_expectation_value(
+        he.spin_2, K=0
+    ) + cisd.compute_two_body_expectation_value(he.spin_2_tb, K=0)
+    np.testing.assert_allclose(s_2, 0, atol=1e-12)
+
+    # Check triplet states
+    for K in range(1, 4):
+        # The triplet states have slightly higher energy
+        assert cisd.energies[K] > gs_energy
+        s_2 = cisd.compute_one_body_expectation_value(
+            he.spin_2, K=K
+        ) + cisd.compute_two_body_expectation_value(he.spin_2_tb, K=K)
+
+        np.testing.assert_allclose(
+            s_2,
+            2,
+        )
 
 
 def test_energy_expectation_values():

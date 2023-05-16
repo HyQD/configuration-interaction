@@ -38,6 +38,9 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         self.system = system
         self.np = self.system.np
 
+        # TODO: This should be inferred from the system
+        self.spin_independent = True
+
         self.n = self.system.n
         self.l = self.system.l
         self.m = self.system.m
@@ -118,7 +121,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             )
         )
 
-    def compute_ground_state(self, k=None):
+    def compute_ground_state(self, k=None, decimals=10):
         """Function constructing the Hamiltonian of the system without any
         optimization such as the Slater-Condon rules, etc. Having constructed
         the Hamiltonian the function diagonalizes the matrix and stores the
@@ -131,11 +134,16 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         k : int
             The number of eigenpairs to compute using an iterative eigensolver.
             Default is ``None``, which means that all eigenpairs are computed.
+        decimals : int
+            Number of decimals to use in ``np.round`` when sorting the
+            eigenvalues using ``np.lexsort``. This provides a hacky way of
+            getting fuzzy sorting. Default is ``10``.
         """
 
         np = self.np
 
         assert self.system.h.dtype == self.system.u.dtype
+        assert self.system.h.dtype == self.system.spin_2.dtype
 
         self.hamiltonian = np.zeros(
             (self.num_states, self.num_states), dtype=self.system.h.dtype
@@ -175,18 +183,99 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
                 )
             )
 
+        self.spin_z = 0
+        self.spin_2 = 0
+
+        if self.spin_independent:
+            self.spin_z = np.zeros_like(self.hamiltonian)
+            self.spin_2 = np.zeros_like(self.hamiltonian)
+
+            np.testing.assert_allclose(
+                self.system.spin_2.shape, self.system.h.shape
+            )
+
+            np.testing.assert_allclose(
+                self.system.spin_2_tb.shape, self.system.u.shape
+            )
+
+            t0 = time.time()
+            setup_one_body_hamiltonian(
+                self.spin_z,
+                self.states,
+                self.system.spin_z,
+                self.n,
+            )
+            t1 = time.time()
+
+            if self.verbose:
+                print("Time spent constructing S_z: {0} sec".format(t1 - t0))
+
+            t0 = time.time()
+            setup_one_body_hamiltonian(
+                self.spin_2,
+                self.states,
+                self.system.spin_2,
+                self.n,
+            )
+
+            setup_two_body_hamiltonian(
+                self.spin_2,
+                self.states,
+                # Slater-Condon rules for two-body Hamiltonian contains a
+                # factor 1/2 somewhere...
+                2 * self.system.spin_2_tb,
+                self.n,
+            )
+            t1 = time.time()
+
+            if self.verbose:
+                print("Time spent constructing S^2: {0} sec".format(t1 - t0))
+
         self.hamiltonian += self.one_body_hamiltonian
         self.hamiltonian += self.two_body_hamiltonian
 
-        t0 = time.time()
-        if k is None:
-            self._energies, self._C = np.linalg.eigh(self.hamiltonian)
-        else:
-            import scipy.sparse.linalg
+        sum_mat = self.hamiltonian + self.spin_z + self.spin_2
 
-            self._energies, self._C = scipy.sparse.linalg.eigsh(
-                self.hamiltonian, k=k
+        t0 = time.time()
+
+        eigvals, self._C = np.linalg.eigh(sum_mat)
+
+        self._energies = np.zeros(len(self._C))
+        self._s_z = np.zeros_like(self._energies)
+        self._s_2 = np.zeros_like(self._energies)
+
+        for i in range(len(self._energies)):
+            self._energies[i] = (
+                self._C[:, i].T.conj() @ self.hamiltonian @ self._C[:, i]
+            ).real
+            self._s_z[i] = (
+                self._C[:, i].T.conj() @ self.spin_z @ self._C[:, i]
+            ).real
+            self._s_2[i] = (
+                self._C[:, i].T.conj() @ self.spin_2 @ self._C[:, i]
+            ).real
+
+        ind = np.lexsort(
+            (
+                np.round(self._s_z, decimals=decimals),
+                np.round(self._s_2, decimals=decimals),
+                np.round(self._energies, decimals=decimals),
             )
+        )
+
+        self._energies = self._energies[ind]
+        self._s_z = self._s_z[ind]
+        self._s_2 = self._s_2[ind]
+        self._C = self._C[:, ind]
+
+        # if k is None:
+        #     self._energies, self._C = np.linalg.eigh(self.hamiltonian)
+        # else:
+        #     import scipy.sparse.linalg
+
+        #     self._energies, self._C = scipy.sparse.linalg.eigsh(
+        #         self.hamiltonian, k=k
+        #     )
         t1 = time.time()
 
         if self.verbose:
@@ -281,12 +370,13 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
 
         return rho_qp
 
-    def compute_two_body_expectation_value(self, op, K=0, asym=True):
+    def compute_two_body_expectation_value(self, op, K=0, tol=1e-8, asym=True):
         r"""Function computing the expectation value of a two-body operator.
         For a given two-body operator :math:`\hat{A}`, we compute the
         expectation value by
 
-        .. math:: \langle \hat{A} \rangle = \rho^{rs}_{pq} A^{pq}_{rs},
+        .. math:: \langle \hat{A} \rangle
+            = \frac{1}{2} \rho^{rs}_{pq} A^{pq}_{rs},
 
         where :math:`p, q, r, s` are general single-particle indices.
 
@@ -297,7 +387,12 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             dimensionality of the array must be the same as the two-body
             density matrix, i.e., the number of basis functions ``l``.
         K : int
-            The eigenstate to use for the two-body density matrix.
+            The eigenstate to use for the two-body density matrix. Default is
+            ``0``, i.e., the ground state.
+        tol: float
+            Tolerance for the trace of the two-body density matrix to be
+            :math:`n(n - 1)`, where :math:`n` is the number of particles.
+            Default is ``1e-8``.
         asym: bool
             Toggle whether or not ``op`` is anti-symmetrized or not. This
             determines the prefactor when tracing the two-body density matrix
@@ -313,13 +408,13 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         ConfigurationInteraction.compute_two_body_density_matrix
 
         """
-        rho_rspq = self.compute_two_body_density_matrix(K=K)
+        rho_rspq = self.compute_two_body_density_matrix(K=K, tol=tol)
 
         return (0.5 if asym else 1.0) * self.np.tensordot(
             op, rho_rspq, axes=((0, 1, 2, 3), (2, 3, 0, 1))
         )
 
-    def compute_two_body_density_matrix(self, K=0):
+    def compute_two_body_density_matrix(self, K=0, tol=1e-8):
         r"""Function computing the two-body density matrix
         :math:`(\rho_K)^{rs}_{pq}` defined by
 
@@ -344,6 +439,10 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
         ----------
         K : int
             The eigenstate to compute the two-body density matrix from.
+        tol: float
+            Tolerance for the trace of the two-body density matrix to be
+            :math:`n(n - 1)`, where :math:`n` is the number of particles.
+            Default is ``1e-8``.
 
         Returns
         -------
@@ -371,7 +470,7 @@ class ConfigurationInteraction(metaclass=abc.ABCMeta):
             f"Trace of two-body density matrix (rho_rspq = {tr_rho}) does "
             + f"not equal (n * (n - 1) = {self.n * (self.n - 1)})"
         )
-        assert abs(tr_rho - self.n * (self.n - 1)) < 1e-8, error_str
+        assert abs(tr_rho - self.n * (self.n - 1)) < tol, error_str
 
         return rho_rspq
 
