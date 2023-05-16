@@ -92,7 +92,6 @@ def test_slater_condon_density_matrix(odho_ti_small):
 
 
 def test_large_basis():
-
     n = 2
     l = 33  # Force the use of two uint64 in a determinant
 
@@ -213,7 +212,6 @@ def test_hellman_feynman():
     from quantum_systems import construct_pyscf_system_rhf
 
     def compute_cisd_with_static_field(e_str, num_states=5):
-
         system = construct_pyscf_system_rhf(
             molecule="h 0.0 0.0 -0.7; h 0.0 0.0 0.7",
             basis="cc-pvdz",
