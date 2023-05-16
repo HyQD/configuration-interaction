@@ -22,7 +22,6 @@ def get_tdho(omega):
 
 
 def test_cisdtq56():
-
     for omega, energy in [
         (0.01, 1.009487),
         (0.1, 4.149560),

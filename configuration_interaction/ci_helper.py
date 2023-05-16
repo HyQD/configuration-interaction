@@ -343,7 +343,6 @@ def compute_sign(state, p):
     k = 0
 
     for i in range(p):
-
         if (i - elem_i * BITSTRING_SIZE) >= BITSTRING_SIZE:
             elem_i += 1
 
