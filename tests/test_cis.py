@@ -2,7 +2,7 @@ import numpy as np
 
 from configuration_interaction import CIS
 from configuration_interaction.ci_helper import (
-    state_printer,
+    bit_state_printer,
     create_excited_states,
     create_reference_state,
 )
@@ -37,7 +37,7 @@ def test_states_setup(odho_ti_small):
     create_singles_states(n, l, states_c, index=1)
 
     for cis_state, state in zip(cis.states, states_c):
-        print(f"{state_printer(cis_state)}\n{state_printer(state)}\n")
+        print(f"{bit_state_printer(cis_state)}\n{bit_state_printer(state)}\n")
 
     np.testing.assert_allclose(cis.states, states_c)
 

@@ -3,7 +3,7 @@ import numpy as np
 from configuration_interaction import CIDTQ
 from configuration_interaction.ci_helper import (
     count_num_states,
-    state_printer,
+    bit_state_printer,
     create_excited_states,
     create_reference_state,
 )
@@ -45,7 +45,7 @@ def test_states_setup(odho_ti):
     for cidtq_state, state in zip(
         np.sort(cidtq.states, axis=0), np.sort(states_c, axis=0)
     ):
-        print(f"{state_printer(cidtq_state)}\n{state_printer(state)}\n")
+        print(f"{bit_state_printer(cidtq_state)}\n{bit_state_printer(state)}\n")
 
     np.testing.assert_allclose(
         np.sort(cidtq.states, axis=0), np.sort(states_c, axis=0)

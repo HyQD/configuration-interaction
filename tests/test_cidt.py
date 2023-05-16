@@ -3,7 +3,6 @@ import numpy as np
 from configuration_interaction import CIDT
 from configuration_interaction.ci_helper import (
     count_num_states,
-    state_printer,
     create_excited_states,
     create_reference_state,
 )

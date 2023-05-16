@@ -2,7 +2,6 @@ import numpy as np
 
 from configuration_interaction import CID
 from configuration_interaction.ci_helper import (
-    state_printer,
     create_excited_states,
     create_reference_state,
 )

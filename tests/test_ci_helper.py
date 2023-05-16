@@ -5,6 +5,8 @@ from configuration_interaction.ci_helper import (
     BITTYPE,
     BITSTRING_SIZE,
     count_num_states,
+    bit_state_printer,
+    occ_state_printer,
     popcount_64,
     count_state,
     occupied_index,
@@ -20,6 +22,7 @@ from configuration_interaction.ci_helper import (
     setup_one_body_hamiltonian,
     setup_two_body_hamiltonian,
 )
+from configuration_interaction.ci import ConfigurationInteraction
 from tests.helper import (
     setup_hamiltonian,
     construct_one_body_density_matrix_brute_force,
@@ -474,3 +477,23 @@ def test_construct_one_body_density_matrices_random(CI):
         construct_one_body_density_matrix(rho, ci.states, ci.C[:, K])
 
         np.testing.assert_allclose(rho_b, rho)
+
+
+def test_state_printers():
+    n = 3
+    l = 8
+    m = l - n
+
+    states = ConfigurationInteraction.setup_ci_space(
+        "SDT",
+        n,
+        l,
+        m,
+        False,
+        np,
+    )
+
+    for s in states:
+        b_s = bit_state_printer(s)
+        o_s = occ_state_printer(s)
+        assert [i for i, e in enumerate(reversed(b_s)) if e != "0"] == o_s

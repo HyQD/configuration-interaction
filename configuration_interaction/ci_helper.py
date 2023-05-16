@@ -48,7 +48,7 @@ def count_num_states(n, m, order):
     return num
 
 
-def state_printer(state):
+def bit_state_printer(state):
     """Function creating a string of the bit-representation of a state"""
 
     s = ""
@@ -56,6 +56,18 @@ def state_printer(state):
         s += bin(elem)[2:].zfill(BITSTRING_SIZE)
 
     return s
+
+
+def occ_state_printer(state):
+    """Function printing the occupied single-particle states in a state as a
+    list of indices"""
+
+    return list(
+        filter(
+            lambda x: x != -1,
+            [get_index(state, index_num=i) for i in range(count_state(state))],
+        )
+    )
 
 
 # Const used by the Hamming weight algorithm
